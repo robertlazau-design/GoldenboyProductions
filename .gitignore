@@ -1,0 +1,16 @@
+node_modules/
+build/
+dist/
+coverage/
+.DS_Store
+*.log
+.env*
+!.env.example
+
+# Large media files (exceeding GitHub's 100MB size limit)
+*.mp4
+*.MP4
+*.mov
+*.MOV
+*.HEIC
+*.heic

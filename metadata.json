@@ -1,0 +1,6 @@
+{
+  "name": "Robert Lazau Portfolio",
+  "description": "Portfolio website for Director & Producer Robert Lazau (Golden Boy Productions).",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
