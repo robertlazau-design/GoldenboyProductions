@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+
+# Block large media files from crawling
+Disallow: /videos/
+
+# Sitemap
+Sitemap: https://robertlazau.com/sitemap.xml

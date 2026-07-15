@@ -1363,20 +1363,58 @@ export default function App() {
           </AnimatePresence>
 
         </main>
+
+        {/* SEO Content Block — visually hidden, crawlable by search engines */}
+        <article className="sr-only" aria-hidden="true">
+          <h2>About Robert Lazau — Director, Producer & Cinematographer</h2>
+          <p>
+            Robert Lazau is a director, producer, and cinematographer based in Portland, Oregon. 
+            He is the founder of Golden Boy Productions, a cinematic production company specializing 
+            in commercial video production, fashion visuals, community spotlight films, nonprofit 
+            campaigns, and brand storytelling. Robert Lazau brings a distinctive visual style that 
+            merges high-contrast cinematography with intimate, character-driven narratives.
+          </p>
+          <h3>Golden Boy Productions — Services</h3>
+          <p>
+            Golden Boy Productions, founded by Robert Lazau, offers professional video production 
+            services including commercial advertising, fashion brand visuals, music video direction, 
+            nonprofit campaign videos, website promotional content, and event coverage. Based in 
+            Portland, Oregon, Golden Boy Productions serves clients throughout the Pacific Northwest 
+            and beyond.
+          </p>
+          <h3>Featured Projects by Robert Lazau</h3>
+          <ul>
+            <li>Valentines Model Mash — A collaborative brand event visual campaign for high-end models and content creators</li>
+            <li>Disaster Preparedness — A PSA commercial campaign produced with the City of Fairview</li>
+            <li>Hive Recovery Website Visual — A promotional website visual for Hive Recovery Collective in Gresham</li>
+            <li>EMOPI Video — A community spotlight film for the EMOPI program in Gresham</li>
+            <li>Refined Kollective — A high-concept fashion visual for Refined Kollective fashion brand</li>
+            <li>Hayes Hustle — A nonprofit spotlight video for a youth engagement organization</li>
+          </ul>
+          <h3>Contact Robert Lazau</h3>
+          <p>
+            Email: robertlazau@gmail.com | Phone: 503-863-8966 | 
+            Instagram: @robertrgb | IMDb: nm14415874 | 
+            Website: robertlazau.com | Company: Golden Boy Productions
+          </p>
+        </article>
         
         {/* Footer */}
-        <footer className="w-full max-w-[1400px] mx-auto px-4 md:px-8 py-16 border-t border-white/5 flex flex-col md:flex-row justify-between items-center text-[10px] text-white/30 uppercase tracking-[0.25em]">
-          <p>© {new Date().getFullYear()} Golden Boy Productions</p>
-          <div className="flex space-x-6 mt-4 md:mt-0 text-[9px] tracking-wider text-white/40">
-            <a href="https://www.instagram.com/robertrgb/?hl=en" target="_blank" rel="noreferrer" className="hover:text-[#dfb86c] transition-colors">Instagram</a>
-            <a href="https://www.imdb.com/name/nm14415874/" target="_blank" rel="noreferrer" className="hover:text-[#dfb86c] transition-colors">IMDb</a>
+        <footer className="w-full max-w-[1400px] mx-auto px-4 md:px-8 py-16 border-t border-white/5" role="contentinfo">
+          <div className="flex flex-col md:flex-row justify-between items-center text-[10px] text-white/30 uppercase tracking-[0.25em]">
+            <p>© {new Date().getFullYear()} Golden Boy Productions — Robert Lazau</p>
+            <nav aria-label="Social media links" className="flex space-x-6 mt-4 md:mt-0 text-[9px] tracking-wider text-white/40">
+              <a href="https://www.instagram.com/robertrgb/?hl=en" target="_blank" rel="noopener noreferrer" className="hover:text-[#dfb86c] transition-colors">Instagram</a>
+              <a href="https://www.imdb.com/name/nm14415874/" target="_blank" rel="noopener noreferrer" className="hover:text-[#dfb86c] transition-colors">IMDb</a>
+              <a href="mailto:robertlazau@gmail.com" className="hover:text-[#dfb86c] transition-colors">Email</a>
+            </nav>
+            <p 
+              onClick={() => setActiveTab('home')}
+              className="mt-4 md:mt-0 font-serif italic text-[#dfb86c] cursor-pointer hover:text-white transition-colors"
+            >
+              Robert Lazau
+            </p>
           </div>
-          <p 
-            onClick={() => setActiveTab('home')}
-            className="mt-4 md:mt-0 font-serif italic text-[#dfb86c] cursor-pointer hover:text-white transition-colors"
-          >
-            Robert Lazau
-          </p>
         </footer>
       </div>
 
