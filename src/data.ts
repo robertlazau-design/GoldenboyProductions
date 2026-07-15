@@ -1,17 +1,17 @@
 import robertPortrait from '../assets/robert_portrait.jpg';
 
-// Video paths served from /public at runtime (not bundled by Vite)
-const projVideo1 = '/videos/projects/ValentinesModelMash.mp4';
-const projVideo2 = '/videos/projects/DisasterPreparedness.mp4';
-const projVideo3 = '/videos/projects/HiveRecovery.mp4';
-const projVideo4 = '/videos/projects/EMOPI.mp4';
-const projVideo5 = '/videos/projects/RefinedKollective.mp4';
-const projVideo6 = '/videos/projects/HayesHustle.mp4';
-const bts1 = '/videos/bts/IMG_8526.MOV';
-const bts2 = '/videos/bts/IMG_9155.MOV';
-const bts3 = '/videos/bts/IMG_2541.MOV';
-const bts4 = '/videos/bts/IMG_4493.MOV';
-const bts5 = '/videos/bts/IMG_9165.mov';
+// Google Drive video embed URLs (using /preview for iframe embedding)
+const projVideo1 = 'https://drive.google.com/file/d/1TaUrXIMbKXiIAWJynMxWxxQfIVW0_Hhy/preview';
+const projVideo2 = 'https://drive.google.com/file/d/1GP8QnVWwXrq3Om58uaJLAAWCbU5szH1C/preview';
+const projVideo3 = 'https://drive.google.com/file/d/1-36T8D9BXnkGCYyrHkzWmPURhkoxY3UZ/preview';
+const projVideo4 = 'https://drive.google.com/file/d/1Jib_GgwhffI2Br_i6cfu_TffWWmo1m7D/preview';
+const projVideo5 = 'https://drive.google.com/file/d/1qAgiLaHfsxvVoRHC15NyA79gspo4Z2Ln/preview';
+const projVideo6 = 'https://drive.google.com/file/d/1Bub3hHrB8I1j1x7Ea8ff5wT10tbXQ5lT/preview';
+const bts1 = 'https://drive.google.com/file/d/1QkL_-PAwx52tWigHB_egNYlH07Gleq3V/preview';
+const bts2 = 'https://drive.google.com/file/d/1WHtfiZ_iMiWSyezXGbSKaR8Q66UsAdBM/preview';
+const bts3 = 'https://drive.google.com/file/d/1k-UWdaZIqZYgh8ms6PC8ewpSQxiPaj1y/preview';
+const bts4 = 'https://drive.google.com/file/d/1zmhlmCAPOpZUSbzWLctzZOA09onptxgc/preview';
+const bts5 = '/videos/bts/IMG_9165.mov'; // Local fallback — no Drive link provided
 import bts6 from '../assets/bts/IMG_0367.JPG';
 import bts7 from '../assets/bts/FullSizeRender.jpg';
 import bts8 from '../assets/bts/IMG_2556.jpg';

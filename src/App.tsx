@@ -9,6 +9,13 @@ const isVideoFile = (url: string) => {
   return /\.(mp4|webm|mov|ogg|m4v)($|\?)/i.test(url);
 };
 
+const isDriveVideo = (url: string) => {
+  if (!url) return false;
+  return url.includes('drive.google.com/file/d/') && url.endsWith('/preview');
+};
+
+const isAnyVideo = (url: string) => isVideoFile(url) || isDriveVideo(url);
+
 export default function App() {
   const [activeTab, setActiveTab] = useState<'home' | 'movies' | 'bts' | 'contact'>('home');
   const [activeBts, setActiveBts] = useState<typeof behindTheScenes[0] | null>(null);
@@ -1108,20 +1115,39 @@ export default function App() {
                       <div className="relative aspect-[16/9] max-h-[520px] w-full overflow-hidden bg-white/5 border border-white/5 mb-8">
                         {/* Slideshow image/video fade-in transition */}
                         <AnimatePresence mode="wait">
-                          {isVideoFile(behindTheScenes[currentBtsIndex].image) ? (
-                            <motion.video
-                              key={currentBtsIndex}
-                              src={behindTheScenes[currentBtsIndex].image}
-                              muted
-                              playsInline
-                              loop
-                              autoPlay
-                              initial={{ opacity: 0, scale: 1.03 }}
-                              animate={{ opacity: 1, scale: 1 }}
-                              exit={{ opacity: 0, scale: 0.98 }}
-                              transition={{ duration: 0.7, ease: "easeInOut" }}
-                              className="w-full h-full object-cover object-center grayscale brightness-90 hover:brightness-100 hover:grayscale-0 transition-all duration-500"
-                            />
+                          {isAnyVideo(behindTheScenes[currentBtsIndex].image) ? (
+                            isDriveVideo(behindTheScenes[currentBtsIndex].image) ? (
+                              <motion.div
+                                key={currentBtsIndex}
+                                initial={{ opacity: 0, scale: 1.03 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                exit={{ opacity: 0, scale: 0.98 }}
+                                transition={{ duration: 0.7, ease: "easeInOut" }}
+                                className="w-full h-full"
+                              >
+                                <iframe
+                                  src={behindTheScenes[currentBtsIndex].image}
+                                  allow="autoplay"
+                                  allowFullScreen
+                                  className="w-full h-full border-0"
+                                  title={behindTheScenes[currentBtsIndex].title}
+                                />
+                              </motion.div>
+                            ) : (
+                              <motion.video
+                                key={currentBtsIndex}
+                                src={behindTheScenes[currentBtsIndex].image}
+                                muted
+                                playsInline
+                                loop
+                                autoPlay
+                                initial={{ opacity: 0, scale: 1.03 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                exit={{ opacity: 0, scale: 0.98 }}
+                                transition={{ duration: 0.7, ease: "easeInOut" }}
+                                className="w-full h-full object-cover object-center grayscale brightness-90 hover:brightness-100 hover:grayscale-0 transition-all duration-500"
+                              />
+                            )
                           ) : (
                             <motion.img
                               key={currentBtsIndex}
@@ -1445,16 +1471,26 @@ export default function App() {
               </button>
 
               <div className="aspect-[16/9] w-full overflow-hidden bg-white/5 border border-white/5 mb-6">
-                {isVideoFile(activeBts.image) ? (
-                  <video 
-                    src={activeBts.image} 
-                    muted
-                    playsInline
-                    loop
-                    autoPlay
-                    controls
-                    className="w-full h-full object-cover object-center"
-                  />
+                {isAnyVideo(activeBts.image) ? (
+                  isDriveVideo(activeBts.image) ? (
+                    <iframe
+                      src={activeBts.image}
+                      allow="autoplay"
+                      allowFullScreen
+                      className="w-full h-full border-0"
+                      title={activeBts.title}
+                    />
+                  ) : (
+                    <video 
+                      src={activeBts.image} 
+                      muted
+                      playsInline
+                      loop
+                      autoPlay
+                      controls
+                      className="w-full h-full object-cover object-center"
+                    />
+                  )
                 ) : (
                   <img 
                     src={activeBts.image} 
@@ -1511,13 +1547,23 @@ export default function App() {
               {/* Video Frame */}
               <div className="aspect-[16/9] w-full overflow-hidden bg-white/5 border border-white/5 mb-6 relative">
                 {activeProjectVideo.video ? (
-                  <video 
-                    src={activeProjectVideo.video} 
-                    controls
-                    autoPlay
-                    playsInline
-                    className="w-full h-full object-cover object-center"
-                  />
+                  isDriveVideo(activeProjectVideo.video) ? (
+                    <iframe
+                      src={activeProjectVideo.video}
+                      allow="autoplay"
+                      allowFullScreen
+                      className="w-full h-full border-0"
+                      title={activeProjectVideo.title}
+                    />
+                  ) : (
+                    <video 
+                      src={activeProjectVideo.video} 
+                      controls
+                      autoPlay
+                      playsInline
+                      className="w-full h-full object-cover object-center"
+                    />
+                  )
                 ) : (
                   <div className="w-full h-full flex flex-col items-center justify-center text-white/40">
                     <Play size={40} className="mb-2" />
