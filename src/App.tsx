@@ -1282,19 +1282,6 @@ export default function App() {
                       </div>
 
                       <div className="border-t border-white/10 pt-6">
-                        <h3 className="font-serif text-lg text-white/90 mb-2">Direct Line</h3>
-                        <p className="text-sm text-white/50 leading-relaxed font-light mb-4">
-                          Available for direct inquiries and scheduling.
-                        </p>
-                        <a 
-                          href="tel:503-863-8966" 
-                          className="text-xs uppercase tracking-widest text-[#dfb86c] hover:text-white transition-colors"
-                        >
-                          503-863-8966
-                        </a>
-                      </div>
-
-                      <div className="border-t border-white/10 pt-6">
                         <h3 className="font-serif text-lg text-white/90 mb-2">Professional Socials</h3>
                         <div className="grid grid-cols-2 gap-4 text-center mt-4">
                           <a 
@@ -1419,7 +1406,7 @@ export default function App() {
           </ul>
           <h3>Contact Robert Lazau</h3>
           <p>
-            Email: robertlazau@gmail.com | Phone: 503-863-8966 | 
+            Email: robertlazau@gmail.com | 
             Instagram: @robertrgb | IMDb: nm14415874 | 
             Website: robertlazau.com | Company: Golden Boy Productions
           </p>
