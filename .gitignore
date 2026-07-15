@@ -7,10 +7,14 @@ coverage/
 .env*
 !.env.example
 
-# Large media files (exceeding GitHub's 100MB size limit)
-*.mp4
-*.MP4
-*.mov
-*.MOV
-*.HEIC
-*.heic
+# Original source video/media folders
+assets/projects/
+assets/bts/*.MOV
+assets/bts/*.mov
+assets/bts/*.HEIC
+assets/bts/*.heic
+
+# All video files in public (served at runtime, not stored in git)
+public/videos/
+
+

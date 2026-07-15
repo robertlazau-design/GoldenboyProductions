@@ -1,15 +1,17 @@
 import robertPortrait from '../assets/robert_portrait.jpg';
-import projVideo1 from '../assets/projects/ValentinesModelMash2026_KyreeFilms 2.MP4';
-import projVideo2 from '../assets/projects/DisasterPreparednessAd 2.mp4';
-import projVideo3 from '../assets/projects/Hive Recovery Website Visual (Update) v2.0.mp4';
-import projVideo4 from '../assets/projects/EMOPI revisions final render.mp4';
-import projVideo5 from '../assets/projects/Refined Kollection v2.mp4';
-import projVideo6 from '../assets/projects/HayesHustle_PoseProStudios.mp4';
-import bts1 from '../assets/bts/IMG_8526.MOV';
-import bts2 from '../assets/bts/IMG_9155.MOV';
-import bts3 from '../assets/bts/IMG_2541.MOV';
-import bts4 from '../assets/bts/IMG_4493.MOV';
-import bts5 from '../assets/bts/IMG_9165.mov';
+
+// Video paths served from /public at runtime (not bundled by Vite)
+const projVideo1 = '/videos/projects/ValentinesModelMash.mp4';
+const projVideo2 = '/videos/projects/DisasterPreparedness.mp4';
+const projVideo3 = '/videos/projects/HiveRecovery.mp4';
+const projVideo4 = '/videos/projects/EMOPI.mp4';
+const projVideo5 = '/videos/projects/RefinedKollective.mp4';
+const projVideo6 = '/videos/projects/HayesHustle.mp4';
+const bts1 = '/videos/bts/IMG_8526.MOV';
+const bts2 = '/videos/bts/IMG_9155.MOV';
+const bts3 = '/videos/bts/IMG_2541.MOV';
+const bts4 = '/videos/bts/IMG_4493.MOV';
+const bts5 = '/videos/bts/IMG_9165.mov';
 import bts6 from '../assets/bts/IMG_0367.JPG';
 import bts7 from '../assets/bts/FullSizeRender.jpg';
 import bts8 from '../assets/bts/IMG_2556.jpg';
