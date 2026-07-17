@@ -393,9 +393,14 @@ export default function App() {
         <nav className="w-full max-w-[1400px] mx-auto px-4 md:px-8 py-10 flex flex-col sm:flex-row justify-between items-center border-b border-white/5 gap-6">
           <div 
             onClick={() => setActiveTab('home')}
-            className="font-serif italic text-white/90 text-xl tracking-wider select-none cursor-pointer hover:text-[#dfb86c] transition-colors"
+            className="flex items-center gap-3 font-serif italic text-white/90 text-xl tracking-wider select-none cursor-pointer hover:text-[#dfb86c] transition-colors group"
           >
-            Golden Boy Productions
+            <img 
+              src="/logo-mark.png" 
+              alt="Golden Boy Productions Logo" 
+              className="h-8 w-auto transition-transform duration-300 group-hover:scale-105" 
+            />
+            <span>Golden Boy Productions</span>
           </div>
           <ul className="flex items-center space-x-6 md:space-x-12 text-[10px] uppercase tracking-[0.25em] text-white/50">
             <li>
@@ -445,7 +450,19 @@ export default function App() {
                 transition={{ duration: 0.4 }}
               >
                 {/* Hero Section */}
-                <section className="min-h-[70vh] flex flex-col justify-center items-center text-center pt-8 pb-16 relative z-10">
+                 <section className="min-h-[70vh] flex flex-col justify-center items-center text-center pt-8 pb-16 relative z-10">
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1], delay: 0.2 }}
+                    className="mb-8 select-none"
+                  >
+                    <img 
+                      src="/logo-mark.png" 
+                      alt="Golden Boy Productions Logo" 
+                      className="h-24 md:h-32 w-auto filter drop-shadow-[0_0_20px_rgba(223,184,108,0.15)]" 
+                    />
+                  </motion.div>
                   <motion.h1 
                     initial={{ opacity: 0, y: 30 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -1301,6 +1318,14 @@ export default function App() {
                             IMDb
                           </a>
                         </div>
+                      </div>
+
+                      <div className="border-t border-white/10 pt-8 flex justify-center md:justify-start">
+                        <img 
+                          src="/logo-full.png" 
+                          alt="Golden Boy Productions Logo" 
+                          className="h-16 md:h-20 w-auto opacity-70 hover:opacity-100 transition-opacity duration-300 select-none filter drop-shadow-[0_0_15px_rgba(223,184,108,0.1)]" 
+                        />
                       </div>
                     </div>
 
