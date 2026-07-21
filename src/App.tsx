@@ -306,9 +306,10 @@ export default function App() {
       setContactType('Feature Film');
       setContactMessage('');
       alert('Your message has been sent successfully! Robert will review it shortly.');
-    } catch (error) {
+    } catch (error: any) {
       console.error('EmailJS Error:', error);
-      alert('Something went wrong sending your message. Please try emailing robertlazau@gmail.com directly.');
+      const errMsg = error?.text || error?.message || JSON.stringify(error);
+      alert(`EmailJS Error: ${errMsg}`);
     } finally {
       setContactSent(false);
     }
