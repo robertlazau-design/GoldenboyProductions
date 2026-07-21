@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import emailjs from '@emailjs/browser';
 import { motion, AnimatePresence, useMotionValue, useSpring } from 'motion/react';
 import { ArrowRight, ArrowLeft, Plus, Minus, Camera, X, Send, Mail, Play } from 'lucide-react';
 import { biography, clientApproach, consultingServices, finishedProjects, currentProjects, favoriteMovies, behindTheScenes, faqs, recommendableMovies } from './data';
@@ -280,19 +281,37 @@ export default function App() {
     }
   };
 
-  // Contact Form Submit Handler
-  const handleContactSubmit = (e: React.FormEvent) => {
+  // Contact Form Submit Handler — sends email via EmailJS
+  const handleContactSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Simulate contact form dispatch
     setContactSent(true);
-    setTimeout(() => {
+
+    const templateParams = {
+      from_name: contactName,
+      from_email: contactEmail,
+      project_type: contactType,
+      message: contactMessage,
+      to_email: 'robertlazau@gmail.com',
+    };
+
+    try {
+      await emailjs.send(
+        import.meta.env.VITE_EMAILJS_SERVICE_ID || 'service_qiwj9ck',
+        import.meta.env.VITE_EMAILJS_TEMPLATE_ID || 'template_dxzql3r',
+        templateParams,
+        import.meta.env.VITE_EMAILJS_PUBLIC_KEY || 'HCe1iw0Kc6rDNVge8'
+      );
       setContactName('');
       setContactEmail('');
       setContactType('Feature Film');
       setContactMessage('');
+      alert('Your message has been sent successfully! Robert will review it shortly.');
+    } catch (error) {
+      console.error('EmailJS Error:', error);
+      alert('Something went wrong sending your message. Please try emailing robertlazau@gmail.com directly.');
+    } finally {
       setContactSent(false);
-      alert("Your message has been dispatched successfully. Robert will review it shortly.");
-    }, 1500);
+    }
   };
 
   return (
