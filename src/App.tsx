@@ -61,7 +61,9 @@ export default function App() {
 
   // Recommendation Form State
   const [showRecForm, setShowRecForm] = useState(false);
-  const [recMovieIndex, setRecMovieIndex] = useState(0);
+  const [recSearchQuery, setRecSearchQuery] = useState('');
+  const [recSelectedMovie, setRecSelectedMovie] = useState<typeof recommendableMovies[0] | null>(null);
+  const [recDropdownOpen, setRecDropdownOpen] = useState(false);
   const [recName, setRecName] = useState('');
   const [recComment, setRecComment] = useState('');
 
@@ -247,14 +249,16 @@ export default function App() {
   // Submit visitor movie recommendation
   const handleRecSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const movie = recommendableMovies[recMovieIndex];
-    if (!movie) return;
+    if (!recSelectedMovie) {
+      alert('Please select a movie from the list.');
+      return;
+    }
 
     const newRec = {
       id: Date.now().toString(),
-      movieTitle: movie.title,
-      movieDirector: movie.director,
-      movieYear: movie.year,
+      movieTitle: recSelectedMovie.title,
+      movieDirector: recSelectedMovie.director,
+      movieYear: recSelectedMovie.year,
       name: recName.trim() || 'Anonymous Cinephile',
       comment: recComment.trim(),
       date: new Date().toLocaleDateString('en-US', { month: 'short', year: 'numeric' })
@@ -265,7 +269,8 @@ export default function App() {
     localStorage.setItem('movie_recommendations', JSON.stringify(updated));
 
     // Reset inputs
-    setRecMovieIndex(0);
+    setRecSelectedMovie(null);
+    setRecSearchQuery('');
     setRecName('');
     setRecComment('');
     setShowRecForm(false);
@@ -793,19 +798,71 @@ export default function App() {
                           <h3 className="font-serif text-2xl mb-6 text-white/90">Recommend a Film Masterpiece</h3>
                           <form onSubmit={handleRecSubmit} className="space-y-6">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                              <div>
-                                <label className="block text-[9px] uppercase tracking-widest text-white/40 mb-2">Select a Masterpiece *</label>
-                                <select 
-                                  value={recMovieIndex}
-                                  onChange={(e) => setRecMovieIndex(Number(e.target.value))}
-                                  className="w-full bg-black/40 border border-white/10 px-4 py-3 text-sm text-white focus:outline-none focus:border-[#dfb86c] transition-colors"
-                                >
-                                  {recommendableMovies.map((movie, idx) => (
-                                    <option key={idx} value={idx} className="bg-[#111] text-white">
-                                      {movie.title} ({movie.director}, {movie.year})
-                                    </option>
-                                  ))}
-                                </select>
+                            <div>
+                                <label className="block text-[9px] uppercase tracking-widest text-white/40 mb-2">Search for a Masterpiece *</label>
+                                <div className="relative">
+                                  <input 
+                                    type="text"
+                                    value={recSearchQuery}
+                                    onChange={(e) => {
+                                      setRecSearchQuery(e.target.value);
+                                      setRecDropdownOpen(true);
+                                      if (!e.target.value.trim()) setRecSelectedMovie(null);
+                                    }}
+                                    onFocus={() => setRecDropdownOpen(true)}
+                                    placeholder="Type a movie title, director, or year..."
+                                    className="w-full bg-black/40 border border-white/10 px-4 py-3 text-sm text-white focus:outline-none focus:border-[#dfb86c] transition-colors"
+                                    autoComplete="off"
+                                  />
+                                  {recSelectedMovie && (
+                                    <button 
+                                      type="button"
+                                      onClick={() => { setRecSelectedMovie(null); setRecSearchQuery(''); }}
+                                      className="absolute right-3 top-1/2 -translate-y-1/2 text-white/30 hover:text-white/60 transition-colors text-xs cursor-pointer"
+                                    >
+                                      <X size={14} />
+                                    </button>
+                                  )}
+                                  {recDropdownOpen && recSearchQuery.trim().length > 0 && !recSelectedMovie && (() => {
+                                    const query = recSearchQuery.toLowerCase();
+                                    const filtered = recommendableMovies.filter(m => 
+                                      m.title.toLowerCase().includes(query) || 
+                                      m.director.toLowerCase().includes(query) || 
+                                      m.year.includes(query)
+                                    ).slice(0, 8);
+                                    return filtered.length > 0 ? (
+                                      <div className="absolute z-50 left-0 right-0 top-full mt-1 bg-[#111] border border-white/10 max-h-[280px] overflow-y-auto shadow-2xl">
+                                        {filtered.map((movie, idx) => (
+                                          <button
+                                            key={idx}
+                                            type="button"
+                                            onClick={() => {
+                                              setRecSelectedMovie(movie);
+                                              setRecSearchQuery(`${movie.title} (${movie.year})`);
+                                              setRecDropdownOpen(false);
+                                            }}
+                                            className="w-full text-left px-4 py-3 hover:bg-white/5 transition-colors border-b border-white/5 last:border-0 cursor-pointer group"
+                                          >
+                                            <span className="text-sm text-white/90 group-hover:text-[#dfb86c] transition-colors">{movie.title}</span>
+                                            <span className="block text-[10px] text-white/40 mt-0.5">{movie.director} — {movie.year}</span>
+                                          </button>
+                                        ))}
+                                      </div>
+                                    ) : (
+                                      <div className="absolute z-50 left-0 right-0 top-full mt-1 bg-[#111] border border-white/10 px-4 py-4 text-center">
+                                        <p className="text-xs text-white/40">No films matching "{recSearchQuery}"</p>
+                                        <p className="text-[10px] text-white/25 mt-1">Try searching by title, director, or year</p>
+                                      </div>
+                                    );
+                                  })()}
+                                </div>
+                                {recSelectedMovie && (
+                                  <div className="mt-2 flex items-center gap-2 text-[10px]">
+                                    <span className="text-[#dfb86c] tracking-wider uppercase font-semibold">Selected:</span>
+                                    <span className="text-white/70">{recSelectedMovie.title}</span>
+                                    <span className="text-white/30">({recSelectedMovie.director}, {recSelectedMovie.year})</span>
+                                  </div>
+                                )}
                               </div>
                               <div>
                                 <label className="block text-[9px] uppercase tracking-widest text-white/40 mb-2">Your Name</label>
