@@ -339,14 +339,14 @@ export default function App() {
               >
                 A Golden Boy Productions Presentation
               </motion.div>
-              <motion.h1
+              <motion.div
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: [0, 0, 1] }}
                 transition={{ duration: 2.2, delay: 0.3, ease: "easeOut" }}
                 className="font-serif italic text-3xl md:text-5xl text-white/90 font-light"
               >
                 Robert Lazau
-              </motion.h1>
+              </motion.div>
               <motion.div 
                 initial={{ width: 0 }}
                 animate={{ width: "80px" }}
@@ -410,7 +410,8 @@ export default function App() {
 
       <div className="relative z-10">
         {/* Navigation Header */}
-        <nav className="w-full max-w-[1400px] mx-auto px-4 md:px-8 py-10 flex flex-col sm:flex-row justify-between items-center border-b border-white/5 gap-6">
+        <header>
+        <nav className="w-full max-w-[1400px] mx-auto px-4 md:px-8 py-10 flex flex-col sm:flex-row justify-between items-center border-b border-white/5 gap-6" aria-label="Main navigation">
           <div 
             onClick={() => setActiveTab('home')}
             className="flex items-center gap-3 font-serif italic text-white/90 text-xl tracking-wider select-none cursor-pointer hover:text-[#dfb86c] transition-colors group"
@@ -457,6 +458,7 @@ export default function App() {
             </li>
           </ul>
         </nav>
+        </header>
 
         <main className="w-full max-w-[1400px] mx-auto px-4 md:px-8">
           
@@ -470,7 +472,7 @@ export default function App() {
                 transition={{ duration: 0.4 }}
               >
                 {/* Hero Section */}
-                 <section className="min-h-[70vh] flex flex-col justify-center items-center text-center pt-8 pb-16 relative z-10">
+                 <section className="min-h-[70vh] flex flex-col justify-center items-center text-center pt-8 pb-16 relative z-10" aria-label="Hero">
                   <motion.div
                     initial={{ opacity: 0, scale: 0.8 }}
                     animate={{ opacity: 1, scale: 1 }}
@@ -520,6 +522,7 @@ export default function App() {
                   viewport={{ once: true, margin: "-100px" }}
                   transition={{ duration: 0.8, ease: "easeOut" }}
                   className="py-28 md:py-44 border-t border-white/5 scroll-mt-12"
+                  aria-label="Biography"
                 >
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-24 items-center">
                     
@@ -527,7 +530,8 @@ export default function App() {
                       <div className="aspect-[3/4] overflow-hidden bg-white/5 border border-white/10 max-w-md mx-auto md:ml-0">
                         <img 
                           src={biography.image} 
-                          alt="Robert Lazau profile portrait" 
+                          alt="Robert Lazau profile portrait"
+                          loading="lazy" 
                           className="w-full h-full object-cover opacity-100 brightness-110 group-hover:brightness-125 group-hover:scale-105 transition-all duration-1000 ease-out"
                         />
                       </div>
@@ -558,6 +562,7 @@ export default function App() {
                   viewport={{ once: true, margin: "-100px" }}
                   transition={{ duration: 0.8, ease: "easeOut" }}
                   className="py-28 md:py-40 border-t border-white/5"
+                  aria-label="Approach to Clientele"
                 >
                   <div className="flex flex-col mb-16">
                     <span className="text-[10px] text-white/40 tracking-[0.3em] uppercase mb-3">{clientApproach.subtitle}</span>
@@ -589,6 +594,7 @@ export default function App() {
                   viewport={{ once: true, margin: "-100px" }}
                   transition={{ duration: 0.8, ease: "easeOut" }}
                   className="py-28 md:py-40 border-t border-white/5"
+                  aria-label="Media Consulting Services"
                 >
                   <div className="flex flex-col mb-16 text-center md:text-left">
                     <span className="text-[10px] text-white/40 tracking-[0.3em] uppercase mb-3">EXPERT GUIDANCE</span>
@@ -620,6 +626,7 @@ export default function App() {
                   viewport={{ once: true, margin: "-100px" }}
                   transition={{ duration: 0.8, ease: "easeOut" }}
                   className="py-28 border-t border-white/5"
+                  aria-label="Filmography and Works"
                 >
                   <div className="mb-20">
                     <span className="text-[10px] text-white/40 tracking-[0.3em] uppercase mb-3 block">PORTFOLIO INDEX</span>
@@ -641,7 +648,8 @@ export default function App() {
                           <div className="aspect-[16/10] overflow-hidden mb-6 bg-white/5 relative">
                             <img 
                               src={project.image} 
-                              alt={project.title} 
+                              alt={project.title}
+                              loading="lazy" 
                               className="w-full h-full object-cover grayscale group-hover:scale-103 group-hover:grayscale-0 transition-all duration-700 ease-out"
                             />
                             {/* Hover Play Button Overlay */}
@@ -674,7 +682,8 @@ export default function App() {
                           <div className="aspect-[16/10] md:w-[45%] overflow-hidden bg-white/5 flex-shrink-0">
                             <img 
                               src={project.image} 
-                              alt={project.title} 
+                              alt={project.title}
+                              loading="lazy" 
                               className="w-full h-full object-cover grayscale group-hover:scale-103 group-hover:grayscale-0 transition-all duration-700 ease-out"
                             />
                           </div>
@@ -696,7 +705,7 @@ export default function App() {
                 </motion.section>
 
                 {/* FAQ Section */}
-                <section id="faq" className="py-28 max-w-4xl mx-auto border-t border-white/5 scroll-mt-12">
+                <section id="faq" className="py-28 max-w-4xl mx-auto border-t border-white/5 scroll-mt-12" aria-label="Frequently Asked Questions">
                   <span className="text-[10px] text-white/40 tracking-[0.3em] uppercase mb-3 block">QUESTIONS</span>
                   <h2 className="font-serif italic text-4xl md:text-6xl mb-16 text-[#f5f5f5]">FAQ</h2>
                   <div className="space-y-4">
@@ -1043,6 +1052,7 @@ export default function App() {
                                 <img 
                                   src={movie.image} 
                                   alt={movie.title} 
+                                  loading="lazy"
                                   className="w-full h-full object-cover grayscale brightness-90 group-hover:scale-101 group-hover:brightness-100 group-hover:grayscale-0 transition-all duration-700 ease-out"
                                 />
                               </div>
@@ -1134,7 +1144,7 @@ export default function App() {
                 transition={{ duration: 0.4 }}
               >
                 {/* Behind the Scenes (BTS) Section */}
-                <section id="bts" className="py-16 relative overflow-hidden">
+                <section id="bts" className="py-16 relative overflow-hidden" aria-label="Behind the Scenes Gallery">
                   {/* Massive background text */}
                   <div className="absolute top-12 left-1/2 -translate-x-1/2 w-full text-center pointer-events-none select-none z-0">
                     <h2 className="font-serif italic text-[15vw] md:text-[22vw] leading-none text-white/[0.01] whitespace-nowrap tracking-tighter">
@@ -1295,7 +1305,7 @@ export default function App() {
                 transition={{ duration: 0.4 }}
               >
                 {/* Contact Page */}
-                <section id="contact-page" className="py-16 max-w-4xl mx-auto">
+                <section id="contact-page" className="py-16 max-w-4xl mx-auto" aria-label="Contact Robert Lazau">
                   <div className="text-center mb-16">
                     <span className="text-[10px] text-white/40 tracking-[0.3em] uppercase mb-3 block">COLLABORATION & COMMISSION</span>
                     <h2 className="font-serif italic text-4xl md:text-6xl text-[#f5f5f5] tracking-tight">Contact Robert</h2>
@@ -1324,7 +1334,7 @@ export default function App() {
                           <a 
                             href="https://www.instagram.com/robertrgb/?hl=en" 
                             target="_blank" 
-                            rel="noreferrer"
+                            rel="noopener noreferrer"
                             className="border border-white/5 hover:border-white/20 bg-white/[0.01] hover:bg-white/[0.03] py-4 text-[9px] uppercase tracking-widest text-white/60 hover:text-[#dfb86c] transition-all"
                           >
                             Instagram
@@ -1423,7 +1433,7 @@ export default function App() {
         </main>
 
         {/* SEO Content Block — visually hidden, crawlable by search engines */}
-        <article className="sr-only" aria-hidden="true">
+        <article className="sr-only">
           <h2>About Robert Lazau — Director, Producer & Cinematographer</h2>
           <p>
             Robert Lazau is a director, producer, and cinematographer based in Portland, Oregon. 
