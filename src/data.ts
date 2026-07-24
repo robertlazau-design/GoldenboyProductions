@@ -83,7 +83,7 @@ export const finishedProjects = [
     role: "Production House / Director",
     image: "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?q=80&w=800&auto=format&fit=crop",
     description: "A collaborative brand event visual campaign bringing together high-end models, professional videographers, and photographers to generate massive, high-impact content catalogs for brand clients.",
-    video: projVideo1
+    video: projVideo6
   },
   {
     id: 2,
@@ -93,7 +93,7 @@ export const finishedProjects = [
     role: "Producer / Director",
     image: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=800&auto=format&fit=crop",
     description: "A targeted public service announcement and commercial campaign produced in collaboration with the City of Fairview to promote civic safety and highlight their disaster preparedness course.",
-    video: projVideo2
+    video: projVideo1
   },
   {
     id: 3,
@@ -113,7 +113,7 @@ export const finishedProjects = [
     role: "Co-Director / Video Producer",
     image: "https://images.unsplash.com/photo-1516035069371-29a1b244cc32?q=80&w=800&auto=format&fit=crop",
     description: "A dedicated community profile film created to highlight the stories, achievements, and impact of the EMOPI program in Gresham.",
-    video: projVideo4
+    video: projVideo2
   },
   {
     id: 5,
@@ -123,7 +123,7 @@ export const finishedProjects = [
     role: "Director / Cinematographer",
     image: "https://images.unsplash.com/photo-1483985988355-763728e1935b?q=80&w=800&auto=format&fit=crop",
     description: "A high-concept, stylized fashion visual and commercial narrative produced for Refined Kollective to showcase their latest season collection.",
-    video: projVideo5
+    video: projVideo4
   },
   {
     id: 6,
@@ -133,7 +133,7 @@ export const finishedProjects = [
     role: "Production House / Director",
     image: "https://images.unsplash.com/photo-1553882809-a4f57e59501d?q=80&w=800&auto=format&fit=crop",
     description: "A spotlight promotional video produced for Hayes Hustle, a nonprofit organization that helps kids connect with nature, horses, and wildlife, while teaching hands-on skills like podcasting and sewing.",
-    video: projVideo6
+    video: projVideo5
   }
 ];
 
