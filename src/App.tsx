@@ -62,10 +62,13 @@ export default function App() {
   // Recommendation Form State
   const [showRecForm, setShowRecForm] = useState(false);
   const [recSearchQuery, setRecSearchQuery] = useState('');
-  const [recSelectedMovie, setRecSelectedMovie] = useState<typeof recommendableMovies[0] | null>(null);
   const [recDropdownOpen, setRecDropdownOpen] = useState(false);
+  const [recMovieTitle, setRecMovieTitle] = useState('');
+  const [recMovieDirector, setRecMovieDirector] = useState('');
+  const [recMovieYear, setRecMovieYear] = useState('');
   const [recName, setRecName] = useState('');
   const [recComment, setRecComment] = useState('');
+  const [recError, setRecError] = useState('');
 
   // Review Publisher Form State
   const [showForm, setShowForm] = useState(false);
@@ -246,19 +249,69 @@ export default function App() {
     }
   };
 
+  // Profanity / offensive content filter
+  const containsOffensiveContent = (text: string): boolean => {
+    const normalized = text.toLowerCase().replace(/[^a-z\s]/g, '').replace(/\s+/g, ' ');
+    // Comprehensive list of slurs, obscenities, and offensive terms
+    const offensivePatterns = [
+      // Racial / ethnic slurs
+      'nigger', 'nigga', 'negro', 'coon', 'spic', 'spick', 'wetback', 'beaner',
+      'chink', 'gook', 'slant', 'zipperhead', 'raghead', 'towelhead', 'camel jockey',
+      'kike', 'hymie', 'sheeny', 'heeb', 'dago', 'wop', 'guinea', 'greaseball',
+      'honky', 'cracker', 'redneck', 'white trash', 'paki', 'darkie', 'jigaboo',
+      'pickaninny', 'sambo', 'uncle tom', 'redskin', 'injun', 'squaw',
+      // Homophobic / transphobic slurs
+      'faggot', 'fag', 'dyke', 'queer', 'tranny', 'shemale', 'homo',
+      // Sexist slurs
+      'bitch', 'whore', 'slut', 'cunt', 'twat', 'skank', 'hoe',
+      // General obscenities
+      'fuck', 'fucking', 'fucker', 'motherfucker', 'shit', 'shitty', 'bullshit',
+      'ass', 'asshole', 'bastard', 'damn', 'dick', 'cock', 'pussy', 'piss',
+      'tits', 'boobs', 'penis', 'vagina', 'anus', 'dildo', 'blowjob',
+      'handjob', 'jerkoff', 'wanker', 'tosser', 'bellend', 'bollocks',
+      // Hate speech patterns
+      'kill yourself', 'kys', 'die', 'go die', 'neck yourself',
+      'white power', 'white supremacy', 'heil hitler', 'nazi', 'sieg heil',
+      'gas the', 'race war', 'ethnic cleansing', 'lynch',
+      // Other offensive terms
+      'retard', 'retarded', 'tard', 'autistic', 'spaz', 'spastic',
+      'cripple', 'mongoloid', 'imbecile', 'moron',
+    ];
+    return offensivePatterns.some(word => {
+      // Match as whole word boundaries using spaces
+      const regex = new RegExp(`(^|\\s)${word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}(s|es|ed|ing|er)?(\\s|$)`, 'i');
+      return regex.test(normalized);
+    });
+  };
+
   // Submit visitor movie recommendation
   const handleRecSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!recSelectedMovie) {
-      alert('Please select a movie from the list.');
+    setRecError('');
+
+    if (!recMovieTitle.trim()) {
+      setRecError('Please enter a movie title.');
       return;
+    }
+
+    // Check all text fields for offensive content
+    const fieldsToCheck = [
+      { value: recComment, label: 'comment' },
+      { value: recName, label: 'name' },
+      { value: recMovieTitle, label: 'movie title' },
+    ];
+    for (const field of fieldsToCheck) {
+      if (containsOffensiveContent(field.value)) {
+        setRecError(`Your ${field.label} contains language that is not permitted. Please keep submissions respectful and appropriate.`);
+        return;
+      }
     }
 
     const newRec = {
       id: Date.now().toString(),
-      movieTitle: recSelectedMovie.title,
-      movieDirector: recSelectedMovie.director,
-      movieYear: recSelectedMovie.year,
+      movieTitle: recMovieTitle.trim(),
+      movieDirector: recMovieDirector.trim() || 'Unknown',
+      movieYear: recMovieYear.trim() || '—',
       name: recName.trim() || 'Anonymous Cinephile',
       comment: recComment.trim(),
       date: new Date().toLocaleDateString('en-US', { month: 'short', year: 'numeric' })
@@ -269,10 +322,13 @@ export default function App() {
     localStorage.setItem('movie_recommendations', JSON.stringify(updated));
 
     // Reset inputs
-    setRecSelectedMovie(null);
+    setRecMovieTitle('');
+    setRecMovieDirector('');
+    setRecMovieYear('');
     setRecSearchQuery('');
     setRecName('');
     setRecComment('');
+    setRecError('');
     setShowRecForm(false);
   };
 
@@ -795,75 +851,95 @@ export default function App() {
                         className="overflow-hidden mb-16"
                       >
                         <div className="border border-white/10 bg-white/[0.02] p-6 md:p-8 rounded-sm backdrop-blur-sm">
-                          <h3 className="font-serif text-2xl mb-6 text-white/90">Recommend a Film Masterpiece</h3>
+                          <h3 className="font-serif text-2xl mb-2 text-white/90">Recommend a Film Masterpiece</h3>
+                          <p className="text-[10px] text-white/30 mb-6 uppercase tracking-wider">Search our curated list or type in any film</p>
                           <form onSubmit={handleRecSubmit} className="space-y-6">
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            {/* Movie Search with Autocomplete */}
                             <div>
-                                <label className="block text-[9px] uppercase tracking-widest text-white/40 mb-2">Search for a Masterpiece *</label>
-                                <div className="relative">
-                                  <input 
-                                    type="text"
-                                    value={recSearchQuery}
-                                    onChange={(e) => {
-                                      setRecSearchQuery(e.target.value);
-                                      setRecDropdownOpen(true);
-                                      if (!e.target.value.trim()) setRecSelectedMovie(null);
-                                    }}
-                                    onFocus={() => setRecDropdownOpen(true)}
-                                    placeholder="Type a movie title, director, or year..."
-                                    className="w-full bg-black/40 border border-white/10 px-4 py-3 text-sm text-white focus:outline-none focus:border-[#dfb86c] transition-colors"
-                                    autoComplete="off"
-                                  />
-                                  {recSelectedMovie && (
-                                    <button 
-                                      type="button"
-                                      onClick={() => { setRecSelectedMovie(null); setRecSearchQuery(''); }}
-                                      className="absolute right-3 top-1/2 -translate-y-1/2 text-white/30 hover:text-white/60 transition-colors text-xs cursor-pointer"
-                                    >
-                                      <X size={14} />
-                                    </button>
-                                  )}
-                                  {recDropdownOpen && recSearchQuery.trim().length > 0 && !recSelectedMovie && (() => {
-                                    const query = recSearchQuery.toLowerCase();
-                                    const filtered = recommendableMovies.filter(m => 
-                                      m.title.toLowerCase().includes(query) || 
-                                      m.director.toLowerCase().includes(query) || 
-                                      m.year.includes(query)
-                                    ).slice(0, 8);
-                                    return filtered.length > 0 ? (
-                                      <div className="absolute z-50 left-0 right-0 top-full mt-1 bg-[#111] border border-white/10 max-h-[280px] overflow-y-auto shadow-2xl">
-                                        {filtered.map((movie, idx) => (
-                                          <button
-                                            key={idx}
-                                            type="button"
-                                            onClick={() => {
-                                              setRecSelectedMovie(movie);
-                                              setRecSearchQuery(`${movie.title} (${movie.year})`);
-                                              setRecDropdownOpen(false);
-                                            }}
-                                            className="w-full text-left px-4 py-3 hover:bg-white/5 transition-colors border-b border-white/5 last:border-0 cursor-pointer group"
-                                          >
-                                            <span className="text-sm text-white/90 group-hover:text-[#dfb86c] transition-colors">{movie.title}</span>
-                                            <span className="block text-[10px] text-white/40 mt-0.5">{movie.director} — {movie.year}</span>
-                                          </button>
-                                        ))}
-                                      </div>
-                                    ) : (
-                                      <div className="absolute z-50 left-0 right-0 top-full mt-1 bg-[#111] border border-white/10 px-4 py-4 text-center">
-                                        <p className="text-xs text-white/40">No films matching "{recSearchQuery}"</p>
-                                        <p className="text-[10px] text-white/25 mt-1">Try searching by title, director, or year</p>
-                                      </div>
-                                    );
-                                  })()}
-                                </div>
-                                {recSelectedMovie && (
-                                  <div className="mt-2 flex items-center gap-2 text-[10px]">
-                                    <span className="text-[#dfb86c] tracking-wider uppercase font-semibold">Selected:</span>
-                                    <span className="text-white/70">{recSelectedMovie.title}</span>
-                                    <span className="text-white/30">({recSelectedMovie.director}, {recSelectedMovie.year})</span>
-                                  </div>
+                              <label className="block text-[9px] uppercase tracking-widest text-white/40 mb-2">Movie Title *</label>
+                              <div className="relative">
+                                <input 
+                                  type="text"
+                                  value={recSearchQuery}
+                                  onChange={(e) => {
+                                    const val = e.target.value;
+                                    setRecSearchQuery(val);
+                                    setRecMovieTitle(val);
+                                    setRecDropdownOpen(true);
+                                  }}
+                                  onFocus={() => setRecDropdownOpen(true)}
+                                  placeholder="Type a movie title, director, or year..."
+                                  className="w-full bg-black/40 border border-white/10 px-4 py-3 text-sm text-white focus:outline-none focus:border-[#dfb86c] transition-colors"
+                                  autoComplete="off"
+                                />
+                                {recSearchQuery && (
+                                  <button 
+                                    type="button"
+                                    onClick={() => { setRecSearchQuery(''); setRecMovieTitle(''); setRecMovieDirector(''); setRecMovieYear(''); setRecDropdownOpen(false); }}
+                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-white/30 hover:text-white/60 transition-colors cursor-pointer"
+                                  >
+                                    <X size={14} />
+                                  </button>
                                 )}
+                                {recDropdownOpen && recSearchQuery.trim().length > 0 && (() => {
+                                  const query = recSearchQuery.toLowerCase();
+                                  const filtered = recommendableMovies.filter(m => 
+                                    m.title.toLowerCase().includes(query) || 
+                                    m.director.toLowerCase().includes(query) || 
+                                    m.year.includes(query)
+                                  ).slice(0, 8);
+                                  return filtered.length > 0 ? (
+                                    <div className="absolute z-50 left-0 right-0 top-full mt-1 bg-[#111] border border-white/10 max-h-[280px] overflow-y-auto shadow-2xl">
+                                      {filtered.map((movie, idx) => (
+                                        <button
+                                          key={idx}
+                                          type="button"
+                                          onClick={() => {
+                                            setRecMovieTitle(movie.title);
+                                            setRecMovieDirector(movie.director);
+                                            setRecMovieYear(movie.year);
+                                            setRecSearchQuery(movie.title);
+                                            setRecDropdownOpen(false);
+                                          }}
+                                          className="w-full text-left px-4 py-3 hover:bg-white/5 transition-colors border-b border-white/5 last:border-0 cursor-pointer group"
+                                        >
+                                          <span className="text-sm text-white/90 group-hover:text-[#dfb86c] transition-colors">{movie.title}</span>
+                                          <span className="block text-[10px] text-white/40 mt-0.5">{movie.director} — {movie.year}</span>
+                                        </button>
+                                      ))}
+                                    </div>
+                                  ) : null;
+                                })()}
                               </div>
+                            </div>
+
+                            {/* Director & Year (auto-filled from selection, or free-text) */}
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                              <div className="md:col-span-2">
+                                <label className="block text-[9px] uppercase tracking-widest text-white/40 mb-2">Director</label>
+                                <input 
+                                  type="text"
+                                  value={recMovieDirector}
+                                  onChange={(e) => setRecMovieDirector(e.target.value)}
+                                  placeholder="e.g., Christopher Nolan"
+                                  className="w-full bg-black/40 border border-white/10 px-4 py-3 text-sm text-white focus:outline-none focus:border-[#dfb86c] transition-colors"
+                                />
+                              </div>
+                              <div>
+                                <label className="block text-[9px] uppercase tracking-widest text-white/40 mb-2">Year</label>
+                                <input 
+                                  type="text"
+                                  value={recMovieYear}
+                                  onChange={(e) => setRecMovieYear(e.target.value)}
+                                  placeholder="e.g., 2023"
+                                  maxLength={4}
+                                  className="w-full bg-black/40 border border-white/10 px-4 py-3 text-sm text-white focus:outline-none focus:border-[#dfb86c] transition-colors"
+                                />
+                              </div>
+                            </div>
+
+                            {/* Name & Comment */}
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                               <div>
                                 <label className="block text-[9px] uppercase tracking-widest text-white/40 mb-2">Your Name</label>
                                 <input 
@@ -874,18 +950,24 @@ export default function App() {
                                   className="w-full bg-black/40 border border-white/10 px-4 py-3 text-sm text-white focus:outline-none focus:border-[#dfb86c] transition-colors"
                                 />
                               </div>
+                              <div>
+                                <label className="block text-[9px] uppercase tracking-widest text-white/40 mb-2">Why should Robert watch this film?</label>
+                                <input 
+                                  type="text"
+                                  value={recComment}
+                                  onChange={(e) => { setRecComment(e.target.value); setRecError(''); }}
+                                  placeholder="A brief note on why you recommend this..."
+                                  className="w-full bg-black/40 border border-white/10 px-4 py-3 text-sm text-white focus:outline-none focus:border-[#dfb86c] transition-colors"
+                                />
+                              </div>
                             </div>
 
-                            <div>
-                              <label className="block text-[9px] uppercase tracking-widest text-white/40 mb-2">Why should Robert watch this film? (Note / Critique)</label>
-                              <textarea 
-                                rows={4}
-                                value={recComment}
-                                onChange={(e) => setRecComment(e.target.value)}
-                                placeholder="Add your note or why you recommend this particular cinematic work..."
-                                className="w-full bg-black/40 border border-white/10 px-4 py-3 text-sm text-white focus:outline-none focus:border-[#dfb86c] transition-colors"
-                              />
-                            </div>
+                            {/* Error message */}
+                            {recError && (
+                              <div className="border border-red-900/30 bg-red-500/5 px-4 py-3 rounded-sm">
+                                <p className="text-[11px] text-red-400 font-medium">{recError}</p>
+                              </div>
+                            )}
 
                             <div className="flex gap-4">
                               <button 
@@ -896,7 +978,7 @@ export default function App() {
                               </button>
                               <button 
                                 type="button" 
-                                onClick={() => setShowRecForm(false)}
+                                onClick={() => { setShowRecForm(false); setRecError(''); }}
                                 className="px-6 py-2.5 rounded-sm border border-white/20 text-white/60 text-[10px] uppercase tracking-widest hover:text-white hover:border-white transition-all cursor-pointer"
                               >
                                 Cancel
