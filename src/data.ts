@@ -103,7 +103,7 @@ export const finishedProjects = [
     role: "Visual Director",
     image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?q=80&w=800&auto=format&fit=crop",
     description: "A customized website visual and promotional loop created for the Hive Recovery Collective, a small business based in Gresham, to capture their workspace and digital identity.",
-    video: projVideo3
+    video: projVideo4
   },
   {
     id: 4,
@@ -123,7 +123,7 @@ export const finishedProjects = [
     role: "Director / Cinematographer",
     image: "https://images.unsplash.com/photo-1483985988355-763728e1935b?q=80&w=800&auto=format&fit=crop",
     description: "A high-concept, stylized fashion visual and commercial narrative produced for Refined Kollective to showcase their latest season collection.",
-    video: projVideo4
+    video: projVideo5
   },
   {
     id: 6,
@@ -133,7 +133,7 @@ export const finishedProjects = [
     role: "Production House / Director",
     image: "https://images.unsplash.com/photo-1553882809-a4f57e59501d?q=80&w=800&auto=format&fit=crop",
     description: "A spotlight promotional video produced for Hayes Hustle, a nonprofit organization that helps kids connect with nature, horses, and wildlife, while teaching hands-on skills like podcasting and sewing.",
-    video: projVideo5
+    video: projVideo3
   }
 ];
 
