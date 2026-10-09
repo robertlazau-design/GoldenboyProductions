@@ -27,10 +27,10 @@ import bts17 from '../assets/bts/IMG_2540.jpg';
 import bts18 from '../assets/bts/IMG_1383.jpg';
 
 export const biography = {
-  year: "1994",
+  year: "Portland, OR",
   title: "Early Vision",
   subtitle: "The Beginning of Golden Boy Productions",
-  text: "Robert Lazau's cinematic journey began with a simple passion: to capture the beauty in the ordinary. Drawing from the gritty realism of 70s American cinema and the meticulous composition of European classics, Robert established a unique visual vocabulary that merges high contrast B&W styling with intimate character-driven narratives.",
+  text: "Robert Lazau's cinematic journey began with a simple passion: to capture the beauty in the ordinary. Drawing from the gritty realism of 70s American cinema and the meticulous composition of European classics, Robert has developed a visual style that pairs bold, cinematic imagery with intimate, character-driven storytelling.",
   quote: "Every frame is a canvas; every shadow tells a story.",
   image: robertPortrait
 };
@@ -38,7 +38,7 @@ export const biography = {
 export const clientApproach = {
   title: "Approach to Clientele",
   subtitle: "Co-creating Visual Legacies",
-  text: "For Robert Lazau, the relationship between director and client is a creative partnership. Whether crafting a cinematic commercial, an artistic music video, or a branding masterpiece, Robert approaches each brief not as a set of rules, but as an opportunity to build a distinct visual world. The focus is always on translating the client's core identity into high-contrast, cinematic storytelling that commands attention and endures.",
+  text: "For Robert Lazau, the relationship between director and client is a creative partnership. Whether crafting a cinematic commercial, an artistic music video, or a branding masterpiece, Robert approaches each brief not as a set of rules, but as an opportunity to build a distinct visual world. The focus is always on translating the client's core identity into cinematic storytelling that commands attention and endures.",
   points: [
     {
       title: "Intimate Discovery",
@@ -50,7 +50,7 @@ export const clientApproach = {
     },
     {
       title: "Uncompromising Execution",
-      desc: "Using state-of-the-art cinema packages (Arri/RED) and premium B&W/color direction to deliver stunning results."
+      desc: "Professional cinema cameras, thoughtful lighting, and careful color work to deliver a polished final piece."
     }
   ]
 };
@@ -137,26 +137,15 @@ export const finishedProjects = [
   }
 ];
 
-export const currentProjects = [
-  {
-    id: 1,
-    title: "The Golden Hour",
-    status: "In Production",
-    type: "Feature Film",
-    expectedRelease: "Late 2026",
-    image: "https://images.unsplash.com/photo-1534447677768-be436bb09401?q=80&w=800&auto=format&fit=crop",
-    description: "An epic historical drama tracking the decline of an aristocratic estate, shot entirely with natural light and custom-designed anamorphic glass."
-  },
-  {
-    id: 2,
-    title: "Fractions of Time",
-    status: "Pre-Production",
-    type: "Short Film Series",
-    expectedRelease: "Mid 2027",
-    image: "https://images.unsplash.com/photo-1485846234645-a62644f84728?q=80&w=800&auto=format&fit=crop",
-    description: "A structured anthology of three short stories exploring critical split-second decisions that define lives."
-  }
-];
+export const currentProjects: Array<{
+  id: number;
+  title: string;
+  status: string;
+  type: string;
+  expectedRelease: string;
+  image: string;
+  description: string;
+}> = [];
 
 export const favoriteMovies: Array<{
   id: number;
@@ -173,144 +162,144 @@ export const behindTheScenes = [
   {
     id: 1,
     title: "Steadicam Tracking",
-    location: "Production Stage",
-    date: "May 2025",
+    location: "On Set",
+    date: "2025",
     image: bts1,
     description: "On-set active camera tracking."
   },
   {
     id: 2,
     title: "Monitor Playback",
-    location: "Production Stage",
-    date: "May 2025",
+    location: "On Set",
+    date: "2025",
     image: bts2,
     description: "Reviewing active production feed."
   },
   {
     id: 3,
     title: "Lighting Setup",
-    location: "Warehouse Stage",
-    date: "June 2025",
+    location: "On Set",
+    date: "2025",
     image: bts3,
     description: "Configuring dynamic shadow depth."
   },
   {
     id: 4,
     title: "Behind the Lens",
-    location: "Brooklyn Studio",
-    date: "April 2025",
+    location: "On Set",
+    date: "2025",
     image: bts4,
     description: "Calibrating macro focal length."
   },
   {
     id: 5,
     title: "Active Set B-Roll",
-    location: "Production Stage",
-    date: "May 2025",
+    location: "On Set",
+    date: "2025",
     image: bts5,
     description: "Capturing stage atmospheric details."
   },
   {
     id: 6,
     title: "Camera Calibration",
-    location: "Astoria Studio",
-    date: "July 2025",
+    location: "On Set",
+    date: "2025",
     image: bts6,
     description: "Balancing primary gear rigs."
   },
   {
     id: 7,
     title: "Shadow Staging",
-    location: "Street Location Set",
-    date: "October 2025",
+    location: "On Location",
+    date: "2025",
     image: bts7,
     description: "Drafting dramatic scene silhouettes."
   },
   {
     id: 8,
     title: "Spotlight Control",
-    location: "Studio A",
-    date: "August 2025",
+    location: "On Set",
+    date: "2025",
     image: bts8,
     description: "Testing dynamic key light ray paths."
   },
   {
     id: 9,
     title: "Lens Staging",
-    location: "Astoria Studio",
-    date: "July 2025",
+    location: "On Set",
+    date: "2025",
     image: bts9,
     description: "Mounting customized vintage glass."
   },
   {
     id: 10,
     title: "Light Refraction",
-    location: "Warehouse Stage",
-    date: "June 2025",
+    location: "On Set",
+    date: "2025",
     image: bts10,
     description: "Splitting lighting into graphic shapes."
   },
   {
     id: 11,
     title: "On-Set Coordination",
-    location: "Brooklyn Studio",
-    date: "April 2025",
+    location: "On Set",
+    date: "2025",
     image: bts11,
     description: "Reviewing cast positioning."
   },
   {
     id: 12,
     title: "Focus Adjustments",
-    location: "Studio A",
-    date: "August 2025",
+    location: "On Set",
+    date: "2025",
     image: bts12,
     description: "Calibrating lens focus markings."
   },
   {
     id: 13,
     title: "Rig Profile",
-    location: "Manhattan Loft Set",
-    date: "March 2025",
+    location: "On Set",
+    date: "2025",
     image: bts13,
     description: "Verifying high contrast framing."
   },
   {
     id: 14,
     title: "Light Modifiers",
-    location: "Manhattan Loft Set",
-    date: "March 2025",
+    location: "On Set",
+    date: "2025",
     image: bts14,
     description: "Setting up bounce boards."
   },
   {
     id: 15,
     title: "Close-up Blocking",
-    location: "Astoria Studio",
-    date: "July 2025",
+    location: "On Set",
+    date: "2025",
     image: bts15,
     description: "Securing focus margins."
   },
   {
     id: 16,
     title: "Staging Setup",
-    location: "Studio A",
-    date: "August 2025",
+    location: "On Set",
+    date: "2025",
     image: bts16,
     description: "Checking camera elevation level."
   },
   {
     id: 17,
     title: "Color Grading Check",
-    location: "Editing Suite C",
-    date: "December 2025",
+    location: "Edit Suite",
+    date: "2025",
     image: bts17,
     description: "Locking in target color spaces."
   },
   {
     id: 18,
     title: "Atmosphere Control",
-    location: "Warehouse Stage",
-    date: "June 2025",
+    location: "On Set",
+    date: "2025",
     image: bts18,
     description: "Calibrating stage fog thickness."
   }
@@ -319,15 +308,15 @@ export const behindTheScenes = [
 export const faqs = [
   {
     question: "What cameras and lenses do you prefer for shooting?",
-    answer: "We primarily shoot on the Arri Alexa 35 and RED V-Raptor, paired with vintage anamorphic lenses or custom Cooke Speed Panchros to achieve our signature textured, organic look."
+    answer: "We pick cameras, lenses, and lighting to fit each project's look, budget, and schedule, from compact cinema setups to full rental packages."
   },
   {
     question: "How do you approach collaboration with screenwriters?",
     answer: "For us, story is everything. We work in close dialogue with writers from the earliest outlines, ensuring that the visual syntax of the film is baked into the subtext of the script itself."
   },
   {
-    question: "Do you offer internship opportunities at Golden Boy Productions?",
-    answer: "Yes, we offer seasonal mentorship programs in editing, cinematography, and assistant directing during active productions. Inquiries should be sent with a resume and portfolio reel."
+    question: "Do you work with emerging filmmakers?",
+    answer: "Yes. We're always glad to connect with editors, camera operators, and production assistants who are building their craft. Reach out through the contact page with a link to your work."
   }
 ];
 

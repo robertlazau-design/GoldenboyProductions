@@ -512,13 +512,10 @@ export default function App() {
                           className="w-full h-full object-cover opacity-100 brightness-110 group-hover:brightness-125 group-hover:scale-105 transition-all duration-1000 ease-out"
                         />
                       </div>
-                      <div className="absolute -bottom-6 left-4 md:left-0 text-[9px] text-white/30 uppercase tracking-[0.2em]">
-                        <p>Photo taken in Manhattan</p>
-                      </div>
                     </div>
                     
                     <div className="flex flex-col items-start max-w-md mx-auto md:mx-0">
-                      <span className="text-[10px] text-[#dfb86c] tracking-[0.3em] uppercase mb-3">{biography.year} / TIMELINE</span>
+                      <span className="text-[10px] text-[#dfb86c] tracking-[0.3em] uppercase mb-3">{biography.year}</span>
                       <h2 className="font-serif text-4xl md:text-6xl mb-6 text-[#f5f5f5] tracking-tight">Biography</h2>
                       <div className="space-y-6 text-sm text-white/60 font-light leading-relaxed">
                         <p>{biography.text}</p>
@@ -577,7 +574,7 @@ export default function App() {
                     <span className="text-[10px] text-white/40 tracking-[0.3em] uppercase mb-3">EXPERT GUIDANCE</span>
                     <h2 className="font-serif text-4xl md:text-6xl text-[#f5f5f5] tracking-tight">Media Consulting Services</h2>
                     <p className="max-w-2xl text-xs md:text-sm text-white/50 leading-relaxed font-light mt-4 mx-auto md:mx-0">
-                      Leveraging over a decade of production excellence to guide filmmakers, creative directors, and premium brands from concept to final cut.
+                      Hands-on production experience to guide filmmakers, creative directors, and brands from concept to final cut.
                     </p>
                   </div>
 
@@ -649,6 +646,7 @@ export default function App() {
                   </div>
 
                   {/* Current Projects */}
+                  {currentProjects.length > 0 && (
                   <div>
                     <h3 className="text-xs uppercase tracking-[0.25em] text-[#dfb86c] border-b border-white/5 pb-4 mb-10 font-medium">
                       Current Projects (In Development)
@@ -679,6 +677,7 @@ export default function App() {
                       ))}
                     </div>
                   </div>
+                  )}
                 </motion.section>
 
                 {/* FAQ Section */}
@@ -1255,40 +1254,6 @@ export default function App() {
 
         </main>
 
-        {/* SEO Content Block — visually hidden, crawlable by search engines */}
-        <article className="sr-only">
-          <h2>About Robert Lazau — Director, Producer & Cinematographer</h2>
-          <p>
-            Robert Lazau is a director, producer, and cinematographer based in Portland, Oregon. 
-            He is the founder of Golden Boy Productions, a cinematic production company specializing 
-            in commercial video production, fashion visuals, community spotlight films, nonprofit 
-            campaigns, and brand storytelling. Robert Lazau brings a distinctive visual style that 
-            merges high-contrast cinematography with intimate, character-driven narratives.
-          </p>
-          <h3>Golden Boy Productions — Services</h3>
-          <p>
-            Golden Boy Productions, founded by Robert Lazau, offers professional video production 
-            services including commercial advertising, fashion brand visuals, music video direction, 
-            nonprofit campaign videos, website promotional content, and event coverage. Based in 
-            Portland, Oregon, Golden Boy Productions serves clients throughout the Pacific Northwest 
-            and beyond.
-          </p>
-          <h3>Featured Projects by Robert Lazau</h3>
-          <ul>
-            <li>Valentines Model Mash — A collaborative brand event visual campaign for high-end models and content creators</li>
-            <li>Disaster Preparedness — A PSA commercial campaign produced with the City of Fairview</li>
-            <li>Hive Recovery Website Visual — A promotional website visual for Hive Recovery Collective in Gresham</li>
-            <li>EMOPI Video — A community spotlight film for the EMOPI program in Gresham</li>
-            <li>Refined Kollective — A high-concept fashion visual for Refined Kollective fashion brand</li>
-            <li>Hayes Hustle — A nonprofit spotlight video for a youth engagement organization</li>
-          </ul>
-          <h3>Contact Robert Lazau</h3>
-          <p>
-            Email: robertlazau@gmail.com | 
-            Instagram: @robertrgb | IMDb: nm14415874 | 
-            Website: robertlazau.com | Company: Golden Boy Productions
-          </p>
-        </article>
         
         {/* Footer */}
         <footer className="w-full max-w-[1400px] mx-auto px-4 md:px-8 py-16 border-t border-white/5" role="contentinfo">

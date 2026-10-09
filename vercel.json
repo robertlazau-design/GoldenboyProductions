@@ -1,4 +1,12 @@
 {
+  "redirects": [
+    {
+      "source": "/:path*",
+      "has": [{ "type": "host", "value": "goldenboy-productions.vercel.app" }],
+      "destination": "https://www.robertlazau.com/:path*",
+      "permanent": true
+    }
+  ],
   "rewrites": [
     { "source": "/favorite-movies", "destination": "/index.html" },
     { "source": "/behind-the-scenes", "destination": "/index.html" },
