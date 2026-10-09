@@ -5,4 +5,4 @@ Allow: /
 Disallow: /videos/
 
 # Sitemap
-Sitemap: https://robertlazau.com/sitemap.xml
+Sitemap: https://www.robertlazau.com/sitemap.xml
