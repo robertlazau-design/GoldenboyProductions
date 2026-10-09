@@ -17,47 +17,62 @@ const isDriveVideo = (url: string) => {
 
 const isAnyVideo = (url: string) => isVideoFile(url) || isDriveVideo(url);
 
+type Tab = 'home' | 'movies' | 'bts' | 'contact';
+
+// Each tab has its own URL so it can be shared and indexed
+const TAB_ROUTES: Record<Tab, { path: string; title: string }> = {
+  home: { path: '/', title: 'Robert Lazau — Director & Producer | Golden Boy Productions' },
+  movies: { path: '/favorite-movies', title: 'Favorite Movies | Robert Lazau' },
+  bts: { path: '/behind-the-scenes', title: 'Behind the Scenes | Robert Lazau' },
+  contact: { path: '/contact', title: 'Contact Robert Lazau | Golden Boy Productions' },
+};
+
+const tabFromPath = (pathname: string): Tab => {
+  const clean = pathname.replace(/\/+$/, '') || '/';
+  const match = (Object.keys(TAB_ROUTES) as Tab[]).find(tab => TAB_ROUTES[tab].path === clean);
+  return match ?? 'home';
+};
+
+const applyTabMeta = (tab: Tab) => {
+  const { path, title } = TAB_ROUTES[tab];
+  const url = `https://www.robertlazau.com${path}`;
+  document.title = title;
+  document.querySelector('link[rel="canonical"]')?.setAttribute('href', url);
+  document.querySelector('meta[property="og:url"]')?.setAttribute('content', url);
+};
+
 export default function App() {
-  const [activeTab, setActiveTab] = useState<'home' | 'movies' | 'bts' | 'contact'>('home');
+  const [activeTab, setActiveTabState] = useState<Tab>(() => tabFromPath(window.location.pathname));
+
+  const setActiveTab = (tab: Tab) => {
+    setActiveTabState(tab);
+    if (window.location.pathname !== TAB_ROUTES[tab].path) {
+      window.history.pushState({ tab }, '', TAB_ROUTES[tab].path);
+    }
+  };
+
+  // Keep tab, title and canonical in sync with the URL (including back/forward)
+  useEffect(() => {
+    applyTabMeta(activeTab);
+  }, [activeTab]);
+
+  useEffect(() => {
+    const onPopState = () => setActiveTabState(tabFromPath(window.location.pathname));
+    window.addEventListener('popstate', onPopState);
+    return () => window.removeEventListener('popstate', onPopState);
+  }, []);
   const [activeBts, setActiveBts] = useState<typeof behindTheScenes[0] | null>(null);
   const [activeProjectVideo, setActiveProjectVideo] = useState<typeof finishedProjects[0] | null>(null);
 
   // Loading / Splash preloader state
   const [loading, setLoading] = useState(true);
 
-  // Movie reviews state loaded from localStorage or initialized with default movies from data.ts
-  const [reviews, setReviews] = useState<typeof favoriteMovies>(() => {
-    const saved = localStorage.getItem('movie_reviews');
-    if (saved) {
-      try {
-        return JSON.parse(saved);
-      } catch (e) {
-        console.error("Failed to parse saved reviews:", e);
-      }
-    }
-    return favoriteMovies;
-  });
-  
-  // Movie recommendations state loaded from localStorage
-  const [recommendations, setRecommendations] = useState<Array<{
-    id: string;
-    movieTitle: string;
-    movieDirector: string;
-    movieYear: string;
-    name: string;
-    comment: string;
-    date: string;
-  }>>(() => {
-    const saved = localStorage.getItem('movie_recommendations');
-    if (saved) {
-      try {
-        return JSON.parse(saved);
-      } catch (e) {
-        console.error("Failed to parse saved recommendations:", e);
-      }
-    }
-    return [];
-  });
+  // Movie reviews are published by adding entries to favoriteMovies in data.ts
+  const reviews = favoriteMovies;
+
+  // Recommendation send status
+  const [recSending, setRecSending] = useState(false);
+  const [recSent, setRecSent] = useState(false);
 
   // Recommendation Form State
   const [showRecForm, setShowRecForm] = useState(false);
@@ -70,47 +85,12 @@ export default function App() {
   const [recComment, setRecComment] = useState('');
   const [recError, setRecError] = useState('');
 
-  // Review Publisher Form State
-  const [showForm, setShowForm] = useState(false);
-  const [newTitle, setNewTitle] = useState('');
-  const [newDirector, setNewDirector] = useState('');
-  const [newYear, setNewYear] = useState('');
-  const [newDuration, setNewDuration] = useState('');
-  const [newRating, setNewRating] = useState('8.0');
-  const [newReview, setNewReview] = useState('');
-  const [newImage, setNewImage] = useState('');
-
   // Contact Form State
   const [contactName, setContactName] = useState('');
   const [contactEmail, setContactEmail] = useState('');
-  const [contactType, setContactType] = useState('Feature Film');
+  const [contactType, setContactType] = useState('Commercial / Brand Campaign');
   const [contactMessage, setContactMessage] = useState('');
   const [contactSent, setContactSent] = useState(false);
-
-  // Admin authentication state
-  const [isAdmin, setIsAdmin] = useState(() => localStorage.getItem('portfolio_admin') === 'true');
-  const [showAuthModal, setShowAuthModal] = useState(false);
-  const [passcode, setPasscode] = useState('');
-  const [authError, setAuthError] = useState('');
-
-  const handleAuthSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (passcode === 'robert2026') {
-      setIsAdmin(true);
-      localStorage.setItem('portfolio_admin', 'true');
-      setShowAuthModal(false);
-      setPasscode('');
-      setAuthError('');
-    } else {
-      setAuthError('Access Denied: Invalid Key');
-    }
-  };
-
-  const handleAdminLogout = () => {
-    setIsAdmin(false);
-    localStorage.removeItem('portfolio_admin');
-    setShowForm(false);
-  };
 
   // Preloader timeout effect
   useEffect(() => {
@@ -118,16 +98,6 @@ export default function App() {
       setLoading(false);
     }, 2800);
     return () => clearTimeout(timer);
-  }, []);
-
-  // One-time auto-wipe of movie reviews from local storage to start fresh
-  useEffect(() => {
-    const hasCleared = localStorage.getItem('movies_cleared_v1');
-    if (!hasCleared) {
-      localStorage.removeItem('movie_reviews');
-      setReviews([]);
-      localStorage.setItem('movies_cleared_v1', 'true');
-    }
   }, []);
 
   // Behind the Scenes active slide index
@@ -197,58 +167,6 @@ export default function App() {
     return () => document.body.classList.remove('custom-cursor-active');
   }, [isDesktop, isCursorVisible]);
 
-  // Handle local file uploads converting to Base64 dataURL
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setNewImage(reader.result as string);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
-  // Submit and save new movie review
-  const handlePublish = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newTitle.trim() || !newReview.trim()) return;
-
-    const newPost = {
-      id: Date.now(),
-      title: newTitle,
-      director: newDirector.trim() || "Unknown",
-      year: newYear.trim() || new Date().getFullYear().toString(),
-      duration: newDuration.trim() || "N/A",
-      rating: newRating,
-      image: newImage || "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?q=80&w=800&auto=format&fit=crop",
-      description: newReview
-    };
-
-    const updatedReviews = [newPost, ...reviews];
-    setReviews(updatedReviews);
-    localStorage.setItem('movie_reviews', JSON.stringify(updatedReviews));
-
-    // Reset Form fields
-    setNewTitle('');
-    setNewDirector('');
-    setNewYear('');
-    setNewDuration('');
-    setNewRating('8.0');
-    setNewReview('');
-    setNewImage('');
-    setShowForm(false);
-  };
-
-  // Delete dynamic review
-  const handleDelete = (id: number) => {
-    if (confirm("Are you sure you want to delete this film review?")) {
-      const updatedReviews = reviews.filter(movie => movie.id !== id);
-      setReviews(updatedReviews);
-      localStorage.setItem('movie_reviews', JSON.stringify(updatedReviews));
-    }
-  };
-
   // Profanity / offensive content filter
   const containsOffensiveContent = (text: string): boolean => {
     const normalized = text.toLowerCase().replace(/[^a-z\s]/g, '').replace(/\s+/g, ' ');
@@ -284,8 +202,8 @@ export default function App() {
     });
   };
 
-  // Submit visitor movie recommendation
-  const handleRecSubmit = (e: React.FormEvent) => {
+  // Submit visitor movie recommendation — emailed to Robert via EmailJS
+  const handleRecSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setRecError('');
 
@@ -307,38 +225,36 @@ export default function App() {
       }
     }
 
-    const newRec = {
-      id: Date.now().toString(),
-      movieTitle: recMovieTitle.trim(),
-      movieDirector: recMovieDirector.trim() || 'Unknown',
-      movieYear: recMovieYear.trim() || '—',
-      name: recName.trim() || 'Anonymous Cinephile',
-      comment: recComment.trim(),
-      date: new Date().toLocaleDateString('en-US', { month: 'short', year: 'numeric' })
-    };
+    const director = recMovieDirector.trim() || 'Unknown director';
+    const year = recMovieYear.trim() || 'year unknown';
+    setRecSending(true);
+    try {
+      await emailjs.send(
+        import.meta.env.VITE_EMAILJS_SERVICE_ID || 'service_qiwj9ck',
+        import.meta.env.VITE_EMAILJS_TEMPLATE_ID || 'template_dxzql3r',
+        {
+          from_name: recName.trim() || 'Anonymous Cinephile',
+          from_email: 'not provided',
+          project_type: 'Movie Recommendation',
+          message: `${recMovieTitle.trim()} (${director}, ${year})${recComment.trim() ? `\n\nWhy: ${recComment.trim()}` : ''}`,
+          to_email: 'robertlazau@gmail.com',
+        },
+        import.meta.env.VITE_EMAILJS_PUBLIC_KEY || 'HCe1iw0Kc6rDNVge8'
+      );
 
-    const updated = [newRec, ...recommendations];
-    setRecommendations(updated);
-    localStorage.setItem('movie_recommendations', JSON.stringify(updated));
-
-    // Reset inputs
-    setRecMovieTitle('');
-    setRecMovieDirector('');
-    setRecMovieYear('');
-    setRecSearchQuery('');
-    setRecName('');
-    setRecComment('');
-    setRecError('');
-    setShowRecForm(false);
-  };
-
-  // Delete movie recommendation
-  const handleDeleteRec = (id: string) => {
-    if (!isAdmin) return;
-    if (confirm("Are you sure you want to delete this suggestion?")) {
-      const updated = recommendations.filter(rec => rec.id !== id);
-      setRecommendations(updated);
-      localStorage.setItem('movie_recommendations', JSON.stringify(updated));
+      // Reset inputs
+      setRecMovieTitle('');
+      setRecMovieDirector('');
+      setRecMovieYear('');
+      setRecSearchQuery('');
+      setRecName('');
+      setRecComment('');
+      setRecSent(true);
+    } catch (error: any) {
+      console.error('EmailJS Error:', error);
+      setRecError('Sorry, your recommendation could not be sent. Please try again in a moment.');
+    } finally {
+      setRecSending(false);
     }
   };
 
@@ -364,7 +280,7 @@ export default function App() {
       );
       setContactName('');
       setContactEmail('');
-      setContactType('Feature Film');
+      setContactType('Commercial / Brand Campaign');
       setContactMessage('');
       alert('Your message has been sent successfully! Robert will review it shortly.');
     } catch (error: any) {
@@ -794,48 +710,14 @@ export default function App() {
                       <h2 className="font-serif italic text-4xl md:text-6xl text-[#f5f5f5] tracking-tight">Favorite Movies Blog</h2>
                     </div>
                     <div className="flex items-center gap-4">
-                      {isAdmin && (
-                        <>
-                          <button
-                            onClick={() => {
-                              if (window.confirm("Are you sure you want to clear all reviews? This will reset your movie reviews blog to empty.")) {
-                                setReviews([]);
-                                localStorage.removeItem('movie_reviews');
-                              }
-                            }}
-                            className="px-4 py-2 border border-white/10 text-white/50 hover:text-white text-[9px] uppercase tracking-widest hover:bg-white/5 transition-all duration-300 font-medium cursor-pointer"
-                          >
-                            Clear All
-                          </button>
-                          <button
-                            onClick={handleAdminLogout}
-                            className="px-4 py-2 border border-red-900/30 text-red-500/70 hover:text-red-400 text-[9px] uppercase tracking-widest hover:bg-red-500/5 transition-all duration-300 font-medium cursor-pointer"
-                          >
-                            Lock Session
-                          </button>
-                        </>
-                      )}
                       <button 
                         onClick={() => {
                           setShowRecForm(!showRecForm);
-                          setShowForm(false);
+                          setRecSent(false);
                         }}
                         className="px-5 py-2.5 rounded-full border border-white/20 text-white/80 text-[10px] uppercase tracking-widest hover:bg-white hover:text-black hover:border-white transition-all duration-300 flex items-center gap-2 font-medium cursor-pointer"
                       >
                         {showRecForm ? 'Close Recommender' : 'Recommend a Movie'}
-                      </button>
-                      <button 
-                        onClick={() => {
-                          if (isAdmin) {
-                            setShowForm(!showForm);
-                            setShowRecForm(false);
-                          } else {
-                            setShowAuthModal(true);
-                          }
-                        }}
-                        className="px-6 py-2.5 rounded-full border border-[#dfb86c]/30 text-[#dfb86c] text-[10px] uppercase tracking-widest hover:bg-[#dfb86c] hover:text-black hover:border-[#dfb86c] transition-all duration-300 flex items-center gap-2 font-medium"
-                      >
-                        {!isAdmin ? 'Admin Sign-in' : (showForm ? 'Close Editor' : '+ Publish Review')}
                       </button>
                     </div>
                   </div>
@@ -969,152 +851,24 @@ export default function App() {
                               </div>
                             )}
 
+                            {/* Success message */}
+                            {recSent && (
+                              <div className="border border-[#dfb86c]/30 bg-[#dfb86c]/5 px-4 py-3 rounded-sm">
+                                <p className="text-[11px] text-[#dfb86c] font-medium">Thanks! Your recommendation was sent to Robert.</p>
+                              </div>
+                            )}
+
                             <div className="flex gap-4">
-                              <button 
-                                type="submit" 
-                                className="px-6 py-2.5 rounded-sm bg-[#dfb86c] text-black text-[10px] uppercase tracking-widest hover:bg-white transition-all font-semibold cursor-pointer"
+                              <button
+                                type="submit"
+                                disabled={recSending}
+                                className="px-6 py-2.5 rounded-sm bg-[#dfb86c] text-black text-[10px] uppercase tracking-widest hover:bg-white transition-all font-semibold cursor-pointer disabled:opacity-50 disabled:cursor-wait"
                               >
-                                Submit Recommendation
+                                {recSending ? 'Sending...' : 'Submit Recommendation'}
                               </button>
                               <button 
                                 type="button" 
-                                onClick={() => { setShowRecForm(false); setRecError(''); }}
-                                className="px-6 py-2.5 rounded-sm border border-white/20 text-white/60 text-[10px] uppercase tracking-widest hover:text-white hover:border-white transition-all cursor-pointer"
-                              >
-                                Cancel
-                              </button>
-                            </div>
-                          </form>
-                        </div>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-
-                  {/* Interactive Publisher Form */}
-                  <AnimatePresence>
-                    {showForm && (
-                      <motion.div 
-                        initial={{ height: 0, opacity: 0 }}
-                        animate={{ height: "auto", opacity: 1 }}
-                        exit={{ height: 0, opacity: 0 }}
-                        transition={{ duration: 0.4, ease: "easeInOut" }}
-                        className="overflow-hidden mb-16"
-                      >
-                        <div className="border border-white/10 bg-white/[0.02] p-6 md:p-8 rounded-sm backdrop-blur-sm">
-                          <h3 className="font-serif text-2xl mb-6 text-white/90">Draft Movie Review</h3>
-                          <form onSubmit={handlePublish} className="space-y-6">
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                              <div>
-                                <label className="block text-[9px] uppercase tracking-widest text-white/40 mb-2">Movie Title *</label>
-                                <input 
-                                  type="text" 
-                                  required
-                                  value={newTitle}
-                                  onChange={(e) => setNewTitle(e.target.value)}
-                                  placeholder="e.g., Barry Lyndon"
-                                  className="w-full bg-black/40 border border-white/10 px-4 py-3 text-sm text-white focus:outline-none focus:border-[#dfb86c] transition-colors"
-                                />
-                              </div>
-                              <div>
-                                <label className="block text-[9px] uppercase tracking-widest text-white/40 mb-2">Director</label>
-                                <input 
-                                  type="text" 
-                                  value={newDirector}
-                                  onChange={(e) => setNewDirector(e.target.value)}
-                                  placeholder="e.g., Stanley Kubrick"
-                                  className="w-full bg-black/40 border border-white/10 px-4 py-3 text-sm text-white focus:outline-none focus:border-[#dfb86c] transition-colors"
-                                />
-                              </div>
-                            </div>
-
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                              <div>
-                                <label className="block text-[9px] uppercase tracking-widest text-white/40 mb-2">Release Year</label>
-                                <input 
-                                  type="text" 
-                                  value={newYear}
-                                  onChange={(e) => setNewYear(e.target.value)}
-                                  placeholder="e.g., 1975"
-                                  className="w-full bg-black/40 border border-white/10 px-4 py-3 text-sm text-white focus:outline-none focus:border-[#dfb86c] transition-colors"
-                                />
-                              </div>
-                              <div>
-                                <label className="block text-[9px] uppercase tracking-widest text-white/40 mb-2">Duration</label>
-                                <input 
-                                  type="text" 
-                                  value={newDuration}
-                                  onChange={(e) => setNewDuration(e.target.value)}
-                                  placeholder="e.g., 3h 5m"
-                                  className="w-full bg-black/40 border border-white/10 px-4 py-3 text-sm text-white focus:outline-none focus:border-[#dfb86c] transition-colors"
-                                />
-                              </div>
-                              <div>
-                                <label className="block text-[9px] uppercase tracking-widest text-white/40 mb-2">Rating (★ 1-10)</label>
-                                <input 
-                                  type="number" 
-                                  step="0.1" 
-                                  min="1" 
-                                  max="10"
-                                  value={newRating}
-                                  onChange={(e) => setNewRating(e.target.value)}
-                                  className="w-full bg-black/40 border border-white/10 px-4 py-3 text-sm text-white focus:outline-none focus:border-[#dfb86c] transition-colors"
-                                />
-                              </div>
-                            </div>
-
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                              <div>
-                                <label className="block text-[9px] uppercase tracking-widest text-white/40 mb-2">Upload Movie Still / Image</label>
-                                <div className="relative border border-dashed border-white/20 bg-black/20 hover:bg-black/30 hover:border-white/40 transition-all p-6 text-center cursor-pointer flex flex-col items-center justify-center h-[90px]">
-                                  <input 
-                                    type="file" 
-                                    accept="image/*"
-                                    onChange={handleImageUpload}
-                                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                                  />
-                                  <Camera className="text-white/40 mb-1" size={20} strokeWidth={1} />
-                                  <span className="text-[9px] text-white/50 tracking-wider">CHOOSE IMAGE FILE</span>
-                                </div>
-                              </div>
-                              <div>
-                                <label className="block text-[9px] uppercase tracking-widest text-white/40 mb-2">Or Paste Image URL</label>
-                                <input 
-                                  type="text" 
-                                  value={newImage}
-                                  onChange={(e) => setNewImage(e.target.value)}
-                                  placeholder="https://images.unsplash.com/..."
-                                  className="w-full bg-black/40 border border-white/10 px-4 py-3 text-sm text-white focus:outline-none focus:border-[#dfb86c] transition-colors"
-                                />
-                                {newImage && (
-                                  <div className="mt-4 aspect-[16/9] w-24 border border-white/10 overflow-hidden">
-                                    <img src={newImage} alt="Preview" className="w-full h-full object-cover" />
-                                  </div>
-                                )}
-                              </div>
-                            </div>
-
-                            <div>
-                              <label className="block text-[9px] uppercase tracking-widest text-white/40 mb-2">Your Review *</label>
-                              <textarea 
-                                required
-                                rows={6}
-                                value={newReview}
-                                onChange={(e) => setNewReview(e.target.value)}
-                                placeholder="Write your detailed critique of the film..."
-                                className="w-full bg-black/40 border border-white/10 px-4 py-3 text-sm text-white focus:outline-none focus:border-[#dfb86c] transition-colors"
-                              />
-                            </div>
-
-                            <div className="flex gap-4">
-                              <button 
-                                type="submit" 
-                                className="px-6 py-2.5 rounded-sm bg-[#dfb86c] text-black text-[10px] uppercase tracking-widest hover:bg-white transition-all font-semibold cursor-pointer"
-                              >
-                                Publish Review
-                              </button>
-                              <button 
-                                type="button" 
-                                onClick={() => setShowForm(false)}
+                                onClick={() => { setShowRecForm(false); setRecError(''); setRecSent(false); }}
                                 className="px-6 py-2.5 rounded-sm border border-white/20 text-white/60 text-[10px] uppercase tracking-widest hover:text-white hover:border-white transition-all cursor-pointer"
                               >
                                 Cancel
@@ -1130,16 +884,14 @@ export default function App() {
                   <div className="space-y-24">
                     {reviews.length === 0 ? (
                       <div className="text-center py-24 border border-dashed border-white/10 rounded-sm bg-white/[0.01]">
-                        <span className="text-[#dfb86c] text-[10px] uppercase tracking-widest font-semibold block mb-2">EMPTY DIARY</span>
-                        <p className="text-sm text-white/40 font-light mb-6">No film reviews published yet.</p>
-                        {!isAdmin && (
-                          <button 
-                            onClick={() => setShowAuthModal(true)} 
-                            className="px-6 py-2.5 rounded-full border border-white/20 text-white/70 text-[10px] uppercase tracking-widest hover:bg-white hover:text-black hover:border-white transition-all cursor-pointer font-medium"
-                          >
-                            Authenticate as Admin
-                          </button>
-                        )}
+                        <span className="text-[#dfb86c] text-[10px] uppercase tracking-widest font-semibold block mb-2">COMING SOON</span>
+                        <p className="text-sm text-white/40 font-light mb-6">Robert's first film reviews are on the way. In the meantime, tell him what to watch.</p>
+                        <button 
+                          onClick={() => setShowRecForm(true)} 
+                          className="px-6 py-2.5 rounded-full border border-white/20 text-white/70 text-[10px] uppercase tracking-widest hover:bg-white hover:text-black hover:border-white transition-all cursor-pointer font-medium"
+                        >
+                          Recommend a Movie
+                        </button>
                       </div>
                     ) : (
                       reviews.map((movie, index) => (
@@ -1174,15 +926,6 @@ export default function App() {
                                 </p>
                               </div>
                               
-                              {/* Delete review action */}
-                              {isAdmin && (
-                                <button 
-                                  onClick={() => handleDelete(movie.id)}
-                                  className="mt-8 text-[9px] uppercase tracking-[0.2em] text-red-500/50 hover:text-red-500 self-start transition-colors cursor-pointer animate-fade-in"
-                                >
-                                  Delete Review
-                                </button>
-                              )}
                             </div>
 
                             {/* Right Column: Image Still and Full Review Text */}
@@ -1204,70 +947,6 @@ export default function App() {
                           </div>
                         </article>
                       ))
-                    )}
-                  </div>
-
-                  {/* Community Recommendations Section */}
-                  <div className="mt-32 pt-20 border-t border-white/10">
-                    <div className="mb-12">
-                      <span className="text-[10px] text-[#dfb86c] tracking-[0.25em] font-semibold uppercase mb-2 block">
-                        CINEPHILE SUGGESTIONS
-                      </span>
-                      <h3 className="font-serif italic text-3xl md:text-4xl text-[#f5f5f5] tracking-tight">
-                        Community Recommendations
-                      </h3>
-                      <p className="text-xs text-white/40 font-light mt-2 max-w-xl">
-                        Movies suggested by visitors from our curated masterpiece catalog. Recommend one above to see it added!
-                      </p>
-                    </div>
-
-                    {recommendations.length === 0 ? (
-                      <div className="text-center py-16 border border-dashed border-white/5 bg-white/[0.005] rounded-sm">
-                        <p className="text-xs text-white/30 font-light">No movie recommendations submitted yet. Be the first!</p>
-                      </div>
-                    ) : (
-                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {recommendations.map((rec) => (
-                          <div 
-                            key={rec.id} 
-                            className="border border-white/5 bg-white/[0.01] p-6 hover:border-white/10 transition-all duration-300 rounded-sm relative flex flex-col justify-between"
-                          >
-                            <div>
-                              <div className="flex justify-between items-start mb-4">
-                                <div>
-                                  <h4 className="font-serif text-lg text-white/90 leading-snug">{rec.movieTitle}</h4>
-                                  <p className="text-[10px] text-white/40 font-light mt-0.5">
-                                    Directed by {rec.movieDirector} ({rec.movieYear})
-                                  </p>
-                                </div>
-                              </div>
-                              {rec.comment && (
-                                <p className="text-xs text-white/60 font-light italic leading-relaxed border-l border-white/10 pl-3 mb-6">
-                                  "{rec.comment}"
-                                </p>
-                              )}
-                            </div>
-
-                            <div className="flex justify-between items-end mt-auto pt-4 border-t border-white/5">
-                              <div>
-                                <p className="text-[9px] uppercase tracking-wider text-[#dfb86c]">Suggested By</p>
-                                <p className="text-[10px] text-white/70 font-semibold">{rec.name}</p>
-                              </div>
-                              <div className="text-right">
-                                <p className="text-[9px] text-white/30">{rec.date}</p>
-                                {isAdmin && (
-                                  <button
-                                    onClick={() => handleDeleteRec(rec.id)}
-                                    className="text-[9px] uppercase text-red-500/60 hover:text-red-400 font-semibold tracking-wider mt-1.5 cursor-pointer"
-                                  >
-                                    Delete
-                                  </button>
-                                )}
-                              </div>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
                     )}
                   </div>
                 </section>
@@ -1533,11 +1212,16 @@ export default function App() {
                             onChange={(e) => setContactType(e.target.value)}
                             className="w-full bg-black/40 border border-white/10 px-4 py-3 text-sm text-white focus:outline-none focus:border-[#dfb86c] transition-colors appearance-none"
                           >
-                            <option value="Feature Film" className="bg-[#060606]">Feature Film</option>
-                            <option value="Commercial Campaign" className="bg-[#060606]">Commercial Campaign</option>
-                            <option value="Media Consulting" className="bg-[#060606]">Media Consulting Service</option>
+                            <option value="Commercial / Brand Campaign" className="bg-[#060606]">Commercial / Brand Campaign</option>
+                            <option value="Community or Nonprofit Film" className="bg-[#060606]">Community or Nonprofit Film</option>
+                            <option value="PSA / Public Sector" className="bg-[#060606]">PSA / Public Sector</option>
+                            <option value="Fashion Visual" className="bg-[#060606]">Fashion Visual</option>
+                            <option value="Event Coverage" className="bg-[#060606]">Event Coverage</option>
+                            <option value="Website Visual / Promo" className="bg-[#060606]">Website Visual / Promo</option>
                             <option value="Music Video" className="bg-[#060606]">Music Video</option>
-                            <option value="Representation / Press" className="bg-[#060606]">Representation / Press</option>
+                            <option value="Short or Feature Film" className="bg-[#060606]">Short or Feature Film</option>
+                            <option value="Media Consulting" className="bg-[#060606]">Media Consulting</option>
+                            <option value="Press / Other" className="bg-[#060606]">Press / Other</option>
                           </select>
                         </div>
 
@@ -1774,70 +1458,6 @@ export default function App() {
                   </p>
                 </div>
               </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Admin Passcode Authentication Modal */}
-      <AnimatePresence>
-        {showAuthModal && (
-          <motion.div 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 bg-[#060606]/95 flex items-center justify-center p-4 backdrop-blur-sm"
-          >
-            <motion.div 
-              initial={{ scale: 0.95, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.95, opacity: 0 }}
-              transition={{ type: "spring", damping: 25, stiffness: 200 }}
-              className="w-full max-w-md bg-black border border-white/10 rounded-sm p-8 relative"
-            >
-              <button 
-                onClick={() => {
-                  setShowAuthModal(false);
-                  setPasscode('');
-                  setAuthError('');
-                }}
-                className="absolute top-4 right-4 text-white/50 hover:text-white p-2 hover:bg-white/10 rounded-full transition-colors cursor-pointer"
-                aria-label="Close modal"
-              >
-                <X size={18} strokeWidth={1.5} />
-              </button>
-
-              <div className="text-center mb-6">
-                <span className="text-[10px] text-[#dfb86c] tracking-[0.3em] uppercase mb-2 block font-semibold">SECURITY CONTROL</span>
-                <h3 className="font-serif text-2xl text-[#f5f5f5]">Admin Authentication</h3>
-                <p className="text-xs text-white/40 mt-1 font-light">Only Robert Lazau is authorized to publish or modify film reviews.</p>
-              </div>
-
-              <form onSubmit={handleAuthSubmit} className="space-y-4">
-                <div>
-                  <label className="block text-[9px] uppercase tracking-widest text-white/40 mb-2">Access Key passcode</label>
-                  <input 
-                    type="password"
-                    required
-                    value={passcode}
-                    onChange={(e) => setPasscode(e.target.value)}
-                    placeholder="Enter passcode..."
-                    className="w-full bg-black/60 border border-white/10 px-4 py-3 text-sm text-white focus:outline-none focus:border-[#dfb86c] transition-colors text-center tracking-widest font-mono"
-                    autoFocus
-                  />
-                </div>
-
-                {authError && (
-                  <p className="text-[10px] text-red-500 font-semibold uppercase tracking-wider text-center">{authError}</p>
-                )}
-
-                <button 
-                  type="submit" 
-                  className="w-full py-3 rounded-sm bg-[#dfb86c] text-black text-[10px] uppercase tracking-widest hover:bg-white transition-all font-semibold flex items-center justify-center gap-2 cursor-pointer"
-                >
-                  Verify Authorization
-                </button>
-              </form>
             </motion.div>
           </motion.div>
         )}

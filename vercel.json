@@ -1,0 +1,7 @@
+{
+  "rewrites": [
+    { "source": "/favorite-movies", "destination": "/index.html" },
+    { "source": "/behind-the-scenes", "destination": "/index.html" },
+    { "source": "/contact", "destination": "/index.html" }
+  ]
+}
