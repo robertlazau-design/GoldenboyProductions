@@ -252,7 +252,7 @@ export default function App() {
       setRecSent(true);
     } catch (error: any) {
       console.error('EmailJS Error:', error);
-      setRecError('Sorry, your recommendation could not be sent. Please try again in a moment.');
+      setRecError("Sorry, your recommendation couldn't be sent. You can email it to Robert at robertlazau@gmail.com.");
     } finally {
       setRecSending(false);
     }
@@ -285,8 +285,7 @@ export default function App() {
       alert('Your message has been sent successfully! Robert will review it shortly.');
     } catch (error: any) {
       console.error('EmailJS Error:', error);
-      const errMsg = error?.text || error?.message || JSON.stringify(error);
-      alert(`EmailJS Error: ${errMsg}`);
+      alert("Sorry, your message couldn't be sent. Please email Robert directly at robertlazau@gmail.com.");
     } finally {
       setContactSent(false);
     }
