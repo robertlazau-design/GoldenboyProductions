@@ -486,8 +486,8 @@ export default function App() {
                     transition={{ duration: 1.2, delay: 0.6 }}
                     className="max-w-2xl text-xs md:text-sm leading-relaxed text-white/40 tracking-wider font-light mb-16"
                   >
-                    Robert Lazau — Cineaste, resident visionary at Golden Boy Productions. Crafting visceral cinematic 
-                    experiences that balance formal precision with human vulnerability.
+                    Portland-area director and producer, and founder of Golden Boy Productions. Robert makes films for
+                    cities, nonprofits, local businesses, and fashion brands, with a cinematic eye and a real interest in their story.
                   </motion.p>
                 </section>
 
@@ -518,7 +518,7 @@ export default function App() {
                       <span className="text-[10px] text-[#dfb86c] tracking-[0.3em] uppercase mb-3">{biography.year}</span>
                       <h2 className="font-serif text-4xl md:text-6xl mb-6 text-[#f5f5f5] tracking-tight">Biography</h2>
                       <div className="space-y-6 text-sm text-white/60 font-light leading-relaxed">
-                        <p>{biography.text}</p>
+                        {biography.text.split('\n\n').map((paragraph, i) => <p key={i}>{paragraph}</p>)}
                         <p className="italic font-serif text-[#dfb86c]/70 text-lg border-l border-[#dfb86c]/30 pl-4 py-1">
                           "{biography.quote}"
                         </p>
@@ -536,7 +536,7 @@ export default function App() {
                   viewport={{ once: true, margin: "-100px" }}
                   transition={{ duration: 0.8, ease: "easeOut" }}
                   className="py-28 md:py-40 border-t border-white/5"
-                  aria-label="Approach to Clientele"
+                  aria-label="How Robert Works"
                 >
                   <div className="flex flex-col mb-16">
                     <span className="text-[10px] text-white/40 tracking-[0.3em] uppercase mb-3">{clientApproach.subtitle}</span>
@@ -574,7 +574,7 @@ export default function App() {
                     <span className="text-[10px] text-white/40 tracking-[0.3em] uppercase mb-3">EXPERT GUIDANCE</span>
                     <h2 className="font-serif text-4xl md:text-6xl text-[#f5f5f5] tracking-tight">Media Consulting Services</h2>
                     <p className="max-w-2xl text-xs md:text-sm text-white/50 leading-relaxed font-light mt-4 mx-auto md:mx-0">
-                      Hands-on production experience to guide filmmakers, creative directors, and brands from concept to final cut.
+                      Have a project and want a second set of eyes? Robert offers one-on-one guidance for filmmakers, creators, and organizations at any stage, from first idea to final cut.
                     </p>
                   </div>
 
@@ -1135,7 +1135,7 @@ export default function App() {
                       <div className="border-t border-white/10 pt-6">
                         <h3 className="font-serif text-lg text-white/90 mb-2">General Inquiries</h3>
                         <p className="text-sm text-white/50 leading-relaxed font-light mb-4">
-                          For features, commercials, and visual campaigns. Let's create something together.
+                          For brand campaigns, community and nonprofit films, events, and creative collaborations. Tell Robert about your project and he'll get back to you.
                         </p>
                         <a 
                           href="mailto:robertlazau@gmail.com" 

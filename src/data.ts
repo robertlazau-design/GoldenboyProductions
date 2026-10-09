@@ -11,7 +11,6 @@ const bts1 = 'https://drive.google.com/file/d/1QkL_-PAwx52tWigHB_egNYlH07Gleq3V/
 const bts2 = 'https://drive.google.com/file/d/1WHtfiZ_iMiWSyezXGbSKaR8Q66UsAdBM/preview';
 const bts3 = 'https://drive.google.com/file/d/1k-UWdaZIqZYgh8ms6PC8ewpSQxiPaj1y/preview';
 const bts4 = 'https://drive.google.com/file/d/1zmhlmCAPOpZUSbzWLctzZOA09onptxgc/preview';
-const bts5 = '/videos/bts/IMG_9165.mov'; // Local fallback — no Drive link provided
 import bts6 from '../assets/bts/IMG_0367.JPG';
 import bts7 from '../assets/bts/FullSizeRender.jpg';
 import bts8 from '../assets/bts/IMG_2556.jpg';
@@ -30,47 +29,47 @@ export const biography = {
   year: "Portland, OR",
   title: "Early Vision",
   subtitle: "The Beginning of Golden Boy Productions",
-  text: "Robert Lazau's cinematic journey began with a simple passion: to capture the beauty in the ordinary. Drawing from the gritty realism of 70s American cinema and the meticulous composition of European classics, Robert has developed a visual style that pairs bold, cinematic imagery with intimate, character-driven storytelling.",
-  quote: "Every frame is a canvas; every shadow tells a story.",
+  text: "Robert started Golden Boy Productions to tell the stories happening in his own backyard. From a disaster-preparedness campaign for the City of Fairview to a profile of the EMOPI program in Gresham and a spotlight on Hayes Hustle's work with kids and animals, his films center real people and the communities they serve.\n\nHe directs, produces, and shoots, so the person you meet on day one is the same person behind the camera and in the edit. That keeps every project personal, nimble, and true to the people in it.",
+  quote: "The best stories are the ones happening right around us.",
   image: robertPortrait
 };
 
 export const clientApproach = {
-  title: "Approach to Clientele",
-  subtitle: "Co-creating Visual Legacies",
-  text: "For Robert Lazau, the relationship between director and client is a creative partnership. Whether crafting a cinematic commercial, an artistic music video, or a branding masterpiece, Robert approaches each brief not as a set of rules, but as an opportunity to build a distinct visual world. The focus is always on translating the client's core identity into cinematic storytelling that commands attention and endures.",
+  title: "How Robert Works",
+  subtitle: "Working Together",
+  text: "Every project starts with a conversation. Robert wants to understand who you are, who you're trying to reach, and what you want them to feel, and then he builds the shoot around that. Whether it's a city PSA, a nonprofit spotlight, a website loop for a small business, or a fashion visual, the goal is the same: a film that sounds like you and looks like it belongs on the big screen.",
   points: [
     {
-      title: "Intimate Discovery",
-      desc: "We begin with collaborative brainstorming to uncover the emotional core of your brand or narrative."
+      title: "Listen First",
+      desc: "A real conversation about your goals, your audience, and your story before any gear comes out."
     },
     {
-      title: "Meticulous Pre-Production",
-      desc: "Storyboard development, styling design, and precise location scouting to construct a bespoke visual aesthetic."
+      title: "Plan with Purpose",
+      desc: "Concept, shot list, locations, and schedule mapped out so the shoot runs smoothly and stays on budget."
     },
     {
-      title: "Uncompromising Execution",
-      desc: "Professional cinema cameras, thoughtful lighting, and careful color work to deliver a polished final piece."
+      title: "Shoot & Finish",
+      desc: "Directing, camera, and edit handled closely from start to finish, so the final piece stays true to the plan."
     }
   ]
 };
 
 export const consultingServices = [
   {
-    title: "Script & Narrative Development",
-    desc: "Refining screenplays, narrative pacing, and structural flow to ensure your story resonates before a single frame is shot."
+    title: "Story & Script",
+    desc: "Shaping your idea into a clear, compelling story before a single frame is shot."
   },
   {
-    title: "Visual Direction & Art Styling",
-    desc: "Developing cohesive color theory, set design guidelines, lighting references, and camera direction to establish a unique signature aesthetic."
+    title: "Look & Visual Direction",
+    desc: "Building a visual plan of references, color, lighting, and framing that fits your brand."
   },
   {
-    title: "Production Strategy & Logistics",
-    desc: "Advising on optimal camera systems, lens selection, scheduling efficiency, and crew acquisition tailored to project scope."
+    title: "Production Planning",
+    desc: "Practical advice on crew, gear, locations, and scheduling for the scope and budget you have."
   },
   {
-    title: "Post-Production Supervision",
-    desc: "Guiding the final stages of editing, soundscape design, visual effects integration, and high-end cinematic color grading."
+    title: "Post-Production Guidance",
+    desc: "Feedback on edit, pacing, sound, and color to get your piece across the finish line."
   }
 ];
 
@@ -81,8 +80,8 @@ export const finishedProjects = [
     type: "Commercial Event Visual",
     year: "2026",
     role: "Production House / Director",
-    image: "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?q=80&w=800&auto=format&fit=crop",
-    description: "A collaborative brand event visual campaign bringing together high-end models, professional videographers, and photographers to generate massive, high-impact content catalogs for brand clients.",
+    image: "/projects/valentines-model-mash.jpg",
+    description: "A Valentine's collaborative shoot that brought models, videographers, and photographers together to create fresh content for brand partners.",
     video: projVideo6
   },
   {
@@ -91,8 +90,8 @@ export const finishedProjects = [
     type: "PSA / Commercial Ad",
     year: "2025",
     role: "Producer / Director",
-    image: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=800&auto=format&fit=crop",
-    description: "A targeted public service announcement and commercial campaign produced in collaboration with the City of Fairview to promote civic safety and highlight their disaster preparedness course.",
+    image: "/projects/disaster-preparedness.jpg",
+    description: "A public service campaign made with the City of Fairview to promote its disaster preparedness course and help residents get ready before an emergency.",
     video: projVideo1
   },
   {
@@ -101,8 +100,8 @@ export const finishedProjects = [
     type: "Website Visual / Promo",
     year: "2025",
     role: "Visual Director",
-    image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?q=80&w=800&auto=format&fit=crop",
-    description: "A customized website visual and promotional loop created for the Hive Recovery Collective, a small business based in Gresham, to capture their workspace and digital identity.",
+    image: "/projects/hive-recovery.jpg",
+    description: "A website visual and promo loop for Hive Recovery Collective in Gresham, capturing the calm, hands-on feel of their space.",
     video: projVideo4
   },
   {
@@ -111,8 +110,8 @@ export const finishedProjects = [
     type: "Community Spotlight Video",
     year: "2025",
     role: "Co-Director / Video Producer",
-    image: "https://images.unsplash.com/photo-1516035069371-29a1b244cc32?q=80&w=800&auto=format&fit=crop",
-    description: "A dedicated community profile film created to highlight the stories, achievements, and impact of the EMOPI program in Gresham.",
+    image: "/projects/emopi.jpg",
+    description: "A community profile of the people behind the EMOPI program in Gresham and the impact of their work.",
     video: projVideo2
   },
   {
@@ -121,8 +120,8 @@ export const finishedProjects = [
     type: "Fashion Visual",
     year: "2025",
     role: "Director / Cinematographer",
-    image: "https://images.unsplash.com/photo-1483985988355-763728e1935b?q=80&w=800&auto=format&fit=crop",
-    description: "A high-concept, stylized fashion visual and commercial narrative produced for Refined Kollective to showcase their latest season collection.",
+    image: "/projects/refined-kollective.jpg",
+    description: "A stylized fashion visual showcasing Refined Kollective's latest collection.",
     video: projVideo5
   },
   {
@@ -131,8 +130,8 @@ export const finishedProjects = [
     type: "Nonprofit Spotlight Video",
     year: "2025",
     role: "Production House / Director",
-    image: "https://images.unsplash.com/photo-1553882809-a4f57e59501d?q=80&w=800&auto=format&fit=crop",
-    description: "A spotlight promotional video produced for Hayes Hustle, a nonprofit organization that helps kids connect with nature, horses, and wildlife, while teaching hands-on skills like podcasting and sewing.",
+    image: "/projects/hayes-hustle.jpg",
+    description: "A spotlight on Hayes Hustle, a nonprofit that connects kids with nature, horses, and wildlife while teaching hands-on skills like podcasting and sewing.",
     video: projVideo3
   }
 ];
@@ -190,14 +189,6 @@ export const behindTheScenes = [
     date: "2025",
     image: bts4,
     description: "Calibrating macro focal length."
-  },
-  {
-    id: 5,
-    title: "Active Set B-Roll",
-    location: "On Set",
-    date: "2025",
-    image: bts5,
-    description: "Capturing stage atmospheric details."
   },
   {
     id: 6,
@@ -311,8 +302,12 @@ export const faqs = [
     answer: "We pick cameras, lenses, and lighting to fit each project's look, budget, and schedule, from compact cinema setups to full rental packages."
   },
   {
-    question: "How do you approach collaboration with screenwriters?",
-    answer: "For us, story is everything. We work in close dialogue with writers from the earliest outlines, ensuring that the visual syntax of the film is baked into the subtext of the script itself."
+    question: "What does a typical project look like?",
+    answer: "It starts with a conversation about your goals. From there we put together a simple plan and quote, schedule the shoot, film, and then refine the edit with you until it's ready to share."
+  },
+  {
+    question: "Where are you based?",
+    answer: "Golden Boy Productions is based in the Portland area and works throughout Gresham, Fairview, and the wider Pacific Northwest. Reach out about projects outside the area, too."
   },
   {
     question: "Do you work with emerging filmmakers?",
