@@ -2,28 +2,18 @@ import React, { useState, useEffect } from 'react';
 import emailjs from '@emailjs/browser';
 import { motion, AnimatePresence, useMotionValue, useSpring } from 'motion/react';
 import { ArrowRight, ArrowLeft, Plus, Minus, Camera, X, Send, Mail, Play } from 'lucide-react';
-import { biography, clientApproach, consultingServices, finishedProjects, currentProjects, favoriteMovies, behindTheScenes, faqs, recommendableMovies } from './data';
+import { biography, clientApproach, consultingServices, finishedProjects, currentProjects, favoriteMovies, behindTheScenes, faqs, recommendableMovies, services } from './data';
 import robertBackground from '../assets/robert_background.jpg';
-import { TAB_ROUTES, tabFromPath, canonicalUrl, type Tab } from './seo';
+import { TAB_ROUTES, pageFromPath, pageMeta, normalizePath, canonicalUrl, projectPath, servicePath, ABOUT_PATH, type Tab } from './seo';
+import { isDriveVideo, isAnyVideo } from './media';
+import { AboutPage, ProjectPage, ServicePage } from './pages';
 
-const isVideoFile = (url: string) => {
-  if (!url) return false;
-  return /\.(mp4|webm|mov|ogg|m4v)($|\?)/i.test(url);
-};
-
-const isDriveVideo = (url: string) => {
-  if (!url) return false;
-  return url.includes('drive.google.com/file/d/') && url.endsWith('/preview');
-};
-
-const isAnyVideo = (url: string) => isVideoFile(url) || isDriveVideo(url);
 
 const setMeta = (selector: string, attr: string, value: string) =>
   document.querySelector(selector)?.setAttribute(attr, value);
 
-const applyTabMeta = (tab: Tab) => {
-  const { title, description } = TAB_ROUTES[tab];
-  const url = canonicalUrl(tab);
+const applyMeta = ({ path, title, description }: { path: string; title: string; description: string }) => {
+  const url = canonicalUrl(path);
   document.title = title;
   setMeta('link[rel="canonical"]', 'href', url);
   setMeta('meta[name="description"]', 'content', description);
@@ -41,36 +31,50 @@ const isPlainClick = (e: React.MouseEvent) =>
   e.button === 0 && !e.metaKey && !e.ctrlKey && !e.shiftKey && !e.altKey;
 
 export default function App({ initialPath }: { initialPath?: string }) {
-  const [activeTab, setActiveTabState] = useState<Tab>(() => tabFromPath(initialPath ?? window.location.pathname));
+  const [path, setPath] = useState(() => normalizePath(initialPath ?? window.location.pathname));
+  const page = pageFromPath(path);
+  const activeTab: Tab | null = page.kind === 'tab' ? page.tab : null;
 
-  const setActiveTab = (tab: Tab) => {
-    setActiveTabState(tab);
-    if (window.location.pathname !== TAB_ROUTES[tab].path) {
-      window.history.pushState({ tab }, '', TAB_ROUTES[tab].path);
+  const navigate = (to: string) => {
+    const [pathname, hash] = to.split('#');
+    setPath(normalizePath(pathname));
+    if (window.location.pathname + window.location.hash !== to) {
+      window.history.pushState(null, '', to);
     }
+    if (!hash) {
+      window.scrollTo(0, 0);
+      return;
+    }
+    // The new page mounts after the old one fades out; wait for the anchor.
+    const scrollToAnchor = (triesLeft: number) => {
+      const target = document.getElementById(hash);
+      if (target) target.scrollIntoView();
+      else if (triesLeft > 0) setTimeout(() => scrollToAnchor(triesLeft - 1), 50);
+    };
+    scrollToAnchor(30);
   };
 
-  const tabLink = (tab: Tab) => ({
-    href: TAB_ROUTES[tab].path,
+  const link = (to: string) => ({
+    href: to,
     onClick: (e: React.MouseEvent) => {
       if (!isPlainClick(e)) return;
       e.preventDefault();
-      setActiveTab(tab);
+      navigate(to);
     },
   });
+  const tabLink = (tab: Tab) => link(TAB_ROUTES[tab].path);
 
-  // Keep tab, title and canonical in sync with the URL (including back/forward)
+  // Keep title, description and canonical in sync with the URL (including back/forward)
   useEffect(() => {
-    applyTabMeta(activeTab);
-  }, [activeTab]);
+    applyMeta(pageMeta(pageFromPath(path)));
+  }, [path]);
 
   useEffect(() => {
-    const onPopState = () => setActiveTabState(tabFromPath(window.location.pathname));
+    const onPopState = () => setPath(normalizePath(window.location.pathname));
     window.addEventListener('popstate', onPopState);
     return () => window.removeEventListener('popstate', onPopState);
   }, []);
   const [activeBts, setActiveBts] = useState<typeof behindTheScenes[0] | null>(null);
-  const [activeProjectVideo, setActiveProjectVideo] = useState<typeof finishedProjects[0] | null>(null);
 
   // Movie reviews are published by adding entries to favoriteMovies in data.ts
   const reviews = favoriteMovies;
@@ -486,6 +490,9 @@ export default function App({ initialPath }: { initialPath?: string }) {
                           "{biography.quote}"
                         </p>
                       </div>
+                      <a {...link(ABOUT_PATH)} className="mt-8 inline-flex items-center gap-2 text-[10px] uppercase tracking-[0.25em] text-[#dfb86c] hover:text-white transition-colors">
+                        More about Robert <ArrowRight size={12} />
+                      </a>
                     </div>
 
                   </div>
@@ -539,6 +546,9 @@ export default function App({ initialPath }: { initialPath?: string }) {
                     <p className="max-w-2xl text-xs md:text-sm text-white/50 leading-relaxed font-light mt-4 mx-auto md:mx-0">
                       Have a project and want a second set of eyes? Robert offers one-on-one guidance for filmmakers, creators, and organizations at any stage, from first idea to final cut.
                     </p>
+                    <a {...link('/services/media-consulting')} className="mt-6 inline-flex items-center justify-center md:justify-start gap-2 text-[10px] uppercase tracking-[0.25em] text-[#dfb86c] hover:text-white transition-colors">
+                      Media consulting details <ArrowRight size={12} />
+                    </a>
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
@@ -568,6 +578,9 @@ export default function App({ initialPath }: { initialPath?: string }) {
                   <div className="mb-20">
                     <span className="text-[10px] text-white/40 tracking-[0.3em] uppercase mb-3 block">PORTFOLIO INDEX</span>
                     <h2 className="font-serif italic text-4xl md:text-6xl text-[#f5f5f5] tracking-tight">Filmography & Works</h2>
+                    <a {...link('/services/video-production')} className="mt-6 inline-flex items-center gap-2 text-[10px] uppercase tracking-[0.25em] text-[#dfb86c] hover:text-white transition-colors">
+                      Video production services <ArrowRight size={12} />
+                    </a>
                   </div>
 
                   {/* Finished Projects */}
@@ -577,10 +590,10 @@ export default function App({ initialPath }: { initialPath?: string }) {
                     </h3>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                       {finishedProjects.map((project) => (
-                        <div 
+                        <a 
                           key={project.id} 
-                          onClick={() => setActiveProjectVideo(project)}
-                          className="group border border-white/5 bg-white/[0.01] p-4 hover:border-white/15 transition-all duration-300 cursor-pointer"
+                          {...link(projectPath(project))}
+                          className="group block border border-white/5 bg-white/[0.01] p-4 hover:border-white/15 transition-all duration-300 cursor-pointer"
                         >
                           <div className="aspect-[16/10] overflow-hidden mb-6 bg-white/5 relative">
                             <img 
@@ -603,7 +616,7 @@ export default function App({ initialPath }: { initialPath?: string }) {
                           <h4 className="font-serif text-xl text-white/90 mb-3 group-hover:text-[#dfb86c] transition-colors">{project.title}</h4>
                           <p className="text-[10px] text-white/40 uppercase tracking-widest mb-3 font-semibold">Role: {project.role}</p>
                           <p className="text-[11px] text-white/50 leading-relaxed font-light">{project.description}</p>
-                        </div>
+                        </a>
                       ))}
                     </div>
                   </div>
@@ -1076,6 +1089,20 @@ export default function App({ initialPath }: { initialPath?: string }) {
               </motion.div>
             )}
 
+            {page.kind !== 'tab' && (
+              <motion.div
+                key={path}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.4 }}
+              >
+                {page.kind === 'about' && <AboutPage link={link} />}
+                {page.kind === 'project' && <ProjectPage project={page.project} link={link} />}
+                {page.kind === 'service' && <ServicePage service={page.service} link={link} />}
+              </motion.div>
+            )}
+
             {activeTab === 'contact' && (
               <motion.div
                 key="contact"
@@ -1220,6 +1247,14 @@ export default function App({ initialPath }: { initialPath?: string }) {
         
         {/* Footer */}
         <footer className="w-full max-w-[1400px] mx-auto px-4 md:px-8 py-16 border-t border-white/5" role="contentinfo">
+          <nav aria-label="Site pages" className="flex flex-wrap justify-center md:justify-start gap-x-8 gap-y-3 mb-10 text-[10px] uppercase tracking-[0.25em] text-white/40">
+            <a {...link(ABOUT_PATH)} className="hover:text-[#dfb86c] transition-colors">About</a>
+            {services.map(s => (
+              <a key={s.slug} {...link(servicePath(s))} className="hover:text-[#dfb86c] transition-colors">{s.name}</a>
+            ))}
+            <a {...tabLink('bts')} className="hover:text-[#dfb86c] transition-colors">Behind the Scenes</a>
+            <a {...tabLink('contact')} className="hover:text-[#dfb86c] transition-colors">Contact</a>
+          </nav>
           <div className="flex flex-col md:flex-row justify-between items-center text-[10px] text-white/30 uppercase tracking-[0.25em]">
             <p>© {new Date().getFullYear()} Golden Boy Productions — Robert Lazau</p>
             <nav aria-label="Social media links" className="flex space-x-6 mt-4 md:mt-0 text-[9px] tracking-wider text-white/40">
@@ -1310,86 +1345,6 @@ export default function App({ initialPath }: { initialPath?: string }) {
         )}
       </AnimatePresence>
 
-      {/* Project Video Reel Lightbox Modal */}
-      <AnimatePresence>
-        {activeProjectVideo && (
-          <motion.div 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={() => setActiveProjectVideo(null)}
-            className="fixed inset-0 z-50 bg-[#060606]/95 flex items-center justify-center p-4 md:p-8 backdrop-blur-sm cursor-zoom-out"
-          >
-            <motion.div 
-              initial={{ scale: 0.95, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.95, opacity: 0 }}
-              transition={{ type: "spring", damping: 25, stiffness: 200 }}
-              onClick={(e) => e.stopPropagation()}
-              className="w-full max-w-5xl bg-black border border-white/10 rounded-sm p-4 md:p-6 overflow-hidden cursor-default relative"
-            >
-              {/* Close Button */}
-              <button 
-                onClick={() => setActiveProjectVideo(null)}
-                className="absolute top-4 right-4 text-white/50 hover:text-white p-2 hover:bg-white/10 rounded-full transition-colors cursor-pointer z-10"
-                aria-label="Close video player"
-              >
-                <X size={20} strokeWidth={1.5} />
-              </button>
-
-              {/* Video Frame */}
-              <div className="aspect-[16/9] w-full overflow-hidden bg-white/5 border border-white/5 mb-6 relative">
-                {activeProjectVideo.video ? (
-                  isDriveVideo(activeProjectVideo.video) ? (
-                    <iframe
-                      src={activeProjectVideo.video}
-                      allow="autoplay"
-                      allowFullScreen
-                      className="w-full h-full border-0"
-                      title={activeProjectVideo.title}
-                    />
-                  ) : (
-                    <video 
-                      src={activeProjectVideo.video} 
-                      controls
-                      autoPlay
-                      playsInline
-                      className="w-full h-full object-cover object-center"
-                    />
-                  )
-                ) : (
-                  <div className="w-full h-full flex flex-col items-center justify-center text-white/40">
-                    <Play size={40} className="mb-2" />
-                    <p className="text-xs uppercase tracking-widest">Video Reel Unavailable</p>
-                  </div>
-                )}
-              </div>
-
-              {/* Project Info details */}
-              <div className="flex flex-col md:flex-row justify-between md:items-start gap-4">
-                <div>
-                  <div className="flex items-center gap-3 mb-1">
-                    <span className="text-[10px] text-[#dfb86c] tracking-widest uppercase font-semibold">
-                      {activeProjectVideo.type}
-                    </span>
-                    <span className="text-white/20 text-xs">•</span>
-                    <span className="text-[10px] text-white/40 tracking-wider font-semibold">
-                      {activeProjectVideo.year}
-                    </span>
-                  </div>
-                  <h3 className="font-serif text-2xl text-[#f5f5f5] mb-2">{activeProjectVideo.title}</h3>
-                  <p className="text-xs text-white/30 uppercase tracking-[0.2em] font-semibold mb-3">
-                    Role: {activeProjectVideo.role}
-                  </p>
-                  <p className="text-sm text-white/60 font-light leading-relaxed max-w-2xl">
-                    {activeProjectVideo.description}
-                  </p>
-                </div>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
     </div>
   );
 }

@@ -5,7 +5,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 const DIST = 'dist';
-const { render, TAB_ROUTES, canonicalUrl, SITE_URL, faqs } = await import(
+const { render, ALL_PATHS, SITE_URL, canonicalUrl, pageFromPath, pageMeta, pageJsonLd } = await import(
   path.resolve('dist-server/entry-server.js')
 );
 
@@ -17,20 +17,12 @@ const setTag = (html, pattern, value) => {
   return html.replace(pattern, (_, before, after) => `${before}${escapeHtml(value)}${after}`);
 };
 
-const faqJsonLd = JSON.stringify({
-  '@context': 'https://schema.org',
-  '@type': 'FAQPage',
-  mainEntity: faqs.map((f) => ({
-    '@type': 'Question',
-    name: f.question,
-    acceptedAnswer: { '@type': 'Answer', text: f.answer },
-  })),
-});
-
 const template = fs.readFileSync(path.join(DIST, 'index.html'), 'utf8');
 
-for (const [tab, route] of Object.entries(TAB_ROUTES)) {
-  const url = canonicalUrl(tab);
+for (const pagePath of ALL_PATHS) {
+  const page = pageFromPath(pagePath);
+  const route = pageMeta(page);
+  const url = canonicalUrl(route.path);
   let html = template;
   html = setTag(html, /(<title>)[^<]*(<\/title>)/, route.title);
   html = setTag(html, /(<meta name="description" content=")[^"]*(")/, route.description);
@@ -41,28 +33,29 @@ for (const [tab, route] of Object.entries(TAB_ROUTES)) {
   html = setTag(html, /(<meta name="twitter:url" content=")[^"]*(")/, url);
   html = setTag(html, /(<meta name="twitter:title" content=")[^"]*(")/, route.title);
   html = setTag(html, /(<meta name="twitter:description" content=")[^"]*(")/, route.description);
-  html = html.replace(
-    '<!--page-jsonld-->',
-    tab === 'home' ? `<script type="application/ld+json">${faqJsonLd}</script>` : '',
-  );
+  const jsonLd = pageJsonLd(page)
+    .map((data) => `<script type="application/ld+json">${JSON.stringify(data).replace(/</g, '\\u003c')}</script>`)
+    .join('\n    ');
+  html = html.replace('<!--page-jsonld-->', jsonLd);
   if (!html.includes('<div id="root"></div>')) throw new Error('prerender: empty #root not found');
   html = html.replace('<div id="root"></div>', `<div id="root">${render(route.path)}</div>`);
 
   const file = route.path === '/' ? 'index.html' : `${route.path.slice(1)}.html`;
+  fs.mkdirSync(path.dirname(path.join(DIST, file)), { recursive: true });
   fs.writeFileSync(path.join(DIST, file), html);
   console.log(`prerendered ${route.path} -> ${file}`);
 }
 
 const today = new Date().toISOString().slice(0, 10);
-const priority = { home: '1.0', contact: '0.8', bts: '0.7', movies: '0.5' };
+const priority = (p) => (p === '/' ? '1.0' : p.startsWith('/services/') || p === '/about' ? '0.9' : p === '/contact' ? '0.8' : '0.7');
 const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-${Object.keys(TAB_ROUTES)
+${ALL_PATHS
   .map(
-    (tab) => `  <url>
-    <loc>${canonicalUrl(tab)}</loc>
+    (p) => `  <url>
+    <loc>${canonicalUrl(p)}</loc>
     <lastmod>${today}</lastmod>
-    <priority>${priority[tab] ?? '0.5'}</priority>
+    <priority>${priority(p)}</priority>
   </url>`,
   )
   .join('\n')}

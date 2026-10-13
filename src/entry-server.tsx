@@ -4,8 +4,7 @@ import { StrictMode } from 'react';
 import { renderToString } from 'react-dom/server';
 import App from './App';
 
-export { TAB_ROUTES, canonicalUrl, SITE_URL } from './seo';
-export { faqs } from './data';
+export { ALL_PATHS, SITE_URL, canonicalUrl, pageFromPath, pageMeta, pageJsonLd } from './seo';
 
 export const render = (path: string) =>
   renderToString(

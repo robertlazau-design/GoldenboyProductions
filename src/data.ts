@@ -73,10 +73,25 @@ export const consultingServices = [
   }
 ];
 
-export const finishedProjects = [
+export type Project = {
+  id: number;
+  title: string;
+  slug: string;
+  client?: string;
+  location?: string;
+  type: string;
+  year: string;
+  role: string;
+  image: string;
+  description: string;
+  video: string;
+};
+
+export const finishedProjects: Project[] = [
   {
     id: 1,
     title: "Valentines Model Mash",
+    slug: "valentines-model-mash",
     type: "Commercial Event Visual",
     year: "2026",
     role: "Production House / Director",
@@ -87,6 +102,9 @@ export const finishedProjects = [
   {
     id: 2,
     title: "Disaster Preparedness",
+    slug: "disaster-preparedness",
+    client: "City of Fairview",
+    location: "Fairview, OR",
     type: "PSA / Commercial Ad",
     year: "2025",
     role: "Producer / Director",
@@ -97,6 +115,9 @@ export const finishedProjects = [
   {
     id: 3,
     title: "Hive Recovery Website Visual",
+    slug: "hive-recovery",
+    client: "Hive Recovery Collective",
+    location: "Gresham, OR",
     type: "Website Visual / Promo",
     year: "2025",
     role: "Visual Director",
@@ -107,6 +128,9 @@ export const finishedProjects = [
   {
     id: 4,
     title: "EMOPI Video",
+    slug: "emopi",
+    client: "EMOPI",
+    location: "Gresham, OR",
     type: "Community Spotlight Video",
     year: "2025",
     role: "Co-Director / Video Producer",
@@ -117,6 +141,8 @@ export const finishedProjects = [
   {
     id: 5,
     title: "Refined Kollective",
+    slug: "refined-kollective",
+    client: "Refined Kollective",
     type: "Fashion Visual",
     year: "2025",
     role: "Director / Cinematographer",
@@ -127,6 +153,8 @@ export const finishedProjects = [
   {
     id: 6,
     title: "Hayes Hustle",
+    slug: "hayes-hustle",
+    client: "Hayes Hustle",
     type: "Nonprofit Spotlight Video",
     year: "2025",
     role: "Production House / Director",
@@ -532,3 +560,62 @@ export const recommendableMovies = [
   { title: "All We Imagine as Light", director: "Payal Kapadia", year: "2024" },
   { title: "Flow", director: "Gints Zilbalodis", year: "2024" },
 ];
+
+// Service pages (/services/<slug>). Copy is drawn from the projects and
+// process described elsewhere on the site.
+export type Service = {
+  slug: string;
+  name: string;
+  title: string;
+  description: string;
+  heading: string;
+  intro: string[];
+  offerings: Array<{ title: string; desc: string }>;
+  projectSlugs: string[];
+};
+
+export const services: Service[] = [
+  {
+    slug: "video-production",
+    name: "Video Production",
+    title: "Video Production in Portland, OR | Golden Boy Productions",
+    description:
+      "Commercials, PSAs, nonprofit spotlights, website visuals and fashion films directed and produced by Robert Lazau for businesses, nonprofits and cities around Portland, Gresham and Fairview.",
+    heading: "Video production for Portland-area brands, nonprofits and cities",
+    intro: [
+      "Golden Boy Productions makes commercials, public service announcements, nonprofit and community spotlights, website visuals and fashion films. Robert Lazau directs and produces every project himself, from the first conversation to the final edit.",
+      "Recent work includes a disaster-preparedness campaign with the City of Fairview, a profile of the EMOPI program in Gresham, a website visual for Hive Recovery Collective and a spotlight on the Hayes Hustle nonprofit.",
+    ],
+    offerings: [
+      { title: "Commercials & brand films", desc: "Short films that show what your business does and why it matters, cut for your website, social media and ads." },
+      { title: "PSAs & city campaigns", desc: "Clear, watchable public service videos for cities and public agencies, like the City of Fairview's disaster-preparedness campaign." },
+      { title: "Nonprofit & community spotlights", desc: "Stories about the people behind an organization and the difference their work makes." },
+      { title: "Website visuals & promo loops", desc: "Short, atmospheric loops and promos that set the tone the moment someone lands on your site." },
+      { title: "Fashion visuals", desc: "Stylized films for collections, lookbooks and brand campaigns." },
+    ],
+    projectSlugs: ["disaster-preparedness", "emopi", "hayes-hustle", "hive-recovery", "refined-kollective", "valentines-model-mash"],
+  },
+  {
+    slug: "media-consulting",
+    name: "Media Consulting",
+    title: "Media Consulting for Filmmakers & Brands | Robert Lazau",
+    description:
+      "One-on-one media consulting from director Robert Lazau: story and script, visual direction, production planning and post-production feedback for filmmakers, creators and organizations.",
+    heading: "Media consulting, from first idea to final cut",
+    intro: [
+      "Have a project and want a second set of eyes? Robert offers one-on-one guidance for filmmakers, creators, and organizations at any stage, from first idea to final cut.",
+      "The advice comes from hands-on production experience. Robert directs, produces and shoots his own projects, so his guidance is practical and built around the budget, crew and schedule you actually have.",
+    ],
+    offerings: consultingServices,
+    projectSlugs: [],
+  },
+];
+
+// About page: the story behind the Golden Boy Productions mark.
+export const sunStar = {
+  title: "The sun star",
+  text: [
+    "The Golden Boy Productions mark is a six-petal rosette, a sun symbol found throughout Romanian folk art. It is carved into the wooden gates of Maramureș, painted on household objects and stitched into traditional embroidery, where it has long stood for light and protection.",
+    "For Robert, it is a nod to his Romanian roots and to craft passed down by hand: the same care he tries to bring to every frame.",
+  ],
+};
