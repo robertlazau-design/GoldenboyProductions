@@ -4,9 +4,9 @@ import { motion, AnimatePresence, useMotionValue, useSpring } from 'motion/react
 import { ArrowRight, ArrowLeft, Plus, Minus, Camera, X, Send, Mail, Play } from 'lucide-react';
 import { biography, clientApproach, consultingServices, finishedProjects, currentProjects, favoriteMovies, behindTheScenes, faqs, recommendableMovies, services } from './data';
 import robertBackground from '../assets/robert_background.jpg';
-import { TAB_ROUTES, pageFromPath, pageMeta, normalizePath, canonicalUrl, projectPath, servicePath, ABOUT_PATH, type Tab } from './seo';
+import { TAB_ROUTES, pageFromPath, pageMeta, normalizePath, canonicalUrl, projectPath, servicePath, ABOUT_PATH, WORK_PATH, type Tab } from './seo';
 import { isDriveVideo, isAnyVideo } from './media';
-import { AboutPage, ProjectPage, ServicePage } from './pages';
+import { AboutPage, ProjectPage, ServicePage, WorkPage } from './pages';
 
 
 const setMeta = (selector: string, attr: string, value: string) =>
@@ -363,7 +363,7 @@ export default function App({ initialPath }: { initialPath?: string }) {
             />
             <span>Golden Boy Productions</span>
           </a>
-          <ul className="flex items-center space-x-6 md:space-x-12 text-[10px] uppercase tracking-[0.25em] text-white/50">
+          <ul className="flex flex-wrap justify-center items-center gap-x-6 gap-y-3 md:gap-x-12 text-[10px] uppercase tracking-[0.25em] text-white/50">
             <li>
               <a 
                 {...tabLink('home')}
@@ -371,6 +371,15 @@ export default function App({ initialPath }: { initialPath?: string }) {
                 className={`inline-block normal-case hover:text-white transition-all duration-300 cursor-pointer ${activeTab === 'home' ? 'text-[#dfb86c] font-semibold border-b border-[#dfb86c] pb-1' : ''}`}
               >
                 Home
+              </a>
+            </li>
+            <li>
+              <a 
+                {...link(WORK_PATH)}
+                aria-current={page.kind === 'work' ? 'page' : undefined}
+                className={`inline-block normal-case hover:text-white transition-all duration-300 cursor-pointer ${(page.kind === 'work' || page.kind === 'project') ? 'text-[#dfb86c] font-semibold border-b border-[#dfb86c] pb-1' : ''}`}
+              >
+                Work
               </a>
             </li>
             <li>
@@ -1098,6 +1107,7 @@ export default function App({ initialPath }: { initialPath?: string }) {
                 transition={{ duration: 0.4 }}
               >
                 {page.kind === 'about' && <AboutPage link={link} />}
+                {page.kind === 'work' && <WorkPage link={link} />}
                 {page.kind === 'project' && <ProjectPage project={page.project} link={link} />}
                 {page.kind === 'service' && <ServicePage service={page.service} link={link} />}
               </motion.div>
@@ -1248,6 +1258,7 @@ export default function App({ initialPath }: { initialPath?: string }) {
         {/* Footer */}
         <footer className="w-full max-w-[1400px] mx-auto px-4 md:px-8 py-16 border-t border-white/5" role="contentinfo">
           <nav aria-label="Site pages" className="flex flex-wrap justify-center md:justify-start gap-x-8 gap-y-3 mb-10 text-[10px] uppercase tracking-[0.25em] text-white/40">
+            <a {...link(WORK_PATH)} className="hover:text-[#dfb86c] transition-colors">Work</a>
             <a {...link(ABOUT_PATH)} className="hover:text-[#dfb86c] transition-colors">About</a>
             {services.map(s => (
               <a key={s.slug} {...link(servicePath(s))} className="hover:text-[#dfb86c] transition-colors">{s.name}</a>

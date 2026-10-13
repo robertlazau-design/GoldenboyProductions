@@ -2,8 +2,8 @@
 // (/services/<slug>) and /about. Styled to match the tabs in App.tsx.
 import React from 'react';
 import { ArrowLeft, ArrowRight, Play } from 'lucide-react';
-import { biography, clientApproach, finishedProjects, services, sunStar, type Project, type Service } from './data';
-import { ABOUT_PATH, TAB_ROUTES, projectPath, servicePath } from './seo';
+import { biography, clientApproach, currentProjects, finishedProjects, services, sunStar, type Project, type Service } from './data';
+import { ABOUT_PATH, TAB_ROUTES, WORK_PATH, projectPath, servicePath } from './seo';
 import { isDriveVideo } from './media';
 
 export type LinkTo = (to: string) => { href: string; onClick: (e: React.MouseEvent) => void };
@@ -25,7 +25,7 @@ const TextLink = ({ link, to, children }: { link: LinkTo; to: string; children: 
   </a>
 );
 
-function ProjectCard({ project, link }: { project: Project; link: LinkTo; key?: React.Key }) {
+function ProjectCard({ project, link, detailed = false }: { project: Project; link: LinkTo; detailed?: boolean; key?: React.Key }) {
   return (
     <a
       {...link(projectPath(project))}
@@ -44,6 +44,12 @@ function ProjectCard({ project, link }: { project: Project; link: LinkTo; key?: 
         <span className="text-[9px] text-[#dfb86c] font-semibold">{project.year}</span>
       </div>
       <h3 className="font-serif text-xl text-white/90 group-hover:text-[#dfb86c] transition-colors">{project.title}</h3>
+      {detailed && (
+        <>
+          <p className="text-[10px] text-white/40 uppercase tracking-widest mt-3 mb-3 font-semibold">Role: {project.role}</p>
+          <p className="text-[11px] text-white/50 leading-relaxed font-light">{project.description}</p>
+        </>
+      )}
     </a>
   );
 }
@@ -102,7 +108,7 @@ export function ProjectPage({ project, link }: { project: Project; link: LinkTo 
   return (
     <article className="py-16">
       <a
-        {...link('/#projects')}
+        {...link(WORK_PATH)}
         className="inline-flex items-center gap-2 text-[10px] uppercase tracking-[0.25em] text-white/40 hover:text-[#dfb86c] transition-colors mb-12"
       >
         <ArrowLeft size={12} /> All work
@@ -267,10 +273,54 @@ export function AboutPage({ link }: { link: LinkTo }) {
 
       <nav className="py-12 border-t border-white/5 flex flex-wrap gap-8" aria-label="Services">
         {services.map(s => <TextLink key={s.slug} link={link} to={servicePath(s)}>{s.name}</TextLink>)}
-        <TextLink link={link} to="/#projects">See the work</TextLink>
+        <TextLink link={link} to={WORK_PATH}>See the work</TextLink>
       </nav>
 
       <ContactCta link={link} heading="Work with Robert" />
+    </article>
+  );
+}
+
+export function WorkPage({ link }: { link: LinkTo }) {
+  const videoService = services.find(s => s.slug === 'video-production');
+  return (
+    <article className="py-16">
+      <header className="mb-20">
+        <Kicker>Portfolio index</Kicker>
+        <h1 className="font-serif italic text-4xl md:text-6xl text-[#f5f5f5] tracking-tight mb-8">Filmography & Works</h1>
+        <p className="max-w-2xl text-sm md:text-base text-white/50 font-light leading-relaxed mb-6">
+          Commercials, PSAs, nonprofit and community spotlights, website visuals and fashion films made with businesses,
+          nonprofits and cities around Portland, Gresham and Fairview.
+        </p>
+        {videoService && <TextLink link={link} to={servicePath(videoService)}>Video production services</TextLink>}
+      </header>
+
+      <section className="pb-20" aria-label="Finished projects">
+        <h2 className="text-xs uppercase tracking-[0.25em] text-[#dfb86c] border-b border-white/5 pb-4 mb-10 font-medium">
+          Finished Projects
+        </h2>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          {finishedProjects.map(p => <ProjectCard key={p.slug} project={p} link={link} detailed />)}
+        </div>
+      </section>
+
+      {currentProjects.length > 0 && (
+        <section className="pb-20" aria-label="Current projects">
+          <h2 className="text-xs uppercase tracking-[0.25em] text-[#dfb86c] border-b border-white/5 pb-4 mb-10 font-medium">
+            Current Projects (In Development)
+          </h2>
+          <ul className="space-y-6">
+            {currentProjects.map(p => (
+              <li key={p.id} className="border border-white/5 bg-white/[0.01] p-5">
+                <h3 className="font-serif text-xl text-white/90 mb-2">{p.title}</h3>
+                <p className="text-[11px] text-white/50 leading-relaxed font-light">{p.description}</p>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+
+      <ContactCta link={link} heading="Have a project in mind?" />
     </article>
   );
 }

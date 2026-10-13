@@ -34,12 +34,14 @@ export const TAB_ROUTES: Record<Tab, { path: string; title: string; description:
 };
 
 export const ABOUT_PATH = '/about';
+export const WORK_PATH = '/work';
 export const projectPath = (p: Project) => `/work/${p.slug}`;
 export const servicePath = (s: Service) => `/services/${s.slug}`;
 
 export type Page =
   | { kind: 'tab'; tab: Tab }
   | { kind: 'about' }
+  | { kind: 'work' }
   | { kind: 'project'; project: Project }
   | { kind: 'service'; service: Service };
 
@@ -48,6 +50,7 @@ export const normalizePath = (pathname: string) => pathname.replace(/\/+$/, '') 
 export const pageFromPath = (pathname: string): Page => {
   const path = normalizePath(pathname);
   if (path === ABOUT_PATH) return { kind: 'about' };
+  if (path === WORK_PATH) return { kind: 'work' };
   const project = finishedProjects.find(p => projectPath(p) === path);
   if (project) return { kind: 'project', project };
   const service = services.find(s => servicePath(s) === path);
@@ -59,6 +62,7 @@ export const pageFromPath = (pathname: string): Page => {
 // Every page the site serves, in sitemap order.
 export const ALL_PATHS: string[] = [
   '/',
+  WORK_PATH,
   ABOUT_PATH,
   ...services.map(servicePath),
   ...finishedProjects.map(projectPath),
@@ -77,6 +81,13 @@ export const pageMeta = (page: Page): { path: string; title: string; description
         title: 'About Robert Lazau | Director & Producer, Golden Boy Productions',
         description:
           'Robert Lazau is a Portland-area director and producer who founded Golden Boy Productions to tell the stories happening in his own community.',
+      };
+    case 'work':
+      return {
+        path: WORK_PATH,
+        title: 'Work — Commercials, PSAs & Nonprofit Films | Robert Lazau',
+        description:
+          'Selected work by Robert Lazau and Golden Boy Productions: commercials, PSAs, nonprofit and community spotlights, website visuals and fashion films from around Portland, Oregon.',
       };
     case 'project': {
       const p = page.project;
@@ -133,6 +144,25 @@ export const pageJsonLd = (page: Page): object[] => {
         },
         breadcrumbs([['Home', '/'], ['About', ABOUT_PATH]]),
       ];
+    case 'work':
+      return [
+        {
+          '@context': 'https://schema.org',
+          '@type': 'CollectionPage',
+          name: 'Work',
+          url: canonicalUrl(WORK_PATH),
+          mainEntity: {
+            '@type': 'ItemList',
+            itemListElement: finishedProjects.map((p, i) => ({
+              '@type': 'ListItem',
+              position: i + 1,
+              url: canonicalUrl(projectPath(p)),
+              name: p.title,
+            })),
+          },
+        },
+        breadcrumbs([['Home', '/'], ['Work', WORK_PATH]]),
+      ];
     case 'project': {
       const p = page.project;
       return [
@@ -150,7 +180,7 @@ export const pageJsonLd = (page: Page): object[] => {
           ...(p.client ? { sourceOrganization: { '@type': 'Organization', name: p.client } } : {}),
           ...(p.location ? { locationCreated: { '@type': 'Place', name: p.location } } : {}),
         },
-        breadcrumbs([['Home', '/'], [p.title, projectPath(p)]]),
+        breadcrumbs([['Home', '/'], ['Work', WORK_PATH], [p.title, projectPath(p)]]),
       ];
     }
     case 'service': {
