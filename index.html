@@ -6,16 +6,14 @@
 
     <!-- Primary SEO Meta Tags -->
     <title>Robert Lazau — Director & Producer | Golden Boy Productions</title>
-    <meta name="title" content="Robert Lazau — Director & Producer | Golden Boy Productions" />
-    <meta name="description" content="Robert Lazau is a director, producer, and cinematographer based in Portland, Oregon. Founder of Golden Boy Productions — crafting cinematic commercials, fashion visuals, community spotlights, and brand campaigns." />
-    <meta name="keywords" content="Robert Lazau, Golden Boy Productions, director, producer, cinematographer, Portland Oregon filmmaker, fashion visual, commercial video production, music video director, brand campaign director" />
+    <meta name="description" content="Robert Lazau is a Portland-area director and producer and the founder of Golden Boy Productions, making commercials, short films and photography for brands, nonprofits and cities." />
     <meta name="author" content="Robert Lazau" />
     <meta name="robots" content="index, follow" />
-    <link rel="canonical" href="https://www.robertlazau.com" />
+    <link rel="canonical" href="https://www.robertlazau.com/" />
 
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://www.robertlazau.com" />
+    <meta property="og:url" content="https://www.robertlazau.com/" />
     <meta property="og:title" content="Robert Lazau — Director & Producer | Golden Boy Productions" />
     <meta property="og:description" content="Robert Lazau is a director, producer, and cinematographer. Founder of Golden Boy Productions — crafting cinematic commercials, fashion visuals, and brand campaigns in Portland, Oregon." />
     <meta property="og:image" content="https://www.robertlazau.com/og-image.jpg" />
@@ -26,7 +24,7 @@
 
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:url" content="https://www.robertlazau.com" />
+    <meta name="twitter:url" content="https://www.robertlazau.com/" />
     <meta name="twitter:title" content="Robert Lazau — Director & Producer | Golden Boy Productions" />
     <meta name="twitter:description" content="Robert Lazau is a director, producer, and cinematographer. Founder of Golden Boy Productions — crafting cinematic commercials, fashion visuals, and brand campaigns." />
     <meta name="twitter:image" content="https://www.robertlazau.com/og-image.jpg" />
@@ -42,6 +40,10 @@
     <!-- Preconnect for Performance -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&display=swap" />
+
+    <!-- Intro plays once per browser session -->
+    <script>try{if(sessionStorage.getItem('gb-intro'))document.documentElement.classList.add('intro-seen');else sessionStorage.setItem('gb-intro','1')}catch(e){}</script>
 
     <!-- JSON-LD Structured Data: Person -->
     <script type="application/ld+json">
@@ -51,7 +53,7 @@
       "name": "Robert Lazau",
       "url": "https://www.robertlazau.com",
       "image": "https://www.robertlazau.com/og-image.jpg",
-      "jobTitle": ["Director", "Producer", "Cinematographer"],
+      "jobTitle": ["Director", "Producer"],
       "description": "Robert Lazau is a director, producer, and cinematographer based in Portland, Oregon. He is the founder of Golden Boy Productions, a cinematic production company specializing in commercials, fashion visuals, community spotlight films, and brand campaigns.",
       "email": "robertlazau@gmail.com",
       "sameAs": [
@@ -79,7 +81,6 @@
       "@context": "https://schema.org",
       "@type": "Organization",
       "name": "Golden Boy Productions",
-      "alternateName": "GBP",
       "url": "https://www.robertlazau.com",
       "logo": "https://www.robertlazau.com/logo-full.png",
       "description": "Golden Boy Productions is a cinematic production company founded by Robert Lazau, specializing in commercial video production, fashion visuals, community spotlights, nonprofit campaigns, and brand storytelling.",
@@ -92,10 +93,10 @@
         "email": "robertlazau@gmail.com",
         "contactType": "General Inquiries"
       },
+      "areaServed": ["Portland, OR", "Gresham, OR", "Fairview, OR", "Pacific Northwest"],
       "sameAs": [
         "https://www.instagram.com/robertrgb/",
-        "https://www.imdb.com/name/nm14415874/",
-        "https://github.com/robertlazau-design/GoldenboyProductions"
+        "https://www.imdb.com/name/nm14415874/"
       ],
       "address": {
         "@type": "PostalAddress",
@@ -121,47 +122,8 @@
     }
     </script>
 
-    <!-- JSON-LD Structured Data: FAQPage -->
-    <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "FAQPage",
-      "mainEntity": [
-        {
-          "@type": "Question",
-          "name": "What cameras and lenses do you prefer for shooting?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "We pick cameras, lenses, and lighting to fit each project's look, budget, and schedule, from compact cinema setups to full rental packages."
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "What does a typical project look like?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "It starts with a conversation about your goals. From there we put together a simple plan and quote, schedule the shoot, film, and then refine the edit with you until it's ready to share."
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "Where are you based?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "Golden Boy Productions is based in the Portland area and works throughout Gresham, Fairview, and the wider Pacific Northwest. Reach out about projects outside the area, too."
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "Do you work with emerging filmmakers?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "Yes. We're always glad to connect with editors, camera operators, and production assistants who are building their craft. Reach out through the contact page with a link to your work."
-          }
-        }
-      ]
-    }
-    </script>
+    <!-- Page-specific structured data (FAQ on the homepage), added by scripts/prerender.mjs -->
+    <!--page-jsonld-->
 
 
     <!-- JSON-LD Structured Data: ProfessionalService -->
@@ -176,10 +138,7 @@
       },
       "url": "https://www.robertlazau.com",
       "description": "Professional media consulting services by Robert Lazau, drawing on hands-on production experience to guide filmmakers, creative directors, and brands from concept to final cut.",
-      "areaServed": {
-        "@type": "Place",
-        "name": "Portland, Oregon and Pacific Northwest"
-      },
+      "areaServed": ["Portland, OR", "Gresham, OR", "Fairview, OR", "Pacific Northwest"],
       "hasOfferCatalog": {
         "@type": "OfferCatalog",
         "name": "Media Consulting Services",
@@ -222,11 +181,11 @@
     </script>
   </head>
   <body>
-    <noscript>
-      <h1>Robert Lazau — Director & Producer | Golden Boy Productions</h1>
-      <p>Robert Lazau is a director, producer, and cinematographer based in Portland, Oregon. He is the founder of Golden Boy Productions, a cinematic production company creating commercials, fashion visuals, community spotlight films, nonprofit campaigns, and brand storytelling. Contact: robertlazau@gmail.com</p>
-      <p>Visit Robert Lazau on <a href="https://www.instagram.com/robertrgb/">Instagram</a> and <a href="https://www.imdb.com/name/nm14415874/">IMDb</a>.</p>
-    </noscript>
+    <div class="intro" aria-hidden="true">
+      <div class="intro-kicker">A Golden Boy Productions Presentation</div>
+      <div class="intro-name">Robert Lazau</div>
+      <div class="intro-line"></div>
+    </div>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>

@@ -1,4 +1,4 @@
-import robertPortrait from '../assets/robert_portrait.jpg';
+import robertPortrait from '../assets/robert_portrait.webp';
 
 // Google Drive video embed URLs (using /preview for iframe embedding)
 const projVideo1 = 'https://drive.google.com/file/d/1TaUrXIMbKXiIAWJynMxWxxQfIVW0_Hhy/preview';
@@ -11,19 +11,19 @@ const bts1 = 'https://drive.google.com/file/d/1QkL_-PAwx52tWigHB_egNYlH07Gleq3V/
 const bts2 = 'https://drive.google.com/file/d/1WHtfiZ_iMiWSyezXGbSKaR8Q66UsAdBM/preview';
 const bts3 = 'https://drive.google.com/file/d/1k-UWdaZIqZYgh8ms6PC8ewpSQxiPaj1y/preview';
 const bts4 = 'https://drive.google.com/file/d/1zmhlmCAPOpZUSbzWLctzZOA09onptxgc/preview';
-import bts6 from '../assets/bts/IMG_0367.JPG';
-import bts7 from '../assets/bts/FullSizeRender.jpg';
-import bts8 from '../assets/bts/IMG_2556.jpg';
-import bts9 from '../assets/bts/IMG_2058.jpg';
-import bts10 from '../assets/bts/IMG_2077.jpg';
-import bts11 from '../assets/bts/IMG_6656.jpg';
-import bts12 from '../assets/bts/IMG_6744.jpg';
-import bts13 from '../assets/bts/IMG_1208.jpg';
-import bts14 from '../assets/bts/IMG_2494.jpg';
-import bts15 from '../assets/bts/IMG_2553.jpg';
-import bts16 from '../assets/bts/IMG_2165.jpg';
-import bts17 from '../assets/bts/IMG_2540.jpg';
-import bts18 from '../assets/bts/IMG_1383.jpg';
+import bts6 from '../assets/bts/IMG_0367.webp';
+import bts7 from '../assets/bts/FullSizeRender.webp';
+import bts8 from '../assets/bts/IMG_2556.webp';
+import bts9 from '../assets/bts/IMG_2058.webp';
+import bts10 from '../assets/bts/IMG_2077.webp';
+import bts11 from '../assets/bts/IMG_6656.webp';
+import bts12 from '../assets/bts/IMG_6744.webp';
+import bts13 from '../assets/bts/IMG_1208.webp';
+import bts14 from '../assets/bts/IMG_2494.webp';
+import bts15 from '../assets/bts/IMG_2553.webp';
+import bts16 from '../assets/bts/IMG_2165.webp';
+import bts17 from '../assets/bts/IMG_2540.webp';
+import bts18 from '../assets/bts/IMG_1383.webp';
 
 export const biography = {
   year: "Portland, OR",
@@ -80,7 +80,7 @@ export const finishedProjects = [
     type: "Commercial Event Visual",
     year: "2026",
     role: "Production House / Director",
-    image: "/projects/valentines-model-mash.jpg",
+    image: "/projects/valentines-model-mash.webp",
     description: "A Valentine's collaborative shoot that brought models, videographers, and photographers together to create fresh content for brand partners.",
     video: projVideo6
   },
@@ -90,7 +90,7 @@ export const finishedProjects = [
     type: "PSA / Commercial Ad",
     year: "2025",
     role: "Producer / Director",
-    image: "/projects/disaster-preparedness.jpg",
+    image: "/projects/disaster-preparedness.webp",
     description: "A public service campaign made with the City of Fairview to promote its disaster preparedness course and help residents get ready before an emergency.",
     video: projVideo1
   },
@@ -100,7 +100,7 @@ export const finishedProjects = [
     type: "Website Visual / Promo",
     year: "2025",
     role: "Visual Director",
-    image: "/projects/hive-recovery.jpg",
+    image: "/projects/hive-recovery.webp",
     description: "A website visual and promo loop for Hive Recovery Collective in Gresham, capturing the calm, hands-on feel of their space.",
     video: projVideo4
   },
@@ -110,7 +110,7 @@ export const finishedProjects = [
     type: "Community Spotlight Video",
     year: "2025",
     role: "Co-Director / Video Producer",
-    image: "/projects/emopi.jpg",
+    image: "/projects/emopi.webp",
     description: "A community profile of the people behind the EMOPI program in Gresham and the impact of their work.",
     video: projVideo2
   },
@@ -120,7 +120,7 @@ export const finishedProjects = [
     type: "Fashion Visual",
     year: "2025",
     role: "Director / Cinematographer",
-    image: "/projects/refined-kollective.jpg",
+    image: "/projects/refined-kollective.webp",
     description: "A stylized fashion visual showcasing Refined Kollective's latest collection.",
     video: projVideo5
   },
@@ -130,7 +130,7 @@ export const finishedProjects = [
     type: "Nonprofit Spotlight Video",
     year: "2025",
     role: "Production House / Director",
-    image: "/projects/hayes-hustle.jpg",
+    image: "/projects/hayes-hustle.webp",
     description: "A spotlight on Hayes Hustle, a nonprofit that connects kids with nature, horses, and wildlife while teaching hands-on skills like podcasting and sewing.",
     video: projVideo3
   }
@@ -196,6 +196,7 @@ export const behindTheScenes = [
     location: "On Set",
     date: "2025",
     image: bts6,
+    alt: "Crew member watching a two-person interview being filmed on the Silicon Forest set, lit in green and purple",
     description: "Balancing primary gear rigs."
   },
   {
@@ -204,6 +205,7 @@ export const behindTheScenes = [
     location: "On Location",
     date: "2025",
     image: bts7,
+    alt: "Two models posing on a reflective, blue-lit studio floor during a fashion shoot",
     description: "Drafting dramatic scene silhouettes."
   },
   {
@@ -212,6 +214,7 @@ export const behindTheScenes = [
     location: "On Set",
     date: "2025",
     image: bts8,
+    alt: "Film crew with a boom mic and camera shooting an outdoor scene on a lawn",
     description: "Testing dynamic key light ray paths."
   },
   {
@@ -220,6 +223,7 @@ export const behindTheScenes = [
     location: "On Set",
     date: "2025",
     image: bts9,
+    alt: "Wide view of a multi-camera interview set with softboxes and a car on the Silicon Forest stage",
     description: "Mounting customized vintage glass."
   },
   {
@@ -228,6 +232,7 @@ export const behindTheScenes = [
     location: "On Set",
     date: "2025",
     image: bts10,
+    alt: "Two-camera interview of two men seated in front of a car on the Silicon Forest set",
     description: "Splitting lighting into graphic shapes."
   },
   {
@@ -236,6 +241,7 @@ export const behindTheScenes = [
     location: "On Set",
     date: "2025",
     image: bts11,
+    alt: "Crew filming a woman in a pink dress against a white studio backdrop",
     description: "Reviewing cast positioning."
   },
   {
@@ -244,6 +250,7 @@ export const behindTheScenes = [
     location: "On Set",
     date: "2025",
     image: bts12,
+    alt: "Director and crew with a camera and boom mic gathered on a grassy field for an outdoor shoot",
     description: "Calibrating lens focus markings."
   },
   {
@@ -252,6 +259,7 @@ export const behindTheScenes = [
     location: "On Set",
     date: "2025",
     image: bts13,
+    alt: "Camera monitor framing two men on a couch in a room decorated with sports memorabilia",
     description: "Verifying high contrast framing."
   },
   {
@@ -260,6 +268,7 @@ export const behindTheScenes = [
     location: "On Set",
     date: "2025",
     image: bts14,
+    alt: "Camera operators filming on an outdoor deck among trees",
     description: "Setting up bounce boards."
   },
   {
@@ -268,6 +277,7 @@ export const behindTheScenes = [
     location: "On Set",
     date: "2025",
     image: bts15,
+    alt: "Clapperboard for Tailspin Episode 1, directed by Robert Lazau",
     description: "Securing focus margins."
   },
   {
@@ -276,6 +286,7 @@ export const behindTheScenes = [
     location: "On Set",
     date: "2025",
     image: bts16,
+    alt: "Crew in silhouette filming in a dark studio with coloured lights",
     description: "Checking camera elevation level."
   },
   {
@@ -284,6 +295,7 @@ export const behindTheScenes = [
     location: "Edit Suite",
     date: "2025",
     image: bts17,
+    alt: "Crew on a camera dolly track filming a dog walking on a treadmill in a studio",
     description: "Locking in target color spaces."
   },
   {
@@ -292,6 +304,7 @@ export const behindTheScenes = [
     location: "On Set",
     date: "2025",
     image: bts18,
+    alt: "Two-person interview filmed in a blue-lit studio with a cinema camera in the foreground",
     description: "Calibrating stage fog thickness."
   }
 ];

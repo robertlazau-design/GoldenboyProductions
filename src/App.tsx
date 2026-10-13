@@ -4,6 +4,7 @@ import { motion, AnimatePresence, useMotionValue, useSpring } from 'motion/react
 import { ArrowRight, ArrowLeft, Plus, Minus, Camera, X, Send, Mail, Play } from 'lucide-react';
 import { biography, clientApproach, consultingServices, finishedProjects, currentProjects, favoriteMovies, behindTheScenes, faqs, recommendableMovies } from './data';
 import robertBackground from '../assets/robert_background.jpg';
+import { TAB_ROUTES, tabFromPath, canonicalUrl, type Tab } from './seo';
 
 const isVideoFile = (url: string) => {
   if (!url) return false;
@@ -17,32 +18,30 @@ const isDriveVideo = (url: string) => {
 
 const isAnyVideo = (url: string) => isVideoFile(url) || isDriveVideo(url);
 
-type Tab = 'home' | 'movies' | 'bts' | 'contact';
-
-// Each tab has its own URL so it can be shared and indexed
-const TAB_ROUTES: Record<Tab, { path: string; title: string }> = {
-  home: { path: '/', title: 'Robert Lazau — Director & Producer | Golden Boy Productions' },
-  movies: { path: '/favorite-movies', title: 'Favorite Movies | Robert Lazau' },
-  bts: { path: '/behind-the-scenes', title: 'Behind the Scenes | Robert Lazau' },
-  contact: { path: '/contact', title: 'Contact Robert Lazau | Golden Boy Productions' },
-};
-
-const tabFromPath = (pathname: string): Tab => {
-  const clean = pathname.replace(/\/+$/, '') || '/';
-  const match = (Object.keys(TAB_ROUTES) as Tab[]).find(tab => TAB_ROUTES[tab].path === clean);
-  return match ?? 'home';
-};
+const setMeta = (selector: string, attr: string, value: string) =>
+  document.querySelector(selector)?.setAttribute(attr, value);
 
 const applyTabMeta = (tab: Tab) => {
-  const { path, title } = TAB_ROUTES[tab];
-  const url = `https://www.robertlazau.com${path}`;
+  const { title, description } = TAB_ROUTES[tab];
+  const url = canonicalUrl(tab);
   document.title = title;
-  document.querySelector('link[rel="canonical"]')?.setAttribute('href', url);
-  document.querySelector('meta[property="og:url"]')?.setAttribute('content', url);
+  setMeta('link[rel="canonical"]', 'href', url);
+  setMeta('meta[name="description"]', 'content', description);
+  setMeta('meta[property="og:url"]', 'content', url);
+  setMeta('meta[property="og:title"]', 'content', title);
+  setMeta('meta[property="og:description"]', 'content', description);
+  setMeta('meta[name="twitter:url"]', 'content', url);
+  setMeta('meta[name="twitter:title"]', 'content', title);
+  setMeta('meta[name="twitter:description"]', 'content', description);
 };
 
-export default function App() {
-  const [activeTab, setActiveTabState] = useState<Tab>(() => tabFromPath(window.location.pathname));
+// Internal page links are real <a href>s so crawlers can follow them;
+// a plain left-click is handled in-app without a reload.
+const isPlainClick = (e: React.MouseEvent) =>
+  e.button === 0 && !e.metaKey && !e.ctrlKey && !e.shiftKey && !e.altKey;
+
+export default function App({ initialPath }: { initialPath?: string }) {
+  const [activeTab, setActiveTabState] = useState<Tab>(() => tabFromPath(initialPath ?? window.location.pathname));
 
   const setActiveTab = (tab: Tab) => {
     setActiveTabState(tab);
@@ -50,6 +49,15 @@ export default function App() {
       window.history.pushState({ tab }, '', TAB_ROUTES[tab].path);
     }
   };
+
+  const tabLink = (tab: Tab) => ({
+    href: TAB_ROUTES[tab].path,
+    onClick: (e: React.MouseEvent) => {
+      if (!isPlainClick(e)) return;
+      e.preventDefault();
+      setActiveTab(tab);
+    },
+  });
 
   // Keep tab, title and canonical in sync with the URL (including back/forward)
   useEffect(() => {
@@ -63,9 +71,6 @@ export default function App() {
   }, []);
   const [activeBts, setActiveBts] = useState<typeof behindTheScenes[0] | null>(null);
   const [activeProjectVideo, setActiveProjectVideo] = useState<typeof finishedProjects[0] | null>(null);
-
-  // Loading / Splash preloader state
-  const [loading, setLoading] = useState(true);
 
   // Movie reviews are published by adding entries to favoriteMovies in data.ts
   const reviews = favoriteMovies;
@@ -91,14 +96,6 @@ export default function App() {
   const [contactType, setContactType] = useState('Commercial / Brand Campaign');
   const [contactMessage, setContactMessage] = useState('');
   const [contactSent, setContactSent] = useState(false);
-
-  // Preloader timeout effect
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setLoading(false);
-    }, 2800);
-    return () => clearTimeout(timer);
-  }, []);
 
   // Behind the Scenes active slide index
   const [currentBtsIndex, setCurrentBtsIndex] = useState(0);
@@ -296,43 +293,6 @@ export default function App() {
       {/* Animated Film Grain Overlay */}
       <div className="film-grain" />
 
-      {/* Preloader Splash Presentation */}
-      <AnimatePresence>
-        {loading && (
-          <motion.div 
-            key="preloader"
-            initial={{ opacity: 1 }}
-            exit={{ opacity: 0, y: -30 }}
-            transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
-            className="fixed inset-0 z-[10000] bg-[#060606] flex flex-col items-center justify-center text-center p-4 select-none"
-          >
-            <div className="space-y-6">
-              <motion.div
-                initial={{ opacity: 0, letterSpacing: "0.2em" }}
-                animate={{ opacity: [0, 1, 1], letterSpacing: ["0.2em", "0.4em", "0.45em"] }}
-                transition={{ duration: 2.2, ease: "easeInOut" }}
-                className="text-[9px] uppercase tracking-[0.45em] text-[#dfb86c] font-light"
-              >
-                A Golden Boy Productions Presentation
-              </motion.div>
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: [0, 0, 1] }}
-                transition={{ duration: 2.2, delay: 0.3, ease: "easeOut" }}
-                className="font-serif italic text-3xl md:text-5xl text-white/90 font-light"
-              >
-                Robert Lazau
-              </motion.div>
-              <motion.div 
-                initial={{ width: 0 }}
-                animate={{ width: "80px" }}
-                transition={{ duration: 1.5, delay: 0.8, ease: "easeInOut" }}
-                className="h-[1px] bg-[#dfb86c]/20 mx-auto"
-              />
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
 
       {/* Custom Mouse Cursor (Desktop Only) */}
       {isDesktop && isCursorVisible && (
@@ -388,8 +348,8 @@ export default function App() {
         {/* Navigation Header */}
         <header>
         <nav className="w-full max-w-[1400px] mx-auto px-4 md:px-8 py-10 flex flex-col sm:flex-row justify-between items-center border-b border-white/5 gap-6" aria-label="Main navigation">
-          <div 
-            onClick={() => setActiveTab('home')}
+          <a 
+            {...tabLink('home')}
             className="flex items-center gap-3 font-serif italic text-white/90 text-xl tracking-wider select-none cursor-pointer hover:text-[#dfb86c] transition-colors group"
           >
             <img 
@@ -398,39 +358,43 @@ export default function App() {
               className="h-9 w-auto transition-transform duration-300 group-hover:scale-105" 
             />
             <span>Golden Boy Productions</span>
-          </div>
+          </a>
           <ul className="flex items-center space-x-6 md:space-x-12 text-[10px] uppercase tracking-[0.25em] text-white/50">
             <li>
-              <button 
-                onClick={() => setActiveTab('home')} 
-                className={`hover:text-white transition-all duration-300 cursor-pointer ${activeTab === 'home' ? 'text-[#dfb86c] font-semibold border-b border-[#dfb86c] pb-1' : ''}`}
+              <a 
+                {...tabLink('home')}
+                aria-current={activeTab === 'home' ? 'page' : undefined}
+                className={`inline-block normal-case hover:text-white transition-all duration-300 cursor-pointer ${activeTab === 'home' ? 'text-[#dfb86c] font-semibold border-b border-[#dfb86c] pb-1' : ''}`}
               >
                 Home
-              </button>
+              </a>
             </li>
             <li>
-              <button 
-                onClick={() => setActiveTab('movies')} 
-                className={`hover:text-white transition-all duration-300 cursor-pointer ${activeTab === 'movies' ? 'text-[#dfb86c] font-semibold border-b border-[#dfb86c] pb-1' : ''}`}
+              <a 
+                {...tabLink('movies')}
+                aria-current={activeTab === 'movies' ? 'page' : undefined}
+                className={`inline-block normal-case hover:text-white transition-all duration-300 cursor-pointer ${activeTab === 'movies' ? 'text-[#dfb86c] font-semibold border-b border-[#dfb86c] pb-1' : ''}`}
               >
                 Favorite Movies
-              </button>
+              </a>
             </li>
             <li>
-              <button 
-                onClick={() => setActiveTab('bts')} 
-                className={`hover:text-white transition-all duration-300 cursor-pointer ${activeTab === 'bts' ? 'text-[#dfb86c] font-semibold border-b border-[#dfb86c] pb-1' : ''}`}
+              <a 
+                {...tabLink('bts')}
+                aria-current={activeTab === 'bts' ? 'page' : undefined}
+                className={`inline-block normal-case hover:text-white transition-all duration-300 cursor-pointer ${activeTab === 'bts' ? 'text-[#dfb86c] font-semibold border-b border-[#dfb86c] pb-1' : ''}`}
               >
                 Behind The Scenes
-              </button>
+              </a>
             </li>
             <li>
-              <button 
-                onClick={() => setActiveTab('contact')} 
-                className={`hover:text-white transition-all duration-300 cursor-pointer ${activeTab === 'contact' ? 'text-[#dfb86c] font-semibold border-b border-[#dfb86c] pb-1' : ''}`}
+              <a 
+                {...tabLink('contact')}
+                aria-current={activeTab === 'contact' ? 'page' : undefined}
+                className={`inline-block normal-case hover:text-white transition-all duration-300 cursor-pointer ${activeTab === 'contact' ? 'text-[#dfb86c] font-semibold border-b border-[#dfb86c] pb-1' : ''}`}
               >
                 Contact
-              </button>
+              </a>
             </li>
           </ul>
         </nav>
@@ -438,7 +402,7 @@ export default function App() {
 
         <main className="w-full max-w-[1400px] mx-auto px-4 md:px-8">
           
-          <AnimatePresence mode="wait">
+          <AnimatePresence mode="wait" initial={false}>
             {activeTab === 'home' && (
               <motion.div
                 key="home"
@@ -450,7 +414,7 @@ export default function App() {
                 {/* Hero Section */}
                  <section className="min-h-[70vh] flex flex-col justify-center items-center text-center pt-8 pb-16 relative z-10" aria-label="Hero">
                   <motion.div
-                    initial={{ opacity: 0, scale: 0.8 }}
+                    initial={false}
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1], delay: 0.2 }}
                     className="mb-8 select-none"
@@ -462,7 +426,7 @@ export default function App() {
                     />
                   </motion.div>
                   <motion.h1 
-                    initial={{ opacity: 0, y: 30 }}
+                    initial={false}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 1, ease: [0.16, 1, 0.3, 1], delay: 0.1 }}
                     className="font-serif text-5xl md:text-8xl lg:text-9xl tracking-tight mb-4 text-[#f5f5f5]"
@@ -471,7 +435,7 @@ export default function App() {
                   </motion.h1>
                   
                   <motion.div 
-                    initial={{ opacity: 0 }}
+                    initial={false}
                     animate={{ opacity: 1 }}
                     transition={{ duration: 1.2, delay: 0.4 }}
                     className="text-[#dfb86c]/90 font-serif italic text-xl md:text-3xl mb-8 tracking-wide"
@@ -480,7 +444,7 @@ export default function App() {
                   </motion.div>
                   
                   <motion.p 
-                    initial={{ opacity: 0 }}
+                    initial={false}
                     animate={{ opacity: 1 }}
                     transition={{ duration: 1.2, delay: 0.6 }}
                     className="max-w-2xl text-xs md:text-sm leading-relaxed text-white/40 tracking-wider font-light mb-16"
@@ -506,7 +470,7 @@ export default function App() {
                       <div className="aspect-[3/4] overflow-hidden bg-white/5 border border-white/10 max-w-md mx-auto md:ml-0">
                         <img 
                           src={biography.image} 
-                          alt="Robert Lazau profile portrait"
+                          alt="Portrait of director Robert Lazau"
                           loading="lazy" 
                           className="w-full h-full object-cover opacity-100 brightness-110 group-hover:brightness-125 group-hover:scale-105 transition-all duration-1000 ease-out"
                         />
@@ -621,7 +585,7 @@ export default function App() {
                           <div className="aspect-[16/10] overflow-hidden mb-6 bg-white/5 relative">
                             <img 
                               src={project.image} 
-                              alt={project.title}
+                              alt={`${project.title}, ${project.type.toLowerCase()} by Golden Boy Productions`}
                               loading="lazy" 
                               className="w-full h-full object-cover grayscale group-hover:scale-103 group-hover:grayscale-0 transition-all duration-700 ease-out"
                             />
@@ -656,7 +620,7 @@ export default function App() {
                           <div className="aspect-[16/10] md:w-[45%] overflow-hidden bg-white/5 flex-shrink-0">
                             <img 
                               src={project.image} 
-                              alt={project.title}
+                              alt={`${project.title}, ${project.type.toLowerCase()} by Golden Boy Productions`}
                               loading="lazy" 
                               className="w-full h-full object-cover grayscale group-hover:scale-103 group-hover:grayscale-0 transition-all duration-700 ease-out"
                             />
@@ -705,7 +669,7 @@ export default function App() {
                   <div className="flex justify-between items-end mb-16 border-b border-white/5 pb-6">
                     <div>
                       <span className="text-[10px] text-white/40 tracking-[0.3em] uppercase mb-2 block">FILM DIARY & REVIEWS</span>
-                      <h2 className="font-serif italic text-4xl md:text-6xl text-[#f5f5f5] tracking-tight">Favorite Movies Blog</h2>
+                      <h1 className="font-serif italic text-4xl md:text-6xl text-[#f5f5f5] tracking-tight">Favorite Movies Blog</h1>
                     </div>
                     <div className="flex items-center gap-4">
                       <button 
@@ -963,21 +927,21 @@ export default function App() {
                 <section id="bts" className="py-16 relative overflow-hidden" aria-label="Behind the Scenes Gallery">
                   {/* Massive background text */}
                   <div className="absolute top-12 left-1/2 -translate-x-1/2 w-full text-center pointer-events-none select-none z-0">
-                    <h2 className="font-serif italic text-[15vw] md:text-[22vw] leading-none text-white/[0.01] whitespace-nowrap tracking-tighter">
+                    <div aria-hidden="true" className="font-serif italic text-[15vw] md:text-[22vw] leading-none text-white/[0.01] whitespace-nowrap tracking-tighter">
                       BTS GALLERY
-                    </h2>
+                    </div>
                   </div>
 
                   <div className="relative z-10">
                     <div className="text-center mb-16">
                       <span className="text-[10px] text-white/40 tracking-[0.3em] uppercase mb-3 block">ON SET & PRODUCTION</span>
-                      <h2 className="font-serif text-4xl md:text-6xl text-[#f5f5f5] tracking-tight">Behind the scenes</h2>
+                      <h1 className="font-serif text-4xl md:text-6xl text-[#f5f5f5] tracking-tight">Behind the scenes</h1>
                     </div>
 
                     <div className="max-w-5xl mx-auto border border-white/10 bg-white/[0.01] p-6 md:p-8 rounded-sm relative">
                       <div className="relative aspect-[16/9] max-h-[520px] w-full overflow-hidden bg-white/5 border border-white/5 mb-8">
                         {/* Slideshow image/video fade-in transition */}
-                        <AnimatePresence mode="wait">
+                        <AnimatePresence mode="wait" initial={false}>
                           {isAnyVideo(behindTheScenes[currentBtsIndex].image) ? (
                             isDriveVideo(behindTheScenes[currentBtsIndex].image) ? (
                               <motion.div
@@ -1015,7 +979,7 @@ export default function App() {
                             <motion.img
                               key={currentBtsIndex}
                               src={behindTheScenes[currentBtsIndex].image}
-                              alt={behindTheScenes[currentBtsIndex].title}
+                              alt={behindTheScenes[currentBtsIndex].alt ?? behindTheScenes[currentBtsIndex].title}
                               initial={{ opacity: 0, scale: 1.03 }}
                               animate={{ opacity: 1, scale: 1 }}
                               exit={{ opacity: 0, scale: 0.98 }}
@@ -1048,7 +1012,7 @@ export default function App() {
                           <span className="text-[10px] text-[#dfb86c] tracking-[0.25em] font-semibold uppercase">
                             0{currentBtsIndex + 1}/ BTS DIARY
                           </span>
-                          <AnimatePresence mode="wait">
+                          <AnimatePresence mode="wait" initial={false}>
                             <motion.div
                               key={currentBtsIndex}
                               initial={{ opacity: 0, y: 10 }}
@@ -1067,7 +1031,7 @@ export default function App() {
                         </div>
 
                         <div className="md:col-span-4 flex flex-col items-end gap-4 text-right">
-                          <AnimatePresence mode="wait">
+                          <AnimatePresence mode="wait" initial={false}>
                             <motion.div
                               key={currentBtsIndex}
                               initial={{ opacity: 0 }}
@@ -1124,7 +1088,7 @@ export default function App() {
                 <section id="contact-page" className="py-16 max-w-4xl mx-auto" aria-label="Contact Robert Lazau">
                   <div className="text-center mb-16">
                     <span className="text-[10px] text-white/40 tracking-[0.3em] uppercase mb-3 block">COLLABORATION & COMMISSION</span>
-                    <h2 className="font-serif italic text-4xl md:text-6xl text-[#f5f5f5] tracking-tight">Contact Robert</h2>
+                    <h1 className="font-serif italic text-4xl md:text-6xl text-[#f5f5f5] tracking-tight">Contact Robert</h1>
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-12 gap-12 items-start">
@@ -1263,12 +1227,12 @@ export default function App() {
               <a href="https://www.imdb.com/name/nm14415874/" target="_blank" rel="noopener noreferrer" className="hover:text-[#dfb86c] transition-colors">IMDb</a>
               <a href="mailto:robertlazau@gmail.com" className="hover:text-[#dfb86c] transition-colors">Email</a>
             </nav>
-            <p 
-              onClick={() => setActiveTab('home')}
+            <a 
+              {...tabLink('home')}
               className="mt-4 md:mt-0 font-serif italic text-[#dfb86c] cursor-pointer hover:text-white transition-colors"
             >
               Robert Lazau
-            </p>
+            </a>
           </div>
         </footer>
       </div>
@@ -1323,7 +1287,7 @@ export default function App() {
                 ) : (
                   <img 
                     src={activeBts.image} 
-                    alt={activeBts.title} 
+                    alt={activeBts.alt ?? activeBts.title} 
                     className="w-full h-full object-cover object-center"
                   />
                 )}
@@ -1437,6 +1401,7 @@ function FAQItem({ question, answer }: { question: string; answer: string; key?:
     <div className="border-b border-white/5">
       <button 
         onClick={() => setIsOpen(!isOpen)}
+        aria-expanded={isOpen}
         className="w-full py-8 flex justify-between items-center text-left hover:text-white group transition-colors duration-300"
       >
         <span className="font-serif text-lg md:text-2xl text-white/80 group-hover:text-[#dfb86c] transition-colors">{question}</span>
@@ -1444,21 +1409,16 @@ function FAQItem({ question, answer }: { question: string; answer: string; key?:
           {isOpen ? <Minus size={16} strokeWidth={1} className="text-[#dfb86c]" /> : <Plus size={16} strokeWidth={1} />}
         </div>
       </button>
-      <AnimatePresence>
-        {isOpen && (
-          <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: "auto", opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.3, ease: "easeInOut" }}
-            className="overflow-hidden"
-          >
-            <p className="pb-8 text-sm md:text-base text-[#e5e5e5]/50 font-light leading-relaxed max-w-2xl">
-              {answer}
-            </p>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      <div
+        className={`grid transition-[grid-template-rows,opacity] duration-300 ease-in-out ${isOpen ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'}`}
+        aria-hidden={!isOpen}
+      >
+        <div className="overflow-hidden">
+          <p className="pb-8 text-sm md:text-base text-[#e5e5e5]/50 font-light leading-relaxed max-w-2xl">
+            {answer}
+          </p>
+        </div>
+      </div>
     </div>
   );
 }
