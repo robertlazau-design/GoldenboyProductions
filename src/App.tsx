@@ -393,9 +393,9 @@ export default function App() {
             className="flex items-center gap-3 font-serif italic text-white/90 text-xl tracking-wider select-none cursor-pointer hover:text-[#dfb86c] transition-colors group"
           >
             <img 
-              src="/logo-mark.png" 
+              src="/logo-mark-small.png" 
               alt="Golden Boy Productions Logo" 
-              className="h-8 w-auto transition-transform duration-300 group-hover:scale-105" 
+              className="h-9 w-auto transition-transform duration-300 group-hover:scale-105" 
             />
             <span>Golden Boy Productions</span>
           </div>
@@ -1170,7 +1170,7 @@ export default function App() {
                         <img 
                           src="/logo-full.png" 
                           alt="Golden Boy Productions Logo" 
-                          className="h-16 md:h-20 w-auto opacity-70 hover:opacity-100 transition-opacity duration-300 select-none filter drop-shadow-[0_0_15px_rgba(223,184,108,0.1)]" 
+                          className="h-28 md:h-36 w-auto opacity-70 hover:opacity-100 transition-opacity duration-300 select-none filter drop-shadow-[0_0_15px_rgba(223,184,108,0.1)]" 
                         />
                       </div>
                     </div>
