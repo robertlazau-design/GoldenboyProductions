@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import emailjs from '@emailjs/browser';
 import { motion, AnimatePresence, useMotionValue, useSpring } from 'motion/react';
-import { ArrowRight, ArrowLeft, Plus, Minus, Camera, X, Send, Mail, Play } from 'lucide-react';
-import { biography, clientApproach, consultingServices, finishedProjects, currentProjects, favoriteMovies, behindTheScenes, faqs, recommendableMovies, services } from './data';
+import { ArrowRight, ArrowLeft, Plus, Minus, Camera, X, Send, Mail } from 'lucide-react';
+import { biography, clientApproach, consultingServices, favoriteMovies, behindTheScenes, faqs, recommendableMovies, services } from './data';
 import robertBackground from '../assets/robert_background.jpg';
-import { TAB_ROUTES, pageFromPath, pageMeta, normalizePath, canonicalUrl, projectPath, servicePath, ABOUT_PATH, WORK_PATH, type Tab } from './seo';
+import { TAB_ROUTES, pageFromPath, pageMeta, normalizePath, canonicalUrl, servicePath, ABOUT_PATH, WORK_PATH, type Tab } from './seo';
 import { isDriveVideo, isAnyVideo } from './media';
 import { AboutPage, ProjectPage, ServicePage, WorkPage } from './pages';
 
@@ -572,97 +572,6 @@ export default function App({ initialPath }: { initialPath?: string }) {
                       </div>
                     ))}
                   </div>
-                </motion.section>
-
-                {/* Finished Projects & Current Projects Sections */}
-                <motion.section 
-                  id="projects" 
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, margin: "-100px" }}
-                  transition={{ duration: 0.8, ease: "easeOut" }}
-                  className="py-28 border-t border-white/5"
-                  aria-label="Filmography and Works"
-                >
-                  <div className="mb-20">
-                    <span className="text-[10px] text-white/40 tracking-[0.3em] uppercase mb-3 block">PORTFOLIO INDEX</span>
-                    <h2 className="font-serif italic text-4xl md:text-6xl text-[#f5f5f5] tracking-tight">Filmography & Works</h2>
-                    <a {...link('/services/video-production')} className="mt-6 inline-flex items-center gap-2 text-[10px] uppercase tracking-[0.25em] text-[#dfb86c] hover:text-white transition-colors">
-                      Video production services <ArrowRight size={12} />
-                    </a>
-                  </div>
-
-                  {/* Finished Projects */}
-                  <div className="mb-24">
-                    <h3 className="text-xs uppercase tracking-[0.25em] text-[#dfb86c] border-b border-white/5 pb-4 mb-10 font-medium">
-                      Finished Projects
-                    </h3>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                      {finishedProjects.map((project) => (
-                        <a 
-                          key={project.id} 
-                          {...link(projectPath(project))}
-                          className="group block border border-white/5 bg-white/[0.01] p-4 hover:border-white/15 transition-all duration-300 cursor-pointer"
-                        >
-                          <div className="aspect-[16/10] overflow-hidden mb-6 bg-white/5 relative">
-                            <img 
-                              src={project.image} 
-                              alt={`${project.title}, ${project.type.toLowerCase()} by Golden Boy Productions`}
-                              loading="lazy" 
-                              className="w-full h-full object-cover grayscale group-hover:scale-103 group-hover:grayscale-0 transition-all duration-700 ease-out"
-                            />
-                            {/* Hover Play Button Overlay */}
-                            <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                              <div className="w-12 h-12 rounded-full border border-white/40 bg-black/50 flex items-center justify-center text-white/80 group-hover:scale-110 group-hover:border-[#dfb86c] group-hover:text-[#dfb86c] transition-all duration-300">
-                                <Play size={18} className="ml-0.5 fill-[#dfb86c] text-[#dfb86c] group-hover:fill-transparent transition-all" />
-                              </div>
-                            </div>
-                          </div>
-                          <div className="flex justify-between items-baseline mb-2">
-                            <span className="text-[9px] uppercase tracking-wider text-white/40">{project.type}</span>
-                            <span className="text-[9px] text-[#dfb86c] font-semibold">{project.year}</span>
-                          </div>
-                          <h4 className="font-serif text-xl text-white/90 mb-3 group-hover:text-[#dfb86c] transition-colors">{project.title}</h4>
-                          <p className="text-[10px] text-white/40 uppercase tracking-widest mb-3 font-semibold">Role: {project.role}</p>
-                          <p className="text-[11px] text-white/50 leading-relaxed font-light">{project.description}</p>
-                        </a>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Current Projects */}
-                  {currentProjects.length > 0 && (
-                  <div>
-                    <h3 className="text-xs uppercase tracking-[0.25em] text-[#dfb86c] border-b border-white/5 pb-4 mb-10 font-medium">
-                      Current Projects (In Development)
-                    </h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                      {currentProjects.map((project) => (
-                        <div key={project.id} className="group border border-white/5 bg-white/[0.01] p-5 hover:border-white/15 transition-all duration-300 flex flex-col md:flex-row gap-6">
-                          <div className="aspect-[16/10] md:w-[45%] overflow-hidden bg-white/5 flex-shrink-0">
-                            <img 
-                              src={project.image} 
-                              alt={`${project.title}, ${project.type.toLowerCase()} by Golden Boy Productions`}
-                              loading="lazy" 
-                              className="w-full h-full object-cover grayscale group-hover:scale-103 group-hover:grayscale-0 transition-all duration-700 ease-out"
-                            />
-                          </div>
-                          <div className="flex flex-col justify-center">
-                            <div className="flex justify-between items-center mb-2">
-                              <span className="text-[9px] uppercase tracking-wider text-white/40">{project.type}</span>
-                              <span className="px-2 py-0.5 border border-[#dfb86c]/30 text-[#dfb86c] text-[8px] uppercase tracking-widest font-semibold bg-[#dfb86c]/5">
-                                {project.status}
-                              </span>
-                            </div>
-                            <h4 className="font-serif text-xl text-white/90 mb-2 group-hover:text-[#dfb86c] transition-colors">{project.title}</h4>
-                            <p className="text-[10px] text-[#dfb86c] tracking-widest uppercase mb-3">EXPECTED: {project.expectedRelease}</p>
-                            <p className="text-[11px] text-white/50 leading-relaxed font-light">{project.description}</p>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                  )}
                 </motion.section>
 
                 {/* FAQ Section */}
