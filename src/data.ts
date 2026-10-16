@@ -572,6 +572,8 @@ export type Service = {
   intro: string[];
   offerings: Array<{ title: string; desc: string }>;
   projectSlugs: string[];
+  sites?: Array<{ name: string; type: string; location: string; url: string; desc: string; result?: string }>;
+  steps?: Array<{ title: string; desc: string }>;
 };
 
 export const services: Service[] = [
@@ -608,6 +610,37 @@ export const services: Service[] = [
     ],
     offerings: consultingServices,
     projectSlugs: [],
+  },
+  {
+    slug: "web-design",
+    name: "Website Design",
+    title: "Website Design & Local SEO in Portland, OR | Golden Boy Productions",
+    description:
+      "Fast, mobile-first websites built and managed by Robert Lazau for Portland-area small businesses: custom design, local SEO, booking and quote forms, real photos and video, and monthly site care.",
+    heading: "Websites that bring in calls, bookings and clients",
+    intro: [
+      "Golden Boy Productions builds and manages websites for small businesses around Portland and the Pacific Northwest. Robert designs each site, writes it around the way your customers actually search, and keeps it fast, secure and up to date after launch.",
+      "Because the same studio shoots video and photos, your site can launch with real footage of your work instead of stock images. Current clients include a towing company in Gresham, a working farm and dog-training academy in Enumclaw and a Portland videographer.",
+    ],
+    offerings: [
+      { title: "Custom design & build", desc: "A fast, mobile-first site designed around your business, with clear buttons to call, book or request a quote on every page." },
+      { title: "Local SEO", desc: "A page for each service and each town you serve, structured data, a sitemap and Google Search Console set up, so you show up when people nearby search." },
+      { title: "Booking & lead forms", desc: "Booking requests, quote forms and tap-to-call buttons that send new leads straight to your inbox or phone." },
+      { title: "Real video & photos", desc: "Launch films, short website loops and photos shot by Golden Boy Productions, so your site looks like your business." },
+      { title: "Monthly site care", desc: "Updates, new pages, speed and security checks, and a regular look at your traffic and Google rankings." },
+      { title: "Fixes & redesigns", desc: "Already have a site? Robert finds what is holding it back on Google, fixes it and modernizes the design." },
+    ],
+    projectSlugs: [],
+    sites: [
+      { name: "Tow Guys", type: "Towing & roadside assistance", location: "Gresham, OR", url: "https://www.towguysgresham.com", desc: "A call-first site for a 24/7 towing company, with its own page for every service and every town they cover, plus a regularly updated blog.", result: "Shows up on Google for its name and for local towing searches around Gresham, and brings in visitors from search every week." },
+      { name: "Pasture & Paw", type: "Farm, dog boarding & training", location: "Enumclaw, WA", url: "https://www.pasturepaw.com", desc: "A working farm and canine academy site with an online booking form for boarding and training, a dedicated dog boarding page and answers to common questions.", result: "Boarding requests started coming in through the site soon after launch." },
+      { name: "Kyree Films", type: "Videographer", location: "Portland, OR", url: "https://kyreefilms.com", desc: "A portfolio site for a Portland videographer, with separate pages for weddings, events and sports so each one can be found on Google.", result: "Every service page is indexed by Google." },
+    ],
+    steps: [
+      { title: "Listen First", desc: "A real conversation about your business, your customers and what the site needs to do: bring in calls, bookings or quote requests." },
+      { title: "Design & Build", desc: "Pages, copy, photos and SEO planned around how your customers search, then built fast and mobile-first." },
+      { title: "Launch & Manage", desc: "Search Console, analytics and forms set up at launch, then ongoing updates and a regular check on how the site is performing." },
+    ],
   },
 ];
 
