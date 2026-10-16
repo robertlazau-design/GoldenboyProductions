@@ -194,11 +194,40 @@ export function ServicePage({ service, link }: { service: Service; link: LinkTo 
         </section>
       )}
 
+      {service.sites && service.sites.length > 0 && (
+        <section className="py-20 border-t border-white/5" aria-label="Client websites">
+          <Kicker>Client sites</Kicker>
+          <SectionHeading>Websites Robert builds and manages</SectionHeading>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {service.sites.map(site => (
+              <a
+                key={site.url}
+                href={site.url}
+                target="_blank"
+                rel="noopener"
+                className="group flex flex-col border border-white/5 bg-white/[0.01] p-6 md:p-8 hover:border-[#dfb86c]/40 transition-colors"
+              >
+                <span className="text-[10px] text-[#dfb86c] tracking-widest uppercase font-semibold mb-4 block">{site.location}</span>
+                <h3 className="font-serif text-xl text-white/90 mb-1 group-hover:text-[#dfb86c] transition-colors">{site.name}</h3>
+                <p className="text-[10px] uppercase tracking-[0.2em] text-white/40 mb-4">{site.type}</p>
+                <p className="text-xs text-white/50 leading-relaxed font-light mb-4">{site.desc}</p>
+                {site.result && (
+                  <p className="text-xs text-white/80 leading-relaxed border-t border-white/10 pt-4 mt-auto">{site.result}</p>
+                )}
+                <span className="mt-6 inline-flex items-center gap-2 text-[10px] uppercase tracking-[0.25em] text-white/40 group-hover:text-[#dfb86c] transition-colors">
+                  Visit site <ArrowRight size={12} />
+                </span>
+              </a>
+            ))}
+          </div>
+        </section>
+      )}
+
       <section className="py-20 border-t border-white/5" aria-label="How it works">
         <Kicker>{clientApproach.subtitle}</Kicker>
         <SectionHeading>How it works</SectionHeading>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {clientApproach.points.map((point, i) => (
+          {(service.steps ?? clientApproach.points).map((point, i) => (
             <div key={point.title} className="border-t border-white/10 pt-6">
               <span className="text-[10px] text-[#dfb86c] tracking-widest font-semibold mb-3 block">0{i + 1}/</span>
               <h3 className="font-serif text-lg text-white/90 mb-2">{point.title}</h3>
