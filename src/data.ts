@@ -626,12 +626,12 @@ export const services: Service[] = [
   {
     slug: "web-design",
     name: "Website Design",
-    title: "Website Design & Local SEO in Portland, OR | Golden Boy Productions",
+    title: "Website Design in Gresham & Portland, OR | Golden Boy Productions",
     description:
-      "Fast, mobile-first websites built and managed by Robert Lazau for Portland-area small businesses: custom design, local SEO, booking and quote forms, real photos and video, and monthly site care.",
+      "Fast, mobile-first websites built and managed by Robert Lazau for small businesses in Gresham, Portland and East Multnomah County: custom design, local SEO, booking and quote forms, real photos and video, and monthly site care.",
     heading: "Websites that bring in calls, bookings and clients",
     intro: [
-      "Golden Boy Productions builds and manages websites for small businesses around Portland and the Pacific Northwest. Robert designs each site, writes it around the way your customers actually search, and keeps it fast, secure and up to date after launch.",
+      "Golden Boy Productions builds and manages websites for small businesses in Gresham, Portland and across East Multnomah County. Robert designs each site, writes it around the way your customers actually search, and keeps it fast, secure and up to date after launch.",
       "Because the same studio shoots video and photos, your site can launch with real footage of your work instead of stock images. Current clients include a towing company in Gresham, a working farm and dog-training academy in Enumclaw and a Portland videographer.",
     ],
     offerings: [

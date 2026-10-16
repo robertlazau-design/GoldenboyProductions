@@ -9,9 +9,9 @@ export type Tab = 'home' | 'movies' | 'bts' | 'contact';
 export const TAB_ROUTES: Record<Tab, { path: string; title: string; description: string }> = {
   home: {
     path: '/',
-    title: 'Robert Lazau — Director & Producer | Golden Boy Productions',
+    title: 'Robert Lazau — Video Production & Websites | Golden Boy Productions',
     description:
-      'Robert Lazau is a Portland-area director and producer and the founder of Golden Boy Productions, making commercials, short films and photography for brands, nonprofits and cities.',
+      'Portland-area director and producer Robert Lazau makes commercials, short films and photography through Golden Boy Productions, and builds websites for small businesses in Gresham and Portland.',
   },
   movies: {
     path: '/favorite-movies',
@@ -29,7 +29,7 @@ export const TAB_ROUTES: Record<Tab, { path: string; title: string; description:
     path: '/contact',
     title: 'Contact Robert Lazau | Golden Boy Productions',
     description:
-      'Hire Robert Lazau and Golden Boy Productions for a commercial, short film, photography or media consulting in the Portland area. Send a message or email directly.',
+      'Hire Robert Lazau and Golden Boy Productions for a commercial, short film, photography, a website or media consulting in the Portland and Gresham area. Send a message or email directly.',
   },
 };
 
@@ -85,9 +85,9 @@ export const pageMeta = (page: Page): { path: string; title: string; description
     case 'work':
       return {
         path: WORK_PATH,
-        title: 'Work — Commercials, PSAs & Nonprofit Films | Robert Lazau',
+        title: 'Work — Films & Websites | Robert Lazau, Golden Boy Productions',
         description:
-          'Selected work by Robert Lazau and Golden Boy Productions: commercials, PSAs, nonprofit and community spotlights, website visuals and fashion films from around Portland, Oregon.',
+          'Selected work by Robert Lazau and Golden Boy Productions: commercials, PSAs, nonprofit spotlights and fashion films, plus websites built and managed for small businesses in Gresham, Portland and beyond.',
       };
     case 'project': {
       const p = page.project;
@@ -153,12 +153,10 @@ export const pageJsonLd = (page: Page): object[] => {
           url: canonicalUrl(WORK_PATH),
           mainEntity: {
             '@type': 'ItemList',
-            itemListElement: finishedProjects.map((p, i) => ({
-              '@type': 'ListItem',
-              position: i + 1,
-              url: canonicalUrl(projectPath(p)),
-              name: p.title,
-            })),
+            itemListElement: [
+              ...finishedProjects.map(p => ({ name: p.title, url: canonicalUrl(projectPath(p)) })),
+              ...(services.find(s => s.slug === 'web-design')?.sites ?? []).map(s => ({ name: `${s.name} website`, url: s.url })),
+            ].map((item, i) => ({ '@type': 'ListItem', position: i + 1, ...item })),
           },
         },
         breadcrumbs([['Home', '/'], ['Work', WORK_PATH]]),
