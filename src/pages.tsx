@@ -361,25 +361,45 @@ export function AboutPage({ link }: { link: LinkTo }) {
 
 export function WorkPage({ link }: { link: LinkTo }) {
   const videoService = services.find(s => s.slug === 'video-production');
+  const webService = services.find(s => s.slug === 'web-design');
+  const sites = webService?.sites ?? [];
+  const shot = (url: string) =>
+    `https://s.wordpress.com/mshots/v1/${encodeURIComponent(url.endsWith('/') ? url : `${url}/`)}?w=1280&h=800`;
+  const domainOf = (url: string) => url.replace(/^https?:\/\/(www\.)?/, '').replace(/\/$/, '');
+  const tab = 'inline-flex items-center gap-3 border border-white/15 px-5 py-3 text-[10px] uppercase tracking-[0.25em] text-white/70 hover:border-[#dfb86c] hover:text-[#dfb86c] transition-colors';
   return (
     <article className="py-16">
-      <header className="mb-20">
+      <header className="mb-16">
         <Kicker>Portfolio index</Kicker>
         <h1 className="font-serif italic text-4xl md:text-6xl text-[#f5f5f5] tracking-tight mb-8">Filmography & Works</h1>
-        <p className="max-w-2xl text-sm md:text-base text-white/50 font-light leading-relaxed mb-6">
+        <p className="max-w-2xl text-sm md:text-base text-white/50 font-light leading-relaxed mb-10">
           Commercials, PSAs, nonprofit and community spotlights, website visuals and fashion films made with businesses,
-          nonprofits and cities around Portland, Gresham and Fairview.
+          nonprofits and cities around Portland, Gresham and Fairview, plus websites built and managed for local businesses.
         </p>
-        {videoService && <TextLink link={link} to={servicePath(videoService)}>Video production services</TextLink>}
+        <nav aria-label="Work sections" className="flex flex-wrap gap-3">
+          <a href="#films" className={tab}>
+            Films <span className="text-[#dfb86c]">{finishedProjects.length}</span>
+          </a>
+          {sites.length > 0 && (
+            <a href="#websites" className={tab}>
+              Websites <span className="text-[#dfb86c]">{sites.length}</span>
+            </a>
+          )}
+        </nav>
       </header>
 
-      <section className="pb-20" aria-label="Finished projects">
+      <section id="films" className="pb-20 scroll-mt-8" aria-label="Finished projects">
         <h2 className="text-xs uppercase tracking-[0.25em] text-[#dfb86c] border-b border-white/5 pb-4 mb-10 font-medium">
-          Finished Projects
+          Films · Finished Projects
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {finishedProjects.map(p => <ProjectCard key={p.slug} project={p} link={link} detailed />)}
         </div>
+        {videoService && (
+          <div className="mt-10">
+            <TextLink link={link} to={servicePath(videoService)}>Video production services</TextLink>
+          </div>
+        )}
       </section>
 
       {currentProjects.length > 0 && (
@@ -395,6 +415,50 @@ export function WorkPage({ link }: { link: LinkTo }) {
               </li>
             ))}
           </ul>
+        </section>
+      )}
+
+      {sites.length > 0 && (
+        <section id="websites" className="pb-20 scroll-mt-8" aria-label="Websites">
+          <h2 className="text-xs uppercase tracking-[0.25em] text-[#dfb86c] border-b border-white/5 pb-4 mb-10 font-medium">
+            Websites · Built & Managed
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {sites.map(site => (
+              <a
+                key={site.url}
+                href={site.url}
+                target="_blank"
+                rel="noopener"
+                className="group block border border-white/5 bg-white/[0.01] p-4 hover:border-[#dfb86c]/40 transition-all duration-300"
+              >
+                <div className="rounded-md overflow-hidden border border-white/10 bg-[#141414] mb-5">
+                  <div className="flex items-center gap-1.5 px-3 py-2 bg-[#1a1a1a] border-b border-white/5">
+                    <span className="w-2 h-2 rounded-full bg-white/15" />
+                    <span className="w-2 h-2 rounded-full bg-white/15" />
+                    <span className="w-2 h-2 rounded-full bg-[#dfb86c]/70" />
+                    <span className="ml-2 truncate text-[9px] tracking-wider text-white/40">{domainOf(site.url)}</span>
+                  </div>
+                  <div className="aspect-[16/10] overflow-hidden">
+                    <img
+                      src={shot(site.url)}
+                      alt={`${site.name} website homepage, designed by Golden Boy Productions`}
+                      loading="lazy"
+                      className="w-full h-full object-cover object-top grayscale group-hover:grayscale-0 group-hover:scale-[1.03] transition-all duration-700 ease-out"
+                    />
+                  </div>
+                </div>
+                <span className="text-[10px] text-[#dfb86c] tracking-widest uppercase font-semibold block mb-2">{site.location}</span>
+                <h3 className="font-serif text-xl text-white/90 mb-1 group-hover:text-[#dfb86c] transition-colors">{site.name}</h3>
+                <p className="text-[10px] uppercase tracking-[0.2em] text-white/40">{site.type}</p>
+              </a>
+            ))}
+          </div>
+          {webService && (
+            <div className="mt-10">
+              <TextLink link={link} to={servicePath(webService)}>Website design services</TextLink>
+            </div>
+          )}
         </section>
       )}
 
