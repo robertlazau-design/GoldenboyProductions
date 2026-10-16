@@ -198,27 +198,76 @@ export function ServicePage({ service, link }: { service: Service; link: LinkTo 
         <section className="py-20 border-t border-white/5" aria-label="Client websites">
           <Kicker>Client sites</Kicker>
           <SectionHeading>Websites Robert builds and manages</SectionHeading>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {service.sites.map(site => (
-              <a
-                key={site.url}
-                href={site.url}
-                target="_blank"
-                rel="noopener"
-                className="group flex flex-col border border-white/5 bg-white/[0.01] p-6 md:p-8 hover:border-[#dfb86c]/40 transition-colors"
-              >
-                <span className="text-[10px] text-[#dfb86c] tracking-widest uppercase font-semibold mb-4 block">{site.location}</span>
-                <h3 className="font-serif text-xl text-white/90 mb-1 group-hover:text-[#dfb86c] transition-colors">{site.name}</h3>
-                <p className="text-[10px] uppercase tracking-[0.2em] text-white/40 mb-4">{site.type}</p>
-                <p className="text-xs text-white/50 leading-relaxed font-light mb-4">{site.desc}</p>
-                {site.result && (
-                  <p className="text-xs text-white/80 leading-relaxed border-t border-white/10 pt-4 mt-auto">{site.result}</p>
-                )}
-                <span className="mt-6 inline-flex items-center gap-2 text-[10px] uppercase tracking-[0.25em] text-white/40 group-hover:text-[#dfb86c] transition-colors">
-                  Visit site <ArrowRight size={12} />
-                </span>
-              </a>
-            ))}
+          <p className="max-w-2xl text-sm md:text-base text-white/50 font-light leading-relaxed -mt-4 mb-16">
+            Live sites for real local businesses, designed for the phone first and built to be found on Google.
+          </p>
+          <div className="space-y-24 md:space-y-32">
+            {service.sites.map((site, i) => {
+              const page = site.url.endsWith('/') ? site.url : `${site.url}/`;
+              const shot = (mobile: boolean) =>
+                `https://s.wordpress.com/mshots/v1/${encodeURIComponent(page)}?${mobile ? 'vpw=390&vph=844&w=390&h=844' : 'w=1280&h=800'}`;
+              const domain = page.replace(/^https?:\/\/(www\.)?/, '').replace(/\/$/, '');
+              const flip = i % 2 === 1;
+              return (
+                <article key={site.url} className="group grid grid-cols-1 md:grid-cols-12 gap-10 md:gap-16 items-center">
+                  <a
+                    href={site.url}
+                    target="_blank"
+                    rel="noopener"
+                    aria-label={`Visit the ${site.name} website`}
+                    className={`relative block md:col-span-7 pr-8 pb-10 ${flip ? 'md:order-2' : ''}`}
+                  >
+                    <div
+                      aria-hidden="true"
+                      className="absolute -inset-6 bg-[radial-gradient(ellipse_at_center,rgba(223,184,108,0.14),transparent_70%)] opacity-0 group-hover:opacity-100 transition-opacity duration-700"
+                    />
+                    <div className="relative border border-white/10 bg-[#141414] rounded-lg overflow-hidden shadow-2xl shadow-black/60 group-hover:border-[#dfb86c]/40 transition-colors duration-500">
+                      <div className="flex items-center gap-2 px-4 py-3 border-b border-white/5 bg-[#1a1a1a]">
+                        <span className="w-2.5 h-2.5 rounded-full bg-white/15" />
+                        <span className="w-2.5 h-2.5 rounded-full bg-white/15" />
+                        <span className="w-2.5 h-2.5 rounded-full bg-[#dfb86c]/70" />
+                        <span className="ml-3 flex-1 truncate rounded-full bg-black/40 px-4 py-1 text-[10px] tracking-wider text-white/40">{domain}</span>
+                      </div>
+                      <div className="aspect-[16/10] overflow-hidden bg-white/5">
+                        <img
+                          src={shot(false)}
+                          alt={`${site.name} homepage on desktop, designed by Golden Boy Productions`}
+                          loading="lazy"
+                          className="w-full h-full object-cover object-top transition-transform duration-[1200ms] ease-out group-hover:scale-[1.03]"
+                        />
+                      </div>
+                    </div>
+                    <div className="absolute right-0 bottom-0 w-[26%] min-w-[90px] rounded-[1.4rem] border-[5px] border-[#1c1c1c] bg-[#1c1c1c] shadow-2xl shadow-black/70 overflow-hidden transition-transform duration-700 group-hover:-translate-y-2">
+                      <div className="aspect-[390/844] overflow-hidden rounded-[1rem] bg-white/5">
+                        <img
+                          src={shot(true)}
+                          alt={`${site.name} homepage on a phone`}
+                          loading="lazy"
+                          className="w-full h-full object-cover object-top"
+                        />
+                      </div>
+                    </div>
+                  </a>
+                  <div className={`md:col-span-5 ${flip ? 'md:order-1' : ''}`}>
+                    <span className="text-[10px] text-[#dfb86c] tracking-widest font-semibold mb-4 block">0{i + 1}/ · {site.location}</span>
+                    <h3 className="font-serif text-3xl md:text-5xl text-[#f5f5f5] tracking-tight mb-3">{site.name}</h3>
+                    <p className="text-[10px] uppercase tracking-[0.25em] text-white/40 mb-6">{site.type}</p>
+                    <p className="text-sm text-white/60 leading-relaxed font-light mb-6">{site.desc}</p>
+                    {site.result && (
+                      <p className="text-sm text-white/85 leading-relaxed border-l-2 border-[#dfb86c] pl-4 mb-8">{site.result}</p>
+                    )}
+                    <a
+                      href={site.url}
+                      target="_blank"
+                      rel="noopener"
+                      className="inline-flex items-center gap-2 border border-[#dfb86c]/40 px-5 py-3 text-[10px] uppercase tracking-[0.25em] text-[#dfb86c] hover:bg-[#dfb86c] hover:text-black transition-colors"
+                    >
+                      Visit {domain} <ArrowRight size={12} />
+                    </a>
+                  </div>
+                </article>
+              );
+            })}
           </div>
         </section>
       )}
