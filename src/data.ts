@@ -174,6 +174,9 @@ export const currentProjects: Array<{
   description: string;
 }> = [];
 
+// Film reviews come from the Markdown files in src/reviews/ (see src/reviews.ts).
+import { reviews } from './reviews';
+
 export const favoriteMovies: Array<{
   id: number;
   title: string;
@@ -183,7 +186,16 @@ export const favoriteMovies: Array<{
   rating: string;
   image: string;
   description: string;
-}> = [];
+}> = reviews.map((r, i) => ({
+  id: i + 1,
+  title: r.title,
+  director: r.director,
+  year: r.year,
+  duration: r.runtime,
+  rating: r.rating,
+  image: r.cover,
+  description: r.body,
+}));
 
 export const behindTheScenes = [
   {

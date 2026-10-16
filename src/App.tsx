@@ -384,6 +384,15 @@ export default function App({ initialPath }: { initialPath?: string }) {
             </li>
             <li>
               <a 
+                {...link('/services/web-design')}
+                aria-current={page.kind === 'service' && page.service.slug === 'web-design' ? 'page' : undefined}
+                className={`inline-block normal-case hover:text-white transition-all duration-300 cursor-pointer ${page.kind === 'service' && page.service.slug === 'web-design' ? 'text-[#dfb86c] font-semibold border-b border-[#dfb86c] pb-1' : ''}`}
+              >
+                Websites
+              </a>
+            </li>
+            <li>
+              <a 
                 {...tabLink('movies')}
                 aria-current={activeTab === 'movies' ? 'page' : undefined}
                 className={`inline-block normal-case hover:text-white transition-all duration-300 cursor-pointer ${activeTab === 'movies' ? 'text-[#dfb86c] font-semibold border-b border-[#dfb86c] pb-1' : ''}`}
