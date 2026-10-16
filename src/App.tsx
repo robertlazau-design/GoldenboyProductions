@@ -1134,6 +1134,7 @@ export default function App({ initialPath }: { initialPath?: string }) {
                             <option value="PSA / Public Sector" className="bg-[#060606]">PSA / Public Sector</option>
                             <option value="Fashion Visual" className="bg-[#060606]">Fashion Visual</option>
                             <option value="Event Coverage" className="bg-[#060606]">Event Coverage</option>
+                            <option value="Website Design" className="bg-[#060606]">Website Design</option>
                             <option value="Website Visual / Promo" className="bg-[#060606]">Website Visual / Promo</option>
                             <option value="Music Video" className="bg-[#060606]">Music Video</option>
                             <option value="Short or Feature Film" className="bg-[#060606]">Short or Feature Film</option>
