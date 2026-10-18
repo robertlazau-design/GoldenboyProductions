@@ -64,6 +64,23 @@ export default function App({ initialPath }: { initialPath?: string }) {
   });
   const tabLink = (tab: Tab) => link(TAB_ROUTES[tab].path);
 
+  // "Get a quote" on a service page: open the contact form with that service picked.
+  const QUOTE_TYPES: Record<string, string> = {
+    'video-production': 'Commercial / Brand Campaign',
+    'web-design': 'Website Design',
+    'media-consulting': 'Media Consulting',
+  };
+  const quoteLink = (slug: string) => {
+    const base = tabLink('contact');
+    return {
+      href: base.href,
+      onClick: (e: React.MouseEvent) => {
+        if (isPlainClick(e) && QUOTE_TYPES[slug]) setContactType(QUOTE_TYPES[slug]);
+        base.onClick(e);
+      },
+    };
+  };
+
   // Keep title, description and canonical in sync with the URL (including back/forward)
   useEffect(() => {
     applyMeta(pageMeta(pageFromPath(path)));
@@ -333,6 +350,7 @@ export default function App({ initialPath }: { initialPath?: string }) {
             src={robertBackground} 
             className="absolute right-0 top-0 h-full w-auto object-cover object-right opacity-[0.55] md:opacity-[0.7] brightness-[1.65] pointer-events-none" 
             alt="" 
+            aria-hidden="true"
           />
           <div className="absolute inset-0 bg-gradient-to-r from-[#060606] via-[#060606]/70 to-transparent" />
           <div className="absolute inset-0 bg-gradient-to-t from-[#060606] via-transparent to-[#060606]" />
@@ -1027,7 +1045,7 @@ export default function App({ initialPath }: { initialPath?: string }) {
                 {page.kind === 'about' && <AboutPage link={link} />}
                 {page.kind === 'work' && <WorkPage link={link} />}
                 {page.kind === 'project' && <ProjectPage project={page.project} link={link} />}
-                {page.kind === 'service' && <ServicePage service={page.service} link={link} />}
+                {page.kind === 'service' && <ServicePage service={page.service} link={link} quote={quoteLink(page.service.slug)} />}
               </motion.div>
             )}
 
