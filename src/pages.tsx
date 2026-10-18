@@ -54,7 +54,7 @@ function ProjectCard({ project, link, detailed = false }: { project: Project; li
   );
 }
 
-function ContactCta({ link, heading }: { link: LinkTo; heading: string }) {
+function ContactCta({ link, heading, cta }: { link: LinkTo; heading: string; cta?: { href: string; onClick: (e: React.MouseEvent) => void; label: string } }) {
   return (
     <section className="py-20 border-t border-white/5 text-center" aria-label="Get in touch">
       <h2 className="font-serif italic text-3xl md:text-5xl text-[#f5f5f5] mb-6">{heading}</h2>
@@ -62,10 +62,10 @@ function ContactCta({ link, heading }: { link: LinkTo; heading: string }) {
         Tell Robert about your project, your audience and your timeline. He reads every message himself.
       </p>
       <a
-        {...link(TAB_ROUTES.contact.path)}
+        {...(cta ? { href: cta.href, onClick: cta.onClick } : link(TAB_ROUTES.contact.path))}
         className="inline-flex items-center gap-3 px-8 py-4 border border-[#dfb86c]/40 text-[#dfb86c] text-[10px] uppercase tracking-[0.25em] hover:bg-[#dfb86c] hover:text-[#060606] transition-all duration-300"
       >
-        Start a project <ArrowRight size={14} />
+        {cta?.label ?? 'Start a project'} <ArrowRight size={14} />
       </a>
     </section>
   );
@@ -154,7 +154,8 @@ export function ProjectPage({ project, link }: { project: Project; link: LinkTo 
   );
 }
 
-export function ServicePage({ service, link }: { service: Service; link: LinkTo }) {
+// `quote` opens the contact form with this service already picked.
+export function ServicePage({ service, link, quote }: { service: Service; link: LinkTo; quote?: ReturnType<LinkTo> }) {
   const work = service.projectSlugs
     .map(slug => finishedProjects.find(p => p.slug === slug))
     .filter((p): p is Project => !!p);
@@ -168,35 +169,27 @@ export function ServicePage({ service, link }: { service: Service; link: LinkTo 
         <div className="space-y-6 text-sm md:text-base text-white/60 font-light leading-relaxed max-w-3xl">
           {service.intro.map((p, i) => <p key={i}>{p}</p>)}
         </div>
+        <div className="flex flex-wrap items-center gap-6 mt-12">
+          <a
+            {...(quote ?? link(TAB_ROUTES.contact.path))}
+            className="inline-flex items-center gap-3 px-8 py-4 bg-[#dfb86c] text-[#060606] text-[10px] uppercase tracking-[0.25em] font-semibold hover:bg-white transition-colors duration-300"
+          >
+            Get a quote <ArrowRight size={14} />
+          </a>
+          {(work.length > 0 || (service.sites?.length ?? 0) > 0) && (
+            <a
+              href="#results"
+              className="inline-flex items-center gap-2 text-[10px] uppercase tracking-[0.25em] text-white/60 hover:text-[#dfb86c] transition-colors"
+            >
+              {service.sites?.length ? 'See client results' : 'See the work'} <ArrowRight size={12} />
+            </a>
+          )}
+        </div>
       </header>
 
-      <section className="py-20 border-t border-white/5" aria-label="What's included">
-        <Kicker>What Robert offers</Kicker>
-        <SectionHeading>What's included</SectionHeading>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {service.offerings.map((o, i) => (
-            <div key={o.title} className="border border-white/5 bg-white/[0.01] p-6 md:p-8">
-              <span className="text-[10px] text-[#dfb86c] tracking-widest font-semibold mb-4 block">0{i + 1}/</span>
-              <h3 className="font-serif text-xl text-white/90 mb-4">{o.title}</h3>
-              <p className="text-xs text-white/50 leading-relaxed font-light">{o.desc}</p>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {work.length > 0 && (
-        <section className="py-20 border-t border-white/5" aria-label="Selected work">
-          <Kicker>Portfolio</Kicker>
-          <SectionHeading>Selected work</SectionHeading>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {work.map(p => <ProjectCard key={p.slug} project={p} link={link} />)}
-          </div>
-        </section>
-      )}
-
       {service.sites && service.sites.length > 0 && (
-        <section className="py-20 border-t border-white/5" aria-label="Client websites">
-          <Kicker>Client sites</Kicker>
+        <section className="py-20 border-t border-white/5" id="results" aria-label="Client websites">
+          <Kicker>Results for local businesses</Kicker>
           <SectionHeading>Websites Robert builds and manages</SectionHeading>
           <p className="max-w-2xl text-sm md:text-base text-white/50 font-light leading-relaxed -mt-4 mb-16">
             Live sites for real local businesses, designed for the phone first and built to be found on Google.
@@ -272,6 +265,30 @@ export function ServicePage({ service, link }: { service: Service; link: LinkTo 
         </section>
       )}
 
+      <section className="py-20 border-t border-white/5" aria-label="What's included">
+        <Kicker>What Robert offers</Kicker>
+        <SectionHeading>What's included</SectionHeading>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {service.offerings.map((o, i) => (
+            <div key={o.title} className="border border-white/5 bg-white/[0.01] p-6 md:p-8">
+              <span className="text-[10px] text-[#dfb86c] tracking-widest font-semibold mb-4 block">0{i + 1}/</span>
+              <h3 className="font-serif text-xl text-white/90 mb-4">{o.title}</h3>
+              <p className="text-xs text-white/50 leading-relaxed font-light">{o.desc}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {work.length > 0 && (
+        <section id={service.sites?.length ? undefined : 'results'} className="py-20 border-t border-white/5" aria-label="Selected work">
+          <Kicker>Portfolio</Kicker>
+          <SectionHeading>Selected work</SectionHeading>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {work.map(p => <ProjectCard key={p.slug} project={p} link={link} />)}
+          </div>
+        </section>
+      )}
+
       <section className="py-20 border-t border-white/5" aria-label="How it works">
         <Kicker>{clientApproach.subtitle}</Kicker>
         <SectionHeading>How it works</SectionHeading>
@@ -293,7 +310,7 @@ export function ServicePage({ service, link }: { service: Service; link: LinkTo 
         </nav>
       )}
 
-      <ContactCta link={link} heading="Let's make something together" />
+      <ContactCta link={link} heading="Let's make something together" cta={quote && { ...quote, label: 'Get a quote' }} />
     </article>
   );
 }
