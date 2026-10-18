@@ -1,10 +1,11 @@
 // Routing and per-page search metadata. Used by the app when navigating and
 // by scripts/prerender.mjs when it writes a static HTML file for each page.
 import { faqs, finishedProjects, services, biography, type Project, type Service } from './data';
+import { recaps, type Recap } from './recaps';
 
 export const SITE_URL = 'https://www.robertlazau.com';
 
-export type Tab = 'home' | 'movies' | 'bts' | 'contact';
+export type Tab = 'home' | 'movies' | 'recaps' | 'contact';
 
 export const TAB_ROUTES: Record<Tab, { path: string; title: string; description: string }> = {
   home: {
@@ -19,11 +20,11 @@ export const TAB_ROUTES: Record<Tab, { path: string; title: string; description:
     description:
       'Films that shaped director Robert Lazau, with notes on why they matter. Recommend a movie for Robert to watch next.',
   },
-  bts: {
-    path: '/behind-the-scenes',
-    title: 'Behind the Scenes | Robert Lazau — Golden Boy Productions',
+  recaps: {
+    path: '/recaps',
+    title: 'Project Recaps — Behind the Work | Robert Lazau, Golden Boy Productions',
     description:
-      'On-set photos and clips from Golden Boy Productions shoots: interviews, studio fashion shoots, commercials and short films around Portland, Oregon.',
+      'After every project, Robert Lazau sits down to talk through the wins, the surprises and what caught him off guard, with behind-the-scenes photos and video from the shoot.',
   },
   contact: {
     path: '/contact',
@@ -37,13 +38,15 @@ export const ABOUT_PATH = '/about';
 export const WORK_PATH = '/work';
 export const projectPath = (p: Project) => `/work/${p.slug}`;
 export const servicePath = (s: Service) => `/services/${s.slug}`;
+export const recapPath = (r: Recap) => `/recaps/${r.slug}`;
 
 export type Page =
   | { kind: 'tab'; tab: Tab }
   | { kind: 'about' }
   | { kind: 'work' }
   | { kind: 'project'; project: Project }
-  | { kind: 'service'; service: Service };
+  | { kind: 'service'; service: Service }
+  | { kind: 'recap'; recap: Recap };
 
 export const normalizePath = (pathname: string) => pathname.replace(/\/+$/, '') || '/';
 
@@ -55,6 +58,8 @@ export const pageFromPath = (pathname: string): Page => {
   if (project) return { kind: 'project', project };
   const service = services.find(s => servicePath(s) === path);
   if (service) return { kind: 'service', service };
+  const recap = recaps.find(r => recapPath(r) === path);
+  if (recap) return { kind: 'recap', recap };
   const tab = (Object.keys(TAB_ROUTES) as Tab[]).find(t => TAB_ROUTES[t].path === path);
   return { kind: 'tab', tab: tab ?? 'home' };
 };
@@ -66,7 +71,8 @@ export const ALL_PATHS: string[] = [
   ABOUT_PATH,
   ...services.map(servicePath),
   ...finishedProjects.map(projectPath),
-  TAB_ROUTES.bts.path,
+  TAB_ROUTES.recaps.path,
+  ...recaps.map(recapPath),
   TAB_ROUTES.contact.path,
   TAB_ROUTES.movies.path,
 ];
@@ -99,6 +105,14 @@ export const pageMeta = (page: Page): { path: string; title: string; description
     }
     case 'service':
       return { path: servicePath(page.service), title: page.service.title, description: page.service.description };
+    case 'recap': {
+      const r = page.recap;
+      return {
+        path: recapPath(r),
+        title: `${r.title} — Project Recap | Robert Lazau`,
+        description: r.summary || `Robert Lazau looks back on ${r.title}: the wins, the surprises and what caught him off guard, with behind-the-scenes photos.`,
+      };
+    }
   }
 };
 
@@ -123,6 +137,21 @@ const breadcrumbs = (items: Array<[string, string]>) => ({
 export const pageJsonLd = (page: Page): object[] => {
   switch (page.kind) {
     case 'tab':
+      if (page.tab === 'recaps') {
+        return [
+          {
+            '@context': 'https://schema.org',
+            '@type': 'CollectionPage',
+            name: 'Project Recaps',
+            url: canonicalUrl(TAB_ROUTES.recaps.path),
+            mainEntity: {
+              '@type': 'ItemList',
+              itemListElement: recaps.map((r, i) => ({ '@type': 'ListItem', position: i + 1, name: r.title, url: canonicalUrl(recapPath(r)) })),
+            },
+          },
+          breadcrumbs([['Home', '/'], ['Project Recaps', TAB_ROUTES.recaps.path]]),
+        ];
+      }
       return page.tab === 'home'
         ? [{
             '@context': 'https://schema.org',
@@ -203,6 +232,30 @@ export const pageJsonLd = (page: Page): object[] => {
           },
         },
         breadcrumbs([['Home', '/'], [s.name, servicePath(s)]]),
+      ];
+    }
+    case 'recap': {
+      const r = page.recap;
+      const url = canonicalUrl(recapPath(r));
+      const image = r.cover ? (r.cover.startsWith('/') ? canonicalUrl(r.cover) : r.cover) : undefined;
+      const project = finishedProjects.find(p => p.slug === r.project);
+      return [
+        {
+          '@context': 'https://schema.org',
+          '@type': 'Article',
+          headline: `${r.title}: Project Recap`,
+          description: r.summary,
+          url,
+          ...(image ? { image } : {}),
+          ...(r.date ? { datePublished: r.date } : {}),
+          author: PERSON,
+          publisher: ORG,
+          ...(project ? { about: { '@type': 'CreativeWork', name: project.title, url: canonicalUrl(projectPath(project)) } } : {}),
+          ...(r.video && image && r.date
+            ? { video: { '@type': 'VideoObject', name: `${r.title}: Project Recap`, description: r.summary || r.title, thumbnailUrl: image, uploadDate: r.date, embedUrl: r.video } }
+            : {}),
+        },
+        breadcrumbs([['Home', '/'], ['Project Recaps', TAB_ROUTES.recaps.path], [r.title, recapPath(r)]]),
       ];
     }
   }
