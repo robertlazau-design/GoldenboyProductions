@@ -3,7 +3,8 @@
 import React from 'react';
 import { ArrowLeft, ArrowRight, Play } from 'lucide-react';
 import { biography, clientApproach, currentProjects, finishedProjects, services, sunStar, type Project, type Service } from './data';
-import { ABOUT_PATH, TAB_ROUTES, WORK_PATH, projectPath, servicePath } from './seo';
+import { ABOUT_PATH, TAB_ROUTES, WORK_PATH, projectPath, recapPath, servicePath } from './seo';
+import { formatRecapDate, recaps, type Recap } from './recaps';
 import { isDriveVideo } from './media';
 
 export type LinkTo = (to: string) => { href: string; onClick: (e: React.MouseEvent) => void };
@@ -54,7 +55,7 @@ function ProjectCard({ project, link, detailed = false }: { project: Project; li
   );
 }
 
-function ContactCta({ link, heading }: { link: LinkTo; heading: string }) {
+function ContactCta({ link, heading, cta }: { link: LinkTo; heading: string; cta?: { href: string; onClick: (e: React.MouseEvent) => void; label: string } }) {
   return (
     <section className="py-20 border-t border-white/5 text-center" aria-label="Get in touch">
       <h2 className="font-serif italic text-3xl md:text-5xl text-[#f5f5f5] mb-6">{heading}</h2>
@@ -62,10 +63,10 @@ function ContactCta({ link, heading }: { link: LinkTo; heading: string }) {
         Tell Robert about your project, your audience and your timeline. He reads every message himself.
       </p>
       <a
-        {...link(TAB_ROUTES.contact.path)}
+        {...(cta ? { href: cta.href, onClick: cta.onClick } : link(TAB_ROUTES.contact.path))}
         className="inline-flex items-center gap-3 px-8 py-4 border border-[#dfb86c]/40 text-[#dfb86c] text-[10px] uppercase tracking-[0.25em] hover:bg-[#dfb86c] hover:text-[#060606] transition-all duration-300"
       >
-        Start a project <ArrowRight size={14} />
+        {cta?.label ?? 'Start a project'} <ArrowRight size={14} />
       </a>
     </section>
   );
@@ -154,7 +155,8 @@ export function ProjectPage({ project, link }: { project: Project; link: LinkTo 
   );
 }
 
-export function ServicePage({ service, link }: { service: Service; link: LinkTo }) {
+// `quote` opens the contact form with this service already picked.
+export function ServicePage({ service, link, quote }: { service: Service; link: LinkTo; quote?: ReturnType<LinkTo> }) {
   const work = service.projectSlugs
     .map(slug => finishedProjects.find(p => p.slug === slug))
     .filter((p): p is Project => !!p);
@@ -168,35 +170,27 @@ export function ServicePage({ service, link }: { service: Service; link: LinkTo 
         <div className="space-y-6 text-sm md:text-base text-white/60 font-light leading-relaxed max-w-3xl">
           {service.intro.map((p, i) => <p key={i}>{p}</p>)}
         </div>
+        <div className="flex flex-wrap items-center gap-6 mt-12">
+          <a
+            {...(quote ?? link(TAB_ROUTES.contact.path))}
+            className="inline-flex items-center gap-3 px-8 py-4 bg-[#dfb86c] text-[#060606] text-[10px] uppercase tracking-[0.25em] font-semibold hover:bg-white transition-colors duration-300"
+          >
+            Get a quote <ArrowRight size={14} />
+          </a>
+          {(work.length > 0 || (service.sites?.length ?? 0) > 0) && (
+            <a
+              href="#results"
+              className="inline-flex items-center gap-2 text-[10px] uppercase tracking-[0.25em] text-white/60 hover:text-[#dfb86c] transition-colors"
+            >
+              {service.sites?.length ? 'See client results' : 'See the work'} <ArrowRight size={12} />
+            </a>
+          )}
+        </div>
       </header>
 
-      <section className="py-20 border-t border-white/5" aria-label="What's included">
-        <Kicker>What Robert offers</Kicker>
-        <SectionHeading>What's included</SectionHeading>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {service.offerings.map((o, i) => (
-            <div key={o.title} className="border border-white/5 bg-white/[0.01] p-6 md:p-8">
-              <span className="text-[10px] text-[#dfb86c] tracking-widest font-semibold mb-4 block">0{i + 1}/</span>
-              <h3 className="font-serif text-xl text-white/90 mb-4">{o.title}</h3>
-              <p className="text-xs text-white/50 leading-relaxed font-light">{o.desc}</p>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {work.length > 0 && (
-        <section className="py-20 border-t border-white/5" aria-label="Selected work">
-          <Kicker>Portfolio</Kicker>
-          <SectionHeading>Selected work</SectionHeading>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {work.map(p => <ProjectCard key={p.slug} project={p} link={link} />)}
-          </div>
-        </section>
-      )}
-
       {service.sites && service.sites.length > 0 && (
-        <section className="py-20 border-t border-white/5" aria-label="Client websites">
-          <Kicker>Client sites</Kicker>
+        <section className="py-20 border-t border-white/5" id="results" aria-label="Client websites">
+          <Kicker>Results for local businesses</Kicker>
           <SectionHeading>Websites Robert builds and manages</SectionHeading>
           <p className="max-w-2xl text-sm md:text-base text-white/50 font-light leading-relaxed -mt-4 mb-16">
             Live sites for real local businesses, designed for the phone first and built to be found on Google.
@@ -272,6 +266,30 @@ export function ServicePage({ service, link }: { service: Service; link: LinkTo 
         </section>
       )}
 
+      <section className="py-20 border-t border-white/5" aria-label="What's included">
+        <Kicker>What Robert offers</Kicker>
+        <SectionHeading>What's included</SectionHeading>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {service.offerings.map((o, i) => (
+            <div key={o.title} className="border border-white/5 bg-white/[0.01] p-6 md:p-8">
+              <span className="text-[10px] text-[#dfb86c] tracking-widest font-semibold mb-4 block">0{i + 1}/</span>
+              <h3 className="font-serif text-xl text-white/90 mb-4">{o.title}</h3>
+              <p className="text-xs text-white/50 leading-relaxed font-light">{o.desc}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {work.length > 0 && (
+        <section id={service.sites?.length ? undefined : 'results'} className="py-20 border-t border-white/5" aria-label="Selected work">
+          <Kicker>Portfolio</Kicker>
+          <SectionHeading>Selected work</SectionHeading>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {work.map(p => <ProjectCard key={p.slug} project={p} link={link} />)}
+          </div>
+        </section>
+      )}
+
       <section className="py-20 border-t border-white/5" aria-label="How it works">
         <Kicker>{clientApproach.subtitle}</Kicker>
         <SectionHeading>How it works</SectionHeading>
@@ -293,7 +311,7 @@ export function ServicePage({ service, link }: { service: Service; link: LinkTo 
         </nav>
       )}
 
-      <ContactCta link={link} heading="Let's make something together" />
+      <ContactCta link={link} heading="Let's make something together" cta={quote && { ...quote, label: 'Get a quote' }} />
     </article>
   );
 }
@@ -463,6 +481,177 @@ export function WorkPage({ link }: { link: LinkTo }) {
       )}
 
       <ContactCta link={link} heading="Have a project in mind?" />
+    </article>
+  );
+}
+
+// /recaps: every project recap, newest first.
+export function RecapsPage({ link }: { link: LinkTo }) {
+  return (
+    <article className="py-16">
+      <header className="max-w-4xl mb-20">
+        <Kicker>Project Recaps</Kicker>
+        <h1 className="font-serif text-4xl md:text-6xl text-[#f5f5f5] tracking-tight mb-10">Behind the work</h1>
+        <div className="space-y-6 text-sm md:text-base text-white/60 font-light leading-relaxed max-w-3xl">
+          <p>
+            After every project, Robert sits down to talk it through: what went right, what surprised him and what caught
+            him off guard. Each recap has the interview, behind-the-scenes photos and video from the set, and a link to the
+            finished work.
+          </p>
+        </div>
+      </header>
+
+      {recaps.length > 0 ? (
+        <section className="grid grid-cols-1 md:grid-cols-2 gap-10" aria-label="All recaps">
+          {recaps.map(r => (
+            <a
+              key={r.slug}
+              {...link(recapPath(r))}
+              className="group block border border-white/5 bg-white/[0.01] p-4 hover:border-white/15 transition-all duration-300"
+            >
+              <div className="aspect-[16/10] overflow-hidden mb-5 bg-white/5">
+                {r.cover && (
+                  <img
+                    src={r.cover}
+                    alt={`Behind the scenes of ${r.title}`}
+                    loading="lazy"
+                    className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700 ease-out"
+                  />
+                )}
+              </div>
+              <div className="flex justify-between items-baseline mb-2 gap-4">
+                <span className="text-[9px] uppercase tracking-wider text-white/40">{r.client}</span>
+                <span className="text-[9px] text-[#dfb86c] font-semibold">{formatRecapDate(r.date)}</span>
+              </div>
+              <h2 className="font-serif text-2xl text-white/90 group-hover:text-[#dfb86c] transition-colors mb-3">{r.title}</h2>
+              {r.summary && <p className="text-xs text-white/50 leading-relaxed font-light">{r.summary}</p>}
+            </a>
+          ))}
+        </section>
+      ) : (
+        <section className="py-16 border-t border-white/5" aria-label="Coming soon">
+          <Kicker>First recaps · January 2027</Kicker>
+          <SectionHeading>What every recap covers</SectionHeading>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            {[
+              ['The interview', 'Robert on camera, talking through the project start to finish.'],
+              ['Wins', 'What worked, and what the client got out of it.'],
+              ['Surprises & curveballs', 'What he didn\'t see coming, and how the team handled it.'],
+              ['From the set', 'Behind-the-scenes photos and video from every shoot.'],
+            ].map(([title, desc]) => (
+              <div key={title} className="border-t border-white/10 pt-6">
+                <h3 className="font-serif text-lg text-white/90 mb-2">{title}</h3>
+                <p className="text-xs text-white/50 leading-relaxed font-light">{desc}</p>
+              </div>
+            ))}
+          </div>
+          <div className="mt-12">
+            <TextLink link={link} to={WORK_PATH}>See the finished work</TextLink>
+          </div>
+        </section>
+      )}
+
+      <ContactCta link={link} heading="Your project could be next" />
+    </article>
+  );
+}
+
+function RecapVideo({ recap }: { recap: Recap }) {
+  const iframe = /youtube-nocookie\.com\/embed\/|drive\.google\.com\/file\/d\/.+\/preview/.test(recap.video);
+  return iframe ? (
+    <iframe
+      src={recap.video}
+      allow="autoplay; fullscreen; picture-in-picture"
+      allowFullScreen
+      loading="lazy"
+      className="w-full h-full border-0"
+      title={`${recap.title}: project recap interview`}
+    />
+  ) : (
+    <video src={recap.video} controls playsInline preload="metadata" poster={recap.cover || undefined} className="w-full h-full object-cover" />
+  );
+}
+
+// /recaps/<slug>: one project recap.
+export function RecapPage({ recap, link }: { recap: Recap; link: LinkTo }) {
+  const project = finishedProjects.find(p => p.slug === recap.project);
+  const others = recaps.filter(r => r.slug !== recap.slug).slice(0, 3);
+  const meta = [recap.client, formatRecapDate(recap.date)].filter(Boolean).join(' · ');
+
+  return (
+    <article className="py-16">
+      <a
+        {...link(TAB_ROUTES.recaps.path)}
+        className="inline-flex items-center gap-2 text-[10px] uppercase tracking-[0.25em] text-white/40 hover:text-[#dfb86c] transition-colors mb-12"
+      >
+        <ArrowLeft size={12} /> All recaps
+      </a>
+
+      <header className="max-w-4xl mb-16">
+        <Kicker>Project Recap{meta ? ` · ${meta}` : ''}</Kicker>
+        <h1 className="font-serif text-4xl md:text-6xl text-[#f5f5f5] tracking-tight mb-8">{recap.title}</h1>
+        {recap.summary && <p className="text-sm md:text-base text-white/60 font-light leading-relaxed max-w-3xl">{recap.summary}</p>}
+      </header>
+
+      {recap.video && (
+        <section className="mb-20" aria-label="Recap interview">
+          <div className="aspect-video w-full bg-white/5 border border-white/5 overflow-hidden">
+            <RecapVideo recap={recap} />
+          </div>
+        </section>
+      )}
+
+      {recap.sections.length > 0 && (
+        <section className="max-w-3xl space-y-16 mb-20" aria-label="The recap">
+          {recap.sections.map(sec => (
+            <div key={sec.heading}>
+              <h2 className="font-serif text-2xl md:text-3xl text-[#f5f5f5] tracking-tight mb-6">{sec.heading}</h2>
+              <div className="space-y-5 text-sm md:text-base text-white/60 font-light leading-relaxed">
+                {sec.paragraphs.map((p, i) => <p key={i}>{p}</p>)}
+              </div>
+            </div>
+          ))}
+        </section>
+      )}
+
+      {recap.photos.length > 0 && (
+        <section className="py-20 border-t border-white/5" aria-label="Behind-the-scenes photos">
+          <Kicker>From the set{recap.photographer ? ` · Photos by ${recap.photographer}` : ''}</Kicker>
+          <SectionHeading>Behind the scenes</SectionHeading>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {recap.photos.map(ph => (
+              <figure key={ph.src} className="m-0">
+                <div className="aspect-[4/3] overflow-hidden bg-white/5">
+                  <img
+                    src={ph.src}
+                    alt={ph.caption || `Behind the scenes of ${recap.title}`}
+                    loading="lazy"
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                {ph.caption && <figcaption className="text-[11px] text-white/40 font-light mt-3 leading-relaxed">{ph.caption}</figcaption>}
+              </figure>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {project && (
+        <section className="py-20 border-t border-white/5" aria-label="The finished work">
+          <Kicker>The finished work</Kicker>
+          <div className="max-w-md">
+            <ProjectCard project={project} link={link} />
+          </div>
+        </section>
+      )}
+
+      {others.length > 0 && (
+        <nav className="py-12 border-t border-white/5 flex flex-wrap gap-8" aria-label="More recaps">
+          {others.map(r => <TextLink key={r.slug} link={link} to={recapPath(r)}>{r.title}</TextLink>)}
+        </nav>
+      )}
+
+      <ContactCta link={link} heading="Your project could be next" />
     </article>
   );
 }

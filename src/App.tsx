@@ -2,11 +2,10 @@ import React, { useState, useEffect } from 'react';
 import emailjs from '@emailjs/browser';
 import { motion, AnimatePresence, useMotionValue, useSpring } from 'motion/react';
 import { ArrowRight, ArrowLeft, Plus, Minus, Camera, X, Send, Mail } from 'lucide-react';
-import { biography, clientApproach, consultingServices, favoriteMovies, behindTheScenes, faqs, recommendableMovies, services } from './data';
+import { biography, clientApproach, consultingServices, favoriteMovies, faqs, recommendableMovies, services } from './data';
 import robertBackground from '../assets/robert_background.jpg';
 import { TAB_ROUTES, pageFromPath, pageMeta, normalizePath, canonicalUrl, servicePath, ABOUT_PATH, WORK_PATH, type Tab } from './seo';
-import { isDriveVideo, isAnyVideo } from './media';
-import { AboutPage, ProjectPage, ServicePage, WorkPage } from './pages';
+import { AboutPage, ProjectPage, RecapPage, RecapsPage, ServicePage, WorkPage } from './pages';
 
 
 const setMeta = (selector: string, attr: string, value: string) =>
@@ -64,6 +63,23 @@ export default function App({ initialPath }: { initialPath?: string }) {
   });
   const tabLink = (tab: Tab) => link(TAB_ROUTES[tab].path);
 
+  // "Get a quote" on a service page: open the contact form with that service picked.
+  const QUOTE_TYPES: Record<string, string> = {
+    'video-production': 'Commercial / Brand Campaign',
+    'web-design': 'Website Design',
+    'media-consulting': 'Media Consulting',
+  };
+  const quoteLink = (slug: string) => {
+    const base = tabLink('contact');
+    return {
+      href: base.href,
+      onClick: (e: React.MouseEvent) => {
+        if (isPlainClick(e) && QUOTE_TYPES[slug]) setContactType(QUOTE_TYPES[slug]);
+        base.onClick(e);
+      },
+    };
+  };
+
   // Keep title, description and canonical in sync with the URL (including back/forward)
   useEffect(() => {
     applyMeta(pageMeta(pageFromPath(path)));
@@ -74,7 +90,6 @@ export default function App({ initialPath }: { initialPath?: string }) {
     window.addEventListener('popstate', onPopState);
     return () => window.removeEventListener('popstate', onPopState);
   }, []);
-  const [activeBts, setActiveBts] = useState<typeof behindTheScenes[0] | null>(null);
 
   // Movie reviews are published by adding entries to favoriteMovies in data.ts
   const reviews = favoriteMovies;
@@ -100,18 +115,6 @@ export default function App({ initialPath }: { initialPath?: string }) {
   const [contactType, setContactType] = useState('Commercial / Brand Campaign');
   const [contactMessage, setContactMessage] = useState('');
   const [contactSent, setContactSent] = useState(false);
-
-  // Behind the Scenes active slide index
-  const [currentBtsIndex, setCurrentBtsIndex] = useState(0);
-
-  // Auto-rotate effect for BTS slideshow
-  useEffect(() => {
-    if (activeTab !== 'bts') return;
-    const interval = setInterval(() => {
-      setCurrentBtsIndex((prevIndex) => (prevIndex + 1) % behindTheScenes.length);
-    }, 4500);
-    return () => clearInterval(interval);
-  }, [activeTab]);
 
   // Custom Cursor Spring Follower Coordinates
   const cursorX = useMotionValue(-100);
@@ -333,6 +336,7 @@ export default function App({ initialPath }: { initialPath?: string }) {
             src={robertBackground} 
             className="absolute right-0 top-0 h-full w-auto object-cover object-right opacity-[0.55] md:opacity-[0.7] brightness-[1.65] pointer-events-none" 
             alt="" 
+            aria-hidden="true"
           />
           <div className="absolute inset-0 bg-gradient-to-r from-[#060606] via-[#060606]/70 to-transparent" />
           <div className="absolute inset-0 bg-gradient-to-t from-[#060606] via-transparent to-[#060606]" />
@@ -402,11 +406,11 @@ export default function App({ initialPath }: { initialPath?: string }) {
             </li>
             <li>
               <a 
-                {...tabLink('bts')}
-                aria-current={activeTab === 'bts' ? 'page' : undefined}
-                className={`inline-block normal-case hover:text-white transition-all duration-300 cursor-pointer ${activeTab === 'bts' ? 'text-[#dfb86c] font-semibold border-b border-[#dfb86c] pb-1' : ''}`}
+                {...tabLink('recaps')}
+                aria-current={activeTab === 'recaps' || page.kind === 'recap' ? 'page' : undefined}
+                className={`inline-block normal-case hover:text-white transition-all duration-300 cursor-pointer ${activeTab === 'recaps' || page.kind === 'recap' ? 'text-[#dfb86c] font-semibold border-b border-[#dfb86c] pb-1' : ''}`}
               >
-                Behind The Scenes
+                Project Recaps
               </a>
             </li>
             <li>
@@ -855,164 +859,15 @@ export default function App({ initialPath }: { initialPath?: string }) {
               </motion.div>
             )}
 
-            {activeTab === 'bts' && (
+            {activeTab === 'recaps' && (
               <motion.div
-                key="bts"
+                key="recaps"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 transition={{ duration: 0.4 }}
               >
-                {/* Behind the Scenes (BTS) Section */}
-                <section id="bts" className="py-16 relative overflow-hidden" aria-label="Behind the Scenes Gallery">
-                  {/* Massive background text */}
-                  <div className="absolute top-12 left-1/2 -translate-x-1/2 w-full text-center pointer-events-none select-none z-0">
-                    <div aria-hidden="true" className="font-serif italic text-[15vw] md:text-[22vw] leading-none text-white/[0.01] whitespace-nowrap tracking-tighter">
-                      BTS GALLERY
-                    </div>
-                  </div>
-
-                  <div className="relative z-10">
-                    <div className="text-center mb-16">
-                      <span className="text-[10px] text-white/40 tracking-[0.3em] uppercase mb-3 block">ON SET & PRODUCTION</span>
-                      <h1 className="font-serif text-4xl md:text-6xl text-[#f5f5f5] tracking-tight">Behind the scenes</h1>
-                    </div>
-
-                    <div className="max-w-5xl mx-auto border border-white/10 bg-white/[0.01] p-6 md:p-8 rounded-sm relative">
-                      <div className="relative aspect-[16/9] max-h-[520px] w-full overflow-hidden bg-white/5 border border-white/5 mb-8">
-                        {/* Slideshow image/video fade-in transition */}
-                        <AnimatePresence mode="wait" initial={false}>
-                          {isAnyVideo(behindTheScenes[currentBtsIndex].image) ? (
-                            isDriveVideo(behindTheScenes[currentBtsIndex].image) ? (
-                              <motion.div
-                                key={currentBtsIndex}
-                                initial={{ opacity: 0, scale: 1.03 }}
-                                animate={{ opacity: 1, scale: 1 }}
-                                exit={{ opacity: 0, scale: 0.98 }}
-                                transition={{ duration: 0.7, ease: "easeInOut" }}
-                                className="w-full h-full"
-                              >
-                                <iframe
-                                  src={behindTheScenes[currentBtsIndex].image}
-                                  allow="autoplay"
-                                  allowFullScreen
-                                  className="w-full h-full border-0"
-                                  title={behindTheScenes[currentBtsIndex].title}
-                                />
-                              </motion.div>
-                            ) : (
-                              <motion.video
-                                key={currentBtsIndex}
-                                src={behindTheScenes[currentBtsIndex].image}
-                                muted
-                                playsInline
-                                loop
-                                autoPlay
-                                initial={{ opacity: 0, scale: 1.03 }}
-                                animate={{ opacity: 1, scale: 1 }}
-                                exit={{ opacity: 0, scale: 0.98 }}
-                                transition={{ duration: 0.7, ease: "easeInOut" }}
-                                className="w-full h-full object-cover object-center grayscale brightness-90 hover:brightness-100 hover:grayscale-0 transition-all duration-500"
-                              />
-                            )
-                          ) : (
-                            <motion.img
-                              key={currentBtsIndex}
-                              src={behindTheScenes[currentBtsIndex].image}
-                              alt={behindTheScenes[currentBtsIndex].alt ?? behindTheScenes[currentBtsIndex].title}
-                              initial={{ opacity: 0, scale: 1.03 }}
-                              animate={{ opacity: 1, scale: 1 }}
-                              exit={{ opacity: 0, scale: 0.98 }}
-                              transition={{ duration: 0.7, ease: "easeInOut" }}
-                              className="w-full h-full object-cover object-center grayscale brightness-90 hover:brightness-100 hover:grayscale-0 transition-all duration-500"
-                            />
-                          )}
-                        </AnimatePresence>
-
-                        {/* Slide Navigation Overlay Arrows */}
-                        <button 
-                          onClick={() => setCurrentBtsIndex((prev) => (prev - 1 + behindTheScenes.length) % behindTheScenes.length)}
-                          className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full border border-white/20 bg-black/60 backdrop-blur-sm flex items-center justify-center hover:bg-[#dfb86c] hover:text-black hover:border-[#dfb86c] transition-all duration-300 cursor-pointer text-white/80"
-                          aria-label="Previous Slide"
-                        >
-                          <ArrowLeft size={16} />
-                        </button>
-                        <button 
-                          onClick={() => setCurrentBtsIndex((prev) => (prev + 1) % behindTheScenes.length)}
-                          className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full border border-white/20 bg-black/60 backdrop-blur-sm flex items-center justify-center hover:bg-[#dfb86c] hover:text-black hover:border-[#dfb86c] transition-all duration-300 cursor-pointer text-white/80"
-                          aria-label="Next Slide"
-                        >
-                          <ArrowRight size={16} />
-                        </button>
-                      </div>
-
-                      {/* Details Grid */}
-                      <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-end">
-                        <div className="md:col-span-8 space-y-3">
-                          <span className="text-[10px] text-[#dfb86c] tracking-[0.25em] font-semibold uppercase">
-                            0{currentBtsIndex + 1}/ BTS DIARY
-                          </span>
-                          <AnimatePresence mode="wait" initial={false}>
-                            <motion.div
-                              key={currentBtsIndex}
-                              initial={{ opacity: 0, y: 10 }}
-                              animate={{ opacity: 1, y: 0 }}
-                              exit={{ opacity: 0, y: -10 }}
-                              transition={{ duration: 0.3 }}
-                            >
-                              <h3 className="font-serif text-2xl md:text-3xl text-white/95 mb-2">
-                                {behindTheScenes[currentBtsIndex].title}
-                              </h3>
-                              <p className="text-xs text-white/50 leading-relaxed font-light">
-                                {behindTheScenes[currentBtsIndex].description}
-                              </p>
-                            </motion.div>
-                          </AnimatePresence>
-                        </div>
-
-                        <div className="md:col-span-4 flex flex-col items-end gap-4 text-right">
-                          <AnimatePresence mode="wait" initial={false}>
-                            <motion.div
-                              key={currentBtsIndex}
-                              initial={{ opacity: 0 }}
-                              animate={{ opacity: 1 }}
-                              exit={{ opacity: 0 }}
-                              transition={{ duration: 0.3 }}
-                              className="text-[10px] text-white/40 uppercase tracking-[0.2em]"
-                            >
-                              <p className="font-semibold text-white/70">{behindTheScenes[currentBtsIndex].location}</p>
-                              <p className="text-[#dfb86c]/70">{behindTheScenes[currentBtsIndex].date}</p>
-                            </motion.div>
-                          </AnimatePresence>
-
-                          {/* Navigation Indicators */}
-                          <div className="flex items-center gap-6 mt-2">
-                            <div className="flex gap-1.5">
-                              <button 
-                                onClick={() => setCurrentBtsIndex((prev) => (prev - 1 + behindTheScenes.length) % behindTheScenes.length)}
-                                className="w-7 h-7 rounded-full border border-white/10 flex items-center justify-center hover:bg-[#dfb86c] hover:text-black hover:border-[#dfb86c] transition-all cursor-pointer text-white/60"
-                                aria-label="Previous image"
-                              >
-                                <ArrowLeft size={10} />
-                              </button>
-                              <button 
-                                onClick={() => setCurrentBtsIndex((prev) => (prev + 1) % behindTheScenes.length)}
-                                className="w-7 h-7 rounded-full border border-white/10 flex items-center justify-center hover:bg-[#dfb86c] hover:text-black hover:border-[#dfb86c] transition-all cursor-pointer text-white/60"
-                                aria-label="Next image"
-                              >
-                                <ArrowRight size={10} />
-                              </button>
-                            </div>
-
-                            <div className="text-[11px] font-mono tracking-widest text-[#dfb86c] font-semibold select-none">
-                              {String(currentBtsIndex + 1).padStart(2, '0')} <span className="text-white/20 mx-1">/</span> {String(behindTheScenes.length).padStart(2, '0')}
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </section>
+                <RecapsPage link={link} />
               </motion.div>
             )}
 
@@ -1027,7 +882,8 @@ export default function App({ initialPath }: { initialPath?: string }) {
                 {page.kind === 'about' && <AboutPage link={link} />}
                 {page.kind === 'work' && <WorkPage link={link} />}
                 {page.kind === 'project' && <ProjectPage project={page.project} link={link} />}
-                {page.kind === 'service' && <ServicePage service={page.service} link={link} />}
+                {page.kind === 'recap' && <RecapPage recap={page.recap} link={link} />}
+                {page.kind === 'service' && <ServicePage service={page.service} link={link} quote={quoteLink(page.service.slug)} />}
               </motion.div>
             )}
 
@@ -1182,7 +1038,7 @@ export default function App({ initialPath }: { initialPath?: string }) {
             {services.map(s => (
               <a key={s.slug} {...link(servicePath(s))} className="hover:text-[#dfb86c] transition-colors">{s.name}</a>
             ))}
-            <a {...tabLink('bts')} className="hover:text-[#dfb86c] transition-colors">Behind the Scenes</a>
+            <a {...tabLink('recaps')} className="hover:text-[#dfb86c] transition-colors">Project Recaps</a>
             <a {...tabLink('contact')} className="hover:text-[#dfb86c] transition-colors">Contact</a>
           </nav>
           <div className="flex flex-col md:flex-row justify-between items-center text-[10px] text-white/30 uppercase tracking-[0.25em]">
@@ -1201,79 +1057,6 @@ export default function App({ initialPath }: { initialPath?: string }) {
           </div>
         </footer>
       </div>
-
-      {/* BTS Lightbox Modal */}
-      <AnimatePresence>
-        {activeBts && (
-          <motion.div 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={() => setActiveBts(null)}
-            className="fixed inset-0 z-50 bg-[#060606]/95 flex items-center justify-center p-4 md:p-8 backdrop-blur-sm cursor-zoom-out"
-          >
-            <motion.div 
-              initial={{ scale: 0.95, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.95, opacity: 0 }}
-              transition={{ type: "spring", damping: 25, stiffness: 200 }}
-              onClick={(e) => e.stopPropagation()}
-              className="w-full max-w-4xl bg-black border border-white/10 rounded-sm p-4 md:p-6 overflow-hidden cursor-default relative"
-            >
-              <button 
-                onClick={() => setActiveBts(null)}
-                className="absolute top-4 right-4 text-white/50 hover:text-white p-2 hover:bg-white/10 rounded-full transition-colors"
-                aria-label="Close lightbox"
-              >
-                <X size={20} strokeWidth={1.5} />
-              </button>
-
-              <div className="aspect-[16/9] w-full overflow-hidden bg-white/5 border border-white/5 mb-6">
-                {isAnyVideo(activeBts.image) ? (
-                  isDriveVideo(activeBts.image) ? (
-                    <iframe
-                      src={activeBts.image}
-                      allow="autoplay"
-                      allowFullScreen
-                      className="w-full h-full border-0"
-                      title={activeBts.title}
-                    />
-                  ) : (
-                    <video 
-                      src={activeBts.image} 
-                      muted
-                      playsInline
-                      loop
-                      autoPlay
-                      controls
-                      className="w-full h-full object-cover object-center"
-                    />
-                  )
-                ) : (
-                  <img 
-                    src={activeBts.image} 
-                    alt={activeBts.alt ?? activeBts.title} 
-                    className="w-full h-full object-cover object-center"
-                  />
-                )}
-              </div>
-
-              <div className="flex flex-col md:flex-row justify-between md:items-start gap-4">
-                <div>
-                  <h3 className="font-serif text-2xl text-[#f5f5f5] mb-2">{activeBts.title}</h3>
-                  <p className="text-sm text-white/60 font-light leading-relaxed max-w-xl">
-                    {activeBts.description}
-                  </p>
-                </div>
-                <div className="text-right text-[10px] text-[#dfb86c] uppercase tracking-[0.2em] font-semibold flex-shrink-0 self-end md:self-auto border-t md:border-t-0 pt-2 md:pt-0">
-                  <p>{activeBts.location}</p>
-                  <p className="text-white/40">{activeBts.date}</p>
-                </div>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
 
     </div>
   );
