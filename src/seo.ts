@@ -10,9 +10,9 @@ export type Tab = 'home' | 'movies' | 'recaps' | 'contact';
 export const TAB_ROUTES: Record<Tab, { path: string; title: string; description: string }> = {
   home: {
     path: '/',
-    title: 'Robert Lazau — Video Production & Websites | Golden Boy Productions',
+    title: 'Robert Lazau — Video & Websites | Golden Boy Productions',
     description:
-      'Portland-area director and producer Robert Lazau makes commercials, short films and photography through Golden Boy Productions, and builds websites for small businesses in Gresham and Portland.',
+      'Portland-area director and producer Robert Lazau makes commercials, short films and photos, and builds websites for Gresham and Portland small businesses.',
   },
   movies: {
     path: '/favorite-movies',
@@ -22,15 +22,15 @@ export const TAB_ROUTES: Record<Tab, { path: string; title: string; description:
   },
   recaps: {
     path: '/recaps',
-    title: 'Project Recaps — Behind the Work | Robert Lazau, Golden Boy Productions',
+    title: 'Project Recaps | Robert Lazau, Golden Boy Productions',
     description:
-      'After every project, Robert Lazau sits down to talk through the wins, the surprises and what caught him off guard, with behind-the-scenes photos and video from the shoot.',
+      'After every project, Robert Lazau talks through the wins, the surprises and what caught him off guard, with behind-the-scenes photos and video.',
   },
   contact: {
     path: '/contact',
     title: 'Contact Robert Lazau | Golden Boy Productions',
     description:
-      'Hire Robert Lazau and Golden Boy Productions for a commercial, short film, photography, a website or media consulting in the Portland and Gresham area. Send a message or email directly.',
+      'Hire Robert Lazau and Golden Boy Productions for a commercial, short film, photography, a website or media consulting in the Portland and Gresham area.',
   },
 };
 
@@ -77,6 +77,9 @@ export const ALL_PATHS: string[] = [
   TAB_ROUTES.movies.path,
 ];
 
+// The first option that fits within max characters (the last one if none does).
+const fit = (max: number, ...options: string[]) => options.find((o) => o.length <= max) ?? options[options.length - 1];
+
 export const pageMeta = (page: Page): { path: string; title: string; description: string } => {
   switch (page.kind) {
     case 'tab':
@@ -84,23 +87,24 @@ export const pageMeta = (page: Page): { path: string; title: string; description
     case 'about':
       return {
         path: ABOUT_PATH,
-        title: 'About Robert Lazau | Director & Producer, Golden Boy Productions',
+        title: 'About Robert Lazau | Director & Producer',
         description:
           'Robert Lazau is a Portland-area director and producer who founded Golden Boy Productions to tell the stories happening in his own community.',
       };
     case 'work':
       return {
         path: WORK_PATH,
-        title: 'Work — Films & Websites | Robert Lazau, Golden Boy Productions',
+        title: 'Work — Films & Websites | Golden Boy Productions',
         description:
-          'Selected work by Robert Lazau and Golden Boy Productions: commercials, PSAs, nonprofit spotlights and fashion films, plus websites built and managed for small businesses in Gresham, Portland and beyond.',
+          'Selected work by Robert Lazau: commercials, PSAs, nonprofit spotlights and fashion films, plus websites for small businesses in Gresham and Portland.',
       };
     case 'project': {
       const p = page.project;
       return {
         path: projectPath(p),
-        title: `${p.title} — ${p.type} | Robert Lazau`,
-        description: `${p.description} ${p.role}: Robert Lazau, Golden Boy Productions.`,
+        // Keep titles to 60 characters and descriptions to 155 so Google shows them whole.
+        title: fit(60, `${p.title} — ${p.type} | Robert Lazau`, `${p.title} | Robert Lazau`),
+        description: fit(155, `${p.description} By Robert Lazau, Golden Boy Productions.`, `${p.description} By Robert Lazau.`, p.description),
       };
     }
     case 'service':

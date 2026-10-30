@@ -367,12 +367,13 @@ export default function App({ initialPath }: { initialPath?: string }) {
             />
             <span>Golden Boy Productions</span>
           </a>
-          <ul className="flex flex-wrap justify-center items-center gap-x-6 gap-y-3 md:gap-x-12 text-[10px] uppercase tracking-[0.25em] text-white/50">
+          {/* On phones: larger text and row spacing so the links are easy to tap (each link also gets a 12px invisible hit area). */}
+          <ul className="flex flex-wrap justify-center items-center gap-x-6 gap-y-6 md:gap-y-3 md:gap-x-12 text-xs md:text-[10px] uppercase tracking-[0.25em] text-white/50">
             <li>
               <a 
                 {...tabLink('home')}
                 aria-current={activeTab === 'home' ? 'page' : undefined}
-                className={`inline-block normal-case hover:text-white transition-all duration-300 cursor-pointer ${activeTab === 'home' ? 'text-[#dfb86c] font-semibold border-b border-[#dfb86c] pb-1' : ''}`}
+                className={`relative inline-block normal-case hover:text-white transition-all duration-300 cursor-pointer before:absolute before:-inset-3 before:content-[''] md:before:hidden ${activeTab === 'home' ? 'text-[#dfb86c] font-semibold border-b border-[#dfb86c] pb-1' : ''}`}
               >
                 Home
               </a>
@@ -381,7 +382,7 @@ export default function App({ initialPath }: { initialPath?: string }) {
               <a 
                 {...link(WORK_PATH)}
                 aria-current={page.kind === 'work' ? 'page' : undefined}
-                className={`inline-block normal-case hover:text-white transition-all duration-300 cursor-pointer ${(page.kind === 'work' || page.kind === 'project') ? 'text-[#dfb86c] font-semibold border-b border-[#dfb86c] pb-1' : ''}`}
+                className={`relative inline-block normal-case hover:text-white transition-all duration-300 cursor-pointer before:absolute before:-inset-3 before:content-[''] md:before:hidden ${(page.kind === 'work' || page.kind === 'project') ? 'text-[#dfb86c] font-semibold border-b border-[#dfb86c] pb-1' : ''}`}
               >
                 Work
               </a>
@@ -390,7 +391,7 @@ export default function App({ initialPath }: { initialPath?: string }) {
               <a 
                 {...link('/services/web-design')}
                 aria-current={page.kind === 'service' && page.service.slug === 'web-design' ? 'page' : undefined}
-                className={`inline-block normal-case hover:text-white transition-all duration-300 cursor-pointer ${page.kind === 'service' && page.service.slug === 'web-design' ? 'text-[#dfb86c] font-semibold border-b border-[#dfb86c] pb-1' : ''}`}
+                className={`relative inline-block normal-case hover:text-white transition-all duration-300 cursor-pointer before:absolute before:-inset-3 before:content-[''] md:before:hidden ${page.kind === 'service' && page.service.slug === 'web-design' ? 'text-[#dfb86c] font-semibold border-b border-[#dfb86c] pb-1' : ''}`}
               >
                 Websites
               </a>
@@ -399,7 +400,7 @@ export default function App({ initialPath }: { initialPath?: string }) {
               <a 
                 {...tabLink('movies')}
                 aria-current={activeTab === 'movies' ? 'page' : undefined}
-                className={`inline-block normal-case hover:text-white transition-all duration-300 cursor-pointer ${activeTab === 'movies' ? 'text-[#dfb86c] font-semibold border-b border-[#dfb86c] pb-1' : ''}`}
+                className={`relative inline-block normal-case hover:text-white transition-all duration-300 cursor-pointer before:absolute before:-inset-3 before:content-[''] md:before:hidden ${activeTab === 'movies' ? 'text-[#dfb86c] font-semibold border-b border-[#dfb86c] pb-1' : ''}`}
               >
                 Favorite Movies
               </a>
@@ -408,7 +409,7 @@ export default function App({ initialPath }: { initialPath?: string }) {
               <a 
                 {...tabLink('recaps')}
                 aria-current={activeTab === 'recaps' || page.kind === 'recap' ? 'page' : undefined}
-                className={`inline-block normal-case hover:text-white transition-all duration-300 cursor-pointer ${activeTab === 'recaps' || page.kind === 'recap' ? 'text-[#dfb86c] font-semibold border-b border-[#dfb86c] pb-1' : ''}`}
+                className={`relative inline-block normal-case hover:text-white transition-all duration-300 cursor-pointer before:absolute before:-inset-3 before:content-[''] md:before:hidden ${activeTab === 'recaps' || page.kind === 'recap' ? 'text-[#dfb86c] font-semibold border-b border-[#dfb86c] pb-1' : ''}`}
               >
                 Project Recaps
               </a>
@@ -417,7 +418,7 @@ export default function App({ initialPath }: { initialPath?: string }) {
               <a 
                 {...tabLink('contact')}
                 aria-current={activeTab === 'contact' ? 'page' : undefined}
-                className={`inline-block normal-case hover:text-white transition-all duration-300 cursor-pointer ${activeTab === 'contact' ? 'text-[#dfb86c] font-semibold border-b border-[#dfb86c] pb-1' : ''}`}
+                className={`relative inline-block normal-case hover:text-white transition-all duration-300 cursor-pointer before:absolute before:-inset-3 before:content-[''] md:before:hidden ${activeTab === 'contact' ? 'text-[#dfb86c] font-semibold border-b border-[#dfb86c] pb-1' : ''}`}
               >
                 Contact
               </a>

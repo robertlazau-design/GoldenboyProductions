@@ -594,7 +594,7 @@ export const services: Service[] = [
     name: "Video Production",
     title: "Video Production in Portland, OR | Golden Boy Productions",
     description:
-      "Commercials, PSAs, nonprofit spotlights, website visuals and fashion films directed and produced by Robert Lazau for businesses, nonprofits and cities around Portland, Gresham and Fairview.",
+      "Commercials, PSAs, nonprofit spotlights and fashion films by Robert Lazau for businesses, nonprofits and cities in Portland, Gresham and Fairview.",
     heading: "Video production for Portland-area brands, nonprofits and cities",
     intro: [
       "Golden Boy Productions makes commercials, public service announcements, nonprofit and community spotlights, website visuals and fashion films. Robert Lazau directs and produces every project himself, from the first conversation to the final edit.",
@@ -614,7 +614,7 @@ export const services: Service[] = [
     name: "Media Consulting",
     title: "Media Consulting for Filmmakers & Brands | Robert Lazau",
     description:
-      "One-on-one media consulting from director Robert Lazau: story and script, visual direction, production planning and post-production feedback for filmmakers, creators and organizations.",
+      "One-on-one media consulting from director Robert Lazau: story, visual direction, production planning and post-production feedback for filmmakers.",
     heading: "Media consulting, from first idea to final cut",
     intro: [
       "Have a project and want a second set of eyes? Robert offers one-on-one guidance for filmmakers, creators, and organizations at any stage, from first idea to final cut.",
@@ -626,9 +626,9 @@ export const services: Service[] = [
   {
     slug: "web-design",
     name: "Website Design",
-    title: "Website Design in Gresham & Portland, OR | Golden Boy Productions",
+    title: "Website Design in Gresham & Portland, OR | Robert Lazau",
     description:
-      "Fast, mobile-first websites built and managed by Robert Lazau for small businesses in Gresham, Portland and East Multnomah County: custom design, local SEO, booking and quote forms, real photos and video, and monthly site care.",
+      "Mobile-first websites built and managed by Robert Lazau for Gresham and Portland small businesses: custom design, local SEO, booking forms and site care.",
     heading: "Websites that bring in calls, bookings and clients",
     intro: [
       "Golden Boy Productions builds and manages websites for small businesses in Gresham, Portland and across East Multnomah County. Robert designs each site, writes it around the way your customers actually search, and keeps it fast, secure and up to date after launch.",
