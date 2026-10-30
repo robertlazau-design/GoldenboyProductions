@@ -1,6 +1,17 @@
 {
   "redirects": [
     {
+      "source": "/",
+      "has": [
+        {
+          "type": "host",
+          "value": "goldenboy-productions.vercel.app"
+        }
+      ],
+      "destination": "https://www.robertlazau.com/",
+      "permanent": true
+    },
+    {
       "source": "/:path*",
       "has": [
         {
@@ -9,11 +20,6 @@
         }
       ],
       "destination": "https://www.robertlazau.com/:path*",
-      "permanent": true
-    },
-    {
-      "source": "/behind-the-scenes",
-      "destination": "/recaps",
       "permanent": true
     }
   ],
