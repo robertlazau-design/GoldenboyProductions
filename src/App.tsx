@@ -5,7 +5,7 @@ import { ArrowRight, ArrowLeft, Plus, Minus, Camera, X, Send, Mail } from 'lucid
 import { biography, clientApproach, consultingServices, favoriteMovies, faqs, recommendableMovies, services } from './data';
 import robertBackground from '../assets/robert_background.jpg';
 import { TAB_ROUTES, isTabShown, pageFromPath, pageMeta, normalizePath, canonicalUrl, servicePath, ABOUT_PATH, WORK_PATH, type Tab } from './seo';
-import { AboutPage, ProjectPage, RecapPage, RecapsPage, ServicePage, WorkPage } from './pages';
+import { AboutPage, ClickToPlay, ProjectPage, RecapPage, RecapsPage, ServicePage, WorkPage, newestFilm } from './pages';
 
 
 const setMeta = (selector: string, attr: string, value: string) =>
@@ -62,6 +62,7 @@ export default function App({ initialPath }: { initialPath?: string }) {
     },
   });
   const tabLink = (tab: Tab) => link(TAB_ROUTES[tab].path);
+  const heroFilm = newestFilm();
 
   // "Get a quote" on a service page: open the contact form with that service picked.
   const QUOTE_TYPES: Record<string, string> = {
@@ -442,47 +443,51 @@ export default function App({ initialPath }: { initialPath?: string }) {
                 exit={{ opacity: 0 }}
                 transition={{ duration: 0.4 }}
               >
-                {/* Hero Section */}
-                 <section className="min-h-[70vh] flex flex-col justify-center items-center text-center pt-8 pb-16 relative z-10" aria-label="Hero">
-                  <motion.div
-                    initial={false}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1], delay: 0.2 }}
-                    className="mb-8 select-none"
-                  >
-                    <img 
-                      src="/logo-mark.png" 
-                      alt="Golden Boy Productions Logo" 
-                      className="h-24 md:h-32 w-auto filter drop-shadow-[0_0_20px_rgba(223,184,108,0.15)]" 
-                    />
-                  </motion.div>
-                  <motion.h1 
-                    initial={false}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 1, ease: [0.16, 1, 0.3, 1], delay: 0.1 }}
-                    className="font-serif text-5xl md:text-8xl lg:text-9xl tracking-tight mb-4 text-[#f5f5f5]"
-                  >
-                    Robert Lazau
-                  </motion.h1>
-                  
-                  <motion.div 
-                    initial={false}
-                    animate={{ opacity: 1 }}
-                    transition={{ duration: 1.2, delay: 0.4 }}
-                    className="text-[#dfb86c]/90 font-serif italic text-xl md:text-3xl mb-8 tracking-wide"
-                  >
-                    Director & Producer
-                  </motion.div>
-                  
-                  <motion.p 
-                    initial={false}
-                    animate={{ opacity: 1 }}
-                    transition={{ duration: 1.2, delay: 0.6 }}
-                    className="max-w-2xl text-xs md:text-sm leading-relaxed text-white/40 tracking-wider font-light mb-16"
-                  >
-                    Portland-area director and producer, and founder of Golden Boy Productions. Robert makes films for
-                    cities, nonprofits, local businesses, and fashion brands, with a cinematic eye and a real interest in their story.
-                  </motion.p>
+                {/* Hero Section: who Robert is, two buttons, and the newest film */}
+                <section className="pt-10 md:pt-16 pb-20 md:pb-28 relative z-10" aria-label="Hero">
+                  <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center">
+                    <div className="lg:col-span-5 flex flex-col items-center lg:items-start text-center lg:text-left">
+                      <img
+                        src="/logo-mark.png"
+                        alt="Golden Boy Productions Logo"
+                        className="h-16 md:h-20 w-auto mb-6 select-none filter drop-shadow-[0_0_20px_rgba(223,184,108,0.15)]"
+                      />
+                      <h1 className="font-serif text-5xl md:text-7xl tracking-tight mb-3 text-[#f5f5f5]">Robert Lazau</h1>
+                      <p className="text-[#dfb86c]/90 font-serif italic text-xl md:text-2xl mb-6 tracking-wide">Director & Producer</p>
+                      <p className="max-w-xl text-sm md:text-base leading-relaxed text-white/60 font-light mb-8">
+                        Portland-area director and producer, and founder of Golden Boy Productions. Robert makes films for
+                        cities, nonprofits, local businesses, and fashion brands, with a cinematic eye and a real interest in their story.
+                      </p>
+                      <div className="flex flex-wrap justify-center lg:justify-start gap-3">
+                        <a
+                          {...link(WORK_PATH)}
+                          className="inline-flex items-center gap-3 px-7 py-4 bg-[#dfb86c] text-[#060606] text-[11px] uppercase tracking-[0.25em] font-semibold hover:bg-white transition-colors"
+                        >
+                          See the work <ArrowRight size={14} />
+                        </a>
+                        <a
+                          {...tabLink('contact')}
+                          className="inline-flex items-center gap-3 px-7 py-4 border border-[#dfb86c]/50 text-[#f5f5f5] text-[11px] uppercase tracking-[0.25em] hover:border-[#dfb86c] hover:text-[#dfb86c] transition-colors"
+                        >
+                          Start a project
+                        </a>
+                      </div>
+                    </div>
+                    {heroFilm && (
+                      <figure className="lg:col-span-7 w-full">
+                        <ClickToPlay project={heroFilm} className="border border-white/10" />
+                        <figcaption className="mt-4 flex flex-wrap items-baseline justify-between gap-x-6 gap-y-2">
+                          <span className="text-[11px] uppercase tracking-[0.2em] text-white/60">
+                            <span className="text-[#dfb86c] font-semibold mr-3">Newest</span>
+                            {heroFilm.title} · {heroFilm.type}
+                          </span>
+                          <a {...link(WORK_PATH)} className="text-[11px] uppercase tracking-[0.2em] text-[#dfb86c] hover:text-white transition-colors">
+                            All work →
+                          </a>
+                        </figcaption>
+                      </figure>
+                    )}
+                  </div>
                 </section>
 
                 {/* Biography Section */}
