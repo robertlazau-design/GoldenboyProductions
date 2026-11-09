@@ -21,6 +21,21 @@
       ],
       "destination": "https://www.robertlazau.com/:path*",
       "permanent": true
+    },
+    {
+      "source": "/favorite-movies",
+      "destination": "/",
+      "permanent": false
+    },
+    {
+      "source": "/recaps",
+      "destination": "/work",
+      "permanent": false
+    },
+    {
+      "source": "/recaps/:path*",
+      "destination": "/work",
+      "permanent": false
     }
   ],
   "cleanUrls": true,
