@@ -378,11 +378,43 @@ export function AboutPage({ link }: { link: LinkTo }) {
 }
 
 // The big "Newest" card: the video loads only when someone presses play, so the page stays fast.
-function FeaturedFilm({ project, link }: { project: Project; link: LinkTo; key?: React.Key }) {
+// A film's poster with a play button. The video itself loads only when someone presses play.
+export function ClickToPlay({ project, className = '' }: { project: Project; className?: string }) {
   const [playing, setPlaying] = React.useState(false);
+  const canEmbed = isYouTubeEmbed(project.video) || isDriveVideo(project.video);
+  return (
+    <div className={`relative aspect-[16/9] overflow-hidden bg-black ${className}`}>
+      {playing && canEmbed ? (
+        <iframe
+          src={isYouTubeEmbed(project.video) ? `${project.video}?autoplay=1&rel=0` : project.video}
+          allow="autoplay; fullscreen; picture-in-picture"
+          allowFullScreen
+          className="absolute inset-0 w-full h-full border-0"
+          title={`${project.title} — ${project.type}`}
+        />
+      ) : (
+        <button
+          type="button"
+          onClick={() => setPlaying(true)}
+          className="group absolute inset-0 w-full h-full cursor-pointer"
+          aria-label={`Play the ${project.title} film`}
+        >
+          <img src={project.image} alt="" className="w-full h-full object-cover" />
+          <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-20 h-20 rounded-full border border-[#dfb86c] bg-[#060606]/60 flex items-center justify-center group-hover:bg-[#dfb86c] group-hover:text-[#060606] text-white transition-colors">
+            <Play size={26} className="ml-1" />
+          </span>
+        </button>
+      )}
+    </div>
+  );
+}
+
+// The newest film for the home page hero: the first film in finishedProjects that has a "Newest" card.
+export const newestFilm = (): Project | undefined => finishedProjects.find(p => featuredExtras[p.slug]);
+
+function FeaturedFilm({ project, link }: { project: Project; link: LinkTo; key?: React.Key }) {
   const extra = featuredExtras[project.slug];
   const recap = recaps.find(r => r.project === project.slug);
-  const canEmbed = isYouTubeEmbed(project.video) || isDriveVideo(project.video);
   const facts: Array<[string, string]> = [
     ...(project.client ? [['Client', project.client] as [string, string]] : []),
     ...(project.location ? [['Location', project.location] as [string, string]] : []),
@@ -391,29 +423,7 @@ function FeaturedFilm({ project, link }: { project: Project; link: LinkTo; key?:
   return (
     <div>
       <article className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center border border-white/5 bg-white/[0.02] p-4 md:p-5">
-        <div className="lg:col-span-7 relative aspect-[16/9] overflow-hidden bg-black">
-          {playing && canEmbed ? (
-            <iframe
-              src={isYouTubeEmbed(project.video) ? `${project.video}?autoplay=1&rel=0` : project.video}
-              allow="autoplay; fullscreen; picture-in-picture"
-              allowFullScreen
-              className="absolute inset-0 w-full h-full border-0"
-              title={`${project.title} — ${project.type}`}
-            />
-          ) : (
-            <button
-              type="button"
-              onClick={() => setPlaying(true)}
-              className="group absolute inset-0 w-full h-full cursor-pointer"
-              aria-label={`Play the ${project.title} film`}
-            >
-              <img src={project.image} alt="" className="w-full h-full object-cover" />
-              <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-20 h-20 rounded-full border border-[#dfb86c] bg-[#060606]/60 flex items-center justify-center group-hover:bg-[#dfb86c] group-hover:text-[#060606] text-white transition-colors">
-                <Play size={26} className="ml-1" />
-              </span>
-            </button>
-          )}
-        </div>
+        <ClickToPlay project={project} className="lg:col-span-7" />
         <div className="lg:col-span-5 flex flex-col gap-4 pb-2 lg:pr-4">
           <div className="flex justify-between gap-4 text-[10px] uppercase tracking-[0.2em]">
             <span className="text-white/50">{project.type}</span>
