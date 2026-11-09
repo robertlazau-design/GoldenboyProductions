@@ -2,10 +2,10 @@
 // (/services/<slug>) and /about. Styled to match the tabs in App.tsx.
 import React from 'react';
 import { ArrowLeft, ArrowRight, Play } from 'lucide-react';
-import { biography, clientApproach, currentProjects, finishedProjects, services, sunStar, type Project, type Service } from './data';
+import { biography, clientApproach, currentProjects, featuredExtras, finishedProjects, recentWork, services, sunStar, type Project, type RecentWork, type Service, type WorkKind } from './data';
 import { ABOUT_PATH, TAB_ROUTES, WORK_PATH, projectPath, recapPath, servicePath } from './seo';
 import { formatRecapDate, recaps, type Recap } from './recaps';
-import { isDriveVideo } from './media';
+import { isDriveVideo, isYouTubeEmbed } from './media';
 
 export type LinkTo = (to: string) => { href: string; onClick: (e: React.MouseEvent) => void };
 
@@ -81,10 +81,10 @@ function ProjectVideo({ project }: { project: Project }) {
       </div>
     );
   }
-  return isDriveVideo(project.video) ? (
+  return isDriveVideo(project.video) || isYouTubeEmbed(project.video) ? (
     <iframe
-      src={project.video}
-      allow="autoplay; fullscreen"
+      src={isYouTubeEmbed(project.video) ? `${project.video}?rel=0` : project.video}
+      allow="autoplay; fullscreen; picture-in-picture"
       allowFullScreen
       loading="lazy"
       className="w-full h-full border-0"
@@ -377,104 +377,239 @@ export function AboutPage({ link }: { link: LinkTo }) {
   );
 }
 
+// The big "Newest" card: the video loads only when someone presses play, so the page stays fast.
+function FeaturedFilm({ project, link }: { project: Project; link: LinkTo }) {
+  const [playing, setPlaying] = React.useState(false);
+  const extra = featuredExtras[project.slug];
+  const recap = recaps.find(r => r.project === project.slug);
+  const canEmbed = isYouTubeEmbed(project.video) || isDriveVideo(project.video);
+  const facts: Array<[string, string]> = [
+    ...(project.client ? [['Client', project.client] as [string, string]] : []),
+    ...(project.location ? [['Location', project.location] as [string, string]] : []),
+    ...(extra?.delivered ? [['Delivered', extra.delivered] as [string, string]] : []),
+  ];
+  return (
+    <div>
+      <article className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center border border-white/5 bg-white/[0.02] p-4 md:p-5">
+        <div className="lg:col-span-7 relative aspect-[16/9] overflow-hidden bg-black">
+          {playing && canEmbed ? (
+            <iframe
+              src={isYouTubeEmbed(project.video) ? `${project.video}?autoplay=1&rel=0` : project.video}
+              allow="autoplay; fullscreen; picture-in-picture"
+              allowFullScreen
+              className="absolute inset-0 w-full h-full border-0"
+              title={`${project.title} — ${project.type}`}
+            />
+          ) : (
+            <button
+              type="button"
+              onClick={() => setPlaying(true)}
+              className="group absolute inset-0 w-full h-full cursor-pointer"
+              aria-label={`Play the ${project.title} film`}
+            >
+              <img src={project.image} alt="" className="w-full h-full object-cover" />
+              <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-20 h-20 rounded-full border border-[#dfb86c] bg-[#060606]/60 flex items-center justify-center group-hover:bg-[#dfb86c] group-hover:text-[#060606] text-white transition-colors">
+                <Play size={26} className="ml-1" />
+              </span>
+            </button>
+          )}
+        </div>
+        <div className="lg:col-span-5 flex flex-col gap-4 pb-2 lg:pr-4">
+          <div className="flex justify-between gap-4 text-[10px] uppercase tracking-[0.2em]">
+            <span className="text-white/50">{project.type}</span>
+            <span className="text-[#dfb86c] font-semibold">{extra?.date ?? project.year}</span>
+          </div>
+          <h2 className="font-serif text-4xl md:text-5xl text-[#f5f5f5] tracking-tight">{project.title}</h2>
+          <p className="text-[10px] text-white/50 uppercase tracking-widest font-semibold">Role: {project.role}</p>
+          <p className="text-sm md:text-base text-white/60 font-light leading-relaxed">{project.description}</p>
+          {facts.length > 0 && (
+            <dl className="border-t border-white/10 pt-4 grid grid-cols-[max-content_1fr] gap-x-6 gap-y-2 text-sm">
+              {facts.map(([label, value]) => (
+                <React.Fragment key={label}>
+                  <dt className="text-[10px] uppercase tracking-[0.2em] text-white/40 pt-1">{label}</dt>
+                  <dd className="text-white/80">{value}</dd>
+                </React.Fragment>
+              ))}
+            </dl>
+          )}
+          <div className="flex flex-wrap gap-3 pt-2">
+            <a
+              {...link(projectPath(project))}
+              className="inline-flex items-center gap-3 px-6 py-4 bg-[#dfb86c] text-[#060606] text-[10px] uppercase tracking-[0.25em] font-semibold hover:bg-white transition-colors"
+            >
+              Watch the film <ArrowRight size={14} />
+            </a>
+            {recap && (
+              <a
+                {...link(recapPath(recap))}
+                className="inline-flex items-center gap-3 px-6 py-4 border border-white/15 text-white/80 text-[10px] uppercase tracking-[0.25em] hover:border-[#dfb86c] hover:text-[#dfb86c] transition-colors"
+              >
+                Behind the scenes
+              </a>
+            )}
+          </div>
+        </div>
+      </article>
+      {extra && extra.photos.length > 0 && (
+        <figure className="mt-4">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            {extra.photos.map(ph => (
+              <img key={ph.src} src={ph.src} alt={ph.alt} loading="lazy" className="w-full aspect-[3/2] object-cover" />
+            ))}
+          </div>
+          {extra.credit && (
+            <figcaption className="mt-3 text-[10px] uppercase tracking-[0.2em] text-white/40">Photos: {extra.credit}</figcaption>
+          )}
+        </figure>
+      )}
+    </div>
+  );
+}
+
+// A phone screenshot in a simple frame, for website cards.
+const PhoneShot = ({ src, alt, className = '' }: { src: string; alt: string; className?: string }) => (
+  <div className={`aspect-[604/1310] overflow-hidden border-[5px] border-[#1b1b1b] bg-black ${className}`}>
+    <img src={src} alt={alt} loading="lazy" className="w-full h-full object-cover object-top" />
+  </div>
+);
+
+function RecentCard({ item }: { item: RecentWork; key?: React.Key }) {
+  const domain = item.url.replace(/^https?:\/\/(www\.)?/, '').replace(/\/$/, '');
+  const text = (
+    <div className="flex flex-col gap-3 p-6 flex-1">
+      <div className="flex justify-between gap-4 text-[10px] uppercase tracking-[0.2em]">
+        <span className="text-white/50">{item.label}</span>
+        <span className="text-[#dfb86c] font-semibold">{item.date}</span>
+      </div>
+      <h3 className="font-serif text-2xl text-white/90 group-hover:text-[#dfb86c] transition-colors">{item.title}</h3>
+      <p className="text-[10px] text-white/50 uppercase tracking-widest font-semibold">Role: {item.role}</p>
+      <p className="text-sm text-white/60 font-light leading-relaxed">{item.description}</p>
+      <span className="mt-auto pt-2 text-xs tracking-wider text-[#dfb86c]">{domain} ↗</span>
+    </div>
+  );
+  if (item.wide && item.photo) {
+    return (
+      <a
+        href={item.url}
+        target="_blank"
+        rel="noopener"
+        className="group md:col-span-2 flex flex-col md:flex-row border border-white/5 bg-white/[0.02] hover:border-[#dfb86c]/40 transition-colors"
+      >
+        <div className="relative md:w-[58%] min-h-[260px] md:min-h-[340px] overflow-hidden">
+          <img src={item.photo} alt={item.photoAlt ?? ''} loading="lazy" className="absolute inset-0 w-full h-full object-cover" />
+          <PhoneShot src={item.phone} alt={`The ${item.title} website on a phone`} className="absolute right-4 bottom-4 w-24 md:w-28 rounded-[20px]" />
+        </div>
+        {text}
+      </a>
+    );
+  }
+  return (
+    <a
+      href={item.url}
+      target="_blank"
+      rel="noopener"
+      className="group flex flex-col border border-white/5 bg-white/[0.02] hover:border-[#dfb86c]/40 transition-colors"
+    >
+      <div className="h-[300px] bg-[#0a0a0a] flex items-end justify-center overflow-hidden pt-8">
+        <PhoneShot
+          src={item.phone}
+          alt={`The ${item.title} website on a phone`}
+          className="w-[150px] rounded-t-[24px] border-b-0 translate-y-10 group-hover:translate-y-6 transition-transform duration-500"
+        />
+      </div>
+      {text}
+    </a>
+  );
+}
+
+type WorkFilter = 'all' | WorkKind;
+
 export function WorkPage({ link }: { link: LinkTo }) {
+  const [filter, setFilter] = React.useState<WorkFilter>('all');
   const videoService = services.find(s => s.slug === 'video-production');
   const webService = services.find(s => s.slug === 'web-design');
-  const sites = webService?.sites ?? [];
-  const shot = (url: string) =>
-    `https://s.wordpress.com/mshots/v1/${encodeURIComponent(url.endsWith('/') ? url : `${url}/`)}?w=1280&h=800`;
-  const domainOf = (url: string) => url.replace(/^https?:\/\/(www\.)?/, '').replace(/\/$/, '');
-  const tab = 'inline-flex items-center gap-3 border border-white/15 px-5 py-3 text-[10px] uppercase tracking-[0.25em] text-white/70 hover:border-[#dfb86c] hover:text-[#dfb86c] transition-colors';
+  const [featured, ...earlier] = finishedProjects;
+  const featuredKinds: WorkKind[] = ['film', ...(featuredExtras[featured?.slug ?? '']?.photos.length ? ['photo' as WorkKind] : [])];
+  const shows = (kinds: WorkKind[]) => filter === 'all' || kinds.includes(filter);
+  const count = (k: WorkFilter) =>
+    (featured && (k === 'all' || featuredKinds.includes(k as WorkKind)) ? 1 : 0) +
+    recentWork.filter(r => k === 'all' || r.kinds.includes(k as WorkKind)).length +
+    (k === 'all' || k === 'film' ? earlier.length : 0);
+  const filters: Array<[WorkFilter, string]> = [['all', 'All'], ['film', 'Films'], ['photo', 'Photo'], ['website', 'Websites']];
+  const recent = recentWork.filter(r => shows(r.kinds));
+  const label = 'text-xs uppercase tracking-[0.25em] text-[#dfb86c] font-medium';
+
   return (
     <article className="py-16">
-      <header className="mb-16">
-        <Kicker>Portfolio index</Kicker>
-        <h1 className="font-serif italic text-4xl md:text-6xl text-[#f5f5f5] tracking-tight mb-8">Filmography & Works</h1>
+      <header className="mb-14">
+        <Kicker>Work · Newest first</Kicker>
+        <h1 className="font-serif italic text-4xl md:text-6xl text-[#f5f5f5] tracking-tight mb-8">What we've been making lately</h1>
         <p className="max-w-2xl text-sm md:text-base text-white/50 font-light leading-relaxed mb-10">
-          Commercials, PSAs, nonprofit and community spotlights, website visuals and fashion films made with businesses,
-          nonprofits and cities around Portland, Gresham and Fairview, plus websites built and managed for local businesses.
+          Films, photo shoots and websites for businesses, nonprofits and cities around Portland and Gresham, newest first.
         </p>
-        <nav aria-label="Work sections" className="flex flex-wrap gap-3">
-          <a href="#films" className={tab}>
-            Films <span className="text-[#dfb86c]">{finishedProjects.length}</span>
-          </a>
-          {sites.length > 0 && (
-            <a href="#websites" className={tab}>
-              Websites <span className="text-[#dfb86c]">{sites.length}</span>
-            </a>
-          )}
-        </nav>
+        <div role="group" aria-label="Filter the work" className="flex flex-wrap gap-3">
+          {filters.map(([k, name]) => (
+            <button
+              key={k}
+              type="button"
+              aria-pressed={filter === k}
+              onClick={() => setFilter(k)}
+              className={`inline-flex items-center gap-3 border px-5 py-3 text-[10px] uppercase tracking-[0.25em] transition-colors cursor-pointer ${
+                filter === k ? 'border-[#dfb86c] text-white' : 'border-white/15 text-white/70 hover:border-[#dfb86c] hover:text-[#dfb86c]'
+              }`}
+            >
+              {name} <span className="text-[#dfb86c]">{count(k)}</span>
+            </button>
+          ))}
+        </div>
       </header>
 
-      <section id="films" className="pb-20 scroll-mt-8" aria-label="Finished projects">
-        <h2 className="text-xs uppercase tracking-[0.25em] text-[#dfb86c] border-b border-white/5 pb-4 mb-10 font-medium">
-          Films · Finished Projects
-        </h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {finishedProjects.map(p => <ProjectCard key={p.slug} project={p} link={link} detailed />)}
-        </div>
-        {videoService && (
-          <div className="mt-10">
-            <TextLink link={link} to={servicePath(videoService)}>Video production services</TextLink>
-          </div>
-        )}
-      </section>
-
-      {currentProjects.length > 0 && (
-        <section className="pb-20" aria-label="Current projects">
-          <h2 className="text-xs uppercase tracking-[0.25em] text-[#dfb86c] border-b border-white/5 pb-4 mb-10 font-medium">
-            Current Projects (In Development)
-          </h2>
-          <ul className="space-y-6">
-            {currentProjects.map(p => (
-              <li key={p.id} className="border border-white/5 bg-white/[0.01] p-5">
-                <h3 className="font-serif text-xl text-white/90 mb-2">{p.title}</h3>
-                <p className="text-[11px] text-white/50 leading-relaxed font-light">{p.description}</p>
-              </li>
-            ))}
-          </ul>
+      {featured && shows(featuredKinds) && (
+        <section className="pb-20" aria-labelledby="newest-work">
+          <h2 id="newest-work" className={`${label} border-b border-white/5 pb-4 mb-8`}>Newest</h2>
+          <FeaturedFilm project={featured} link={link} />
         </section>
       )}
 
-      {sites.length > 0 && (
-        <section id="websites" className="pb-20 scroll-mt-8" aria-label="Websites">
-          <h2 className="text-xs uppercase tracking-[0.25em] text-[#dfb86c] border-b border-white/5 pb-4 mb-10 font-medium">
-            Websites · Built & Managed
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {sites.map(site => (
-              <a
-                key={site.url}
-                href={site.url}
-                target="_blank"
-                rel="noopener"
-                className="group block border border-white/5 bg-white/[0.01] p-4 hover:border-[#dfb86c]/40 transition-all duration-300"
-              >
-                <div className="rounded-md overflow-hidden border border-white/10 bg-[#141414] mb-5">
-                  <div className="flex items-center gap-1.5 px-3 py-2 bg-[#1a1a1a] border-b border-white/5">
-                    <span className="w-2 h-2 rounded-full bg-white/15" />
-                    <span className="w-2 h-2 rounded-full bg-white/15" />
-                    <span className="w-2 h-2 rounded-full bg-[#dfb86c]/70" />
-                    <span className="ml-2 truncate text-[9px] tracking-wider text-white/40">{domainOf(site.url)}</span>
-                  </div>
-                  <div className="aspect-[16/10] overflow-hidden">
-                    <img
-                      src={shot(site.url)}
-                      alt={`${site.name} website homepage, designed by Golden Boy Productions`}
-                      loading="lazy"
-                      className="w-full h-full object-cover object-top grayscale group-hover:grayscale-0 group-hover:scale-[1.03] transition-all duration-700 ease-out"
-                    />
-                  </div>
-                </div>
-                <span className="text-[10px] text-[#dfb86c] tracking-widest uppercase font-semibold block mb-2">{site.location}</span>
-                <h3 className="font-serif text-xl text-white/90 mb-1 group-hover:text-[#dfb86c] transition-colors">{site.name}</h3>
-                <p className="text-[10px] uppercase tracking-[0.2em] text-white/40">{site.type}</p>
-              </a>
-            ))}
+      {recent.length > 0 && (
+        <section className="pb-20" aria-labelledby="recent-work">
+          <h2 id="recent-work" className={`${label} border-b border-white/5 pb-4 mb-8`}>The last few months</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {recent.map(item => <RecentCard key={item.title} item={item} />)}
           </div>
-          {webService && (
+          {webService && shows(['website']) && (
             <div className="mt-10">
               <TextLink link={link} to={servicePath(webService)}>Website design services</TextLink>
+            </div>
+          )}
+        </section>
+      )}
+
+      {currentProjects.length > 0 && filter === 'all' && (
+        <section className="pb-20" aria-labelledby="in-production">
+          <h2 id="in-production" className={`${label} border-b border-white/5 pb-4 mb-8`}>In production</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {currentProjects.map(p => (
+              <div key={p.id} className="border border-dashed border-[#dfb86c]/40 p-6">
+                <p className="text-[10px] uppercase tracking-[0.2em] text-white/50 mb-3">{p.type}</p>
+                <h3 className="font-serif italic text-2xl text-white/90 mb-3">{p.title}</h3>
+                <p className="text-sm text-white/60 leading-relaxed font-light">{p.description}</p>
+                <p className="mt-4 text-[10px] uppercase tracking-[0.2em] text-[#dfb86c]">{p.status}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {earlier.length > 0 && shows(['film']) && (
+        <section id="films" className="pb-20 scroll-mt-8" aria-labelledby="earlier-films">
+          <h2 id="earlier-films" className={`${label} border-b border-white/5 pb-4 mb-8`}>Earlier films</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {earlier.map(p => <ProjectCard key={p.slug} project={p} link={link} detailed />)}
+          </div>
+          {videoService && (
+            <div className="mt-10">
+              <TextLink link={link} to={servicePath(videoService)}>Video production services</TextLink>
             </div>
           )}
         </section>

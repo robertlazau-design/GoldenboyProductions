@@ -1,6 +1,6 @@
 // Routing and per-page search metadata. Used by the app when navigating and
 // by scripts/prerender.mjs when it writes a static HTML file for each page.
-import { faqs, finishedProjects, services, biography, type Project, type Service } from './data';
+import { faqs, finishedProjects, recentWork, services, biography, type Project, type Service } from './data';
 import { recaps, type Recap } from './recaps';
 
 export const SITE_URL = 'https://www.robertlazau.com';
@@ -94,9 +94,9 @@ export const pageMeta = (page: Page): { path: string; title: string; description
     case 'work':
       return {
         path: WORK_PATH,
-        title: 'Work — Films & Websites | Golden Boy Productions',
+        title: 'Work: Films, Photos & Websites | Golden Boy Productions',
         description:
-          'Selected work by Robert Lazau: commercials, PSAs, nonprofit spotlights and fashion films, plus websites for small businesses in Gresham and Portland.',
+          'Recent work by Robert Lazau, newest first: commercial films, photo shoots and websites for businesses in Gresham and Portland, plus earlier PSAs and films.',
       };
     case 'project': {
       const p = page.project;
@@ -188,7 +188,7 @@ export const pageJsonLd = (page: Page): object[] => {
             '@type': 'ItemList',
             itemListElement: [
               ...finishedProjects.map(p => ({ name: p.title, url: canonicalUrl(projectPath(p)) })),
-              ...(services.find(s => s.slug === 'web-design')?.sites ?? []).map(s => ({ name: `${s.name} website`, url: s.url })),
+              ...recentWork.map(r => ({ name: r.kinds.includes('website') ? `${r.title} website` : r.title, url: r.url })),
             ].map((item, i) => ({ '@type': 'ListItem', position: i + 1, ...item })),
           },
         },

@@ -7,6 +7,8 @@ const projVideo3 = 'https://drive.google.com/file/d/1-36T8D9BXnkGCYyrHkzWmPURhko
 const projVideo4 = 'https://drive.google.com/file/d/1Jib_GgwhffI2Br_i6cfu_TffWWmo1m7D/preview';
 const projVideo5 = 'https://drive.google.com/file/d/1qAgiLaHfsxvVoRHC15NyA79gspo4Z2Ln/preview';
 const projVideo6 = 'https://drive.google.com/file/d/1Bub3hHrB8I1j1x7Ea8ff5wT10tbXQ5lT/preview';
+// YouTube embeds (youtube-nocookie). New films go on YouTube, then here.
+const matmanVideo = 'https://www.youtube-nocookie.com/embed/c-HqvIjidCc';
 const bts1 = 'https://drive.google.com/file/d/1QkL_-PAwx52tWigHB_egNYlH07Gleq3V/preview';
 const bts2 = 'https://drive.google.com/file/d/1WHtfiZ_iMiWSyezXGbSKaR8Q66UsAdBM/preview';
 const bts3 = 'https://drive.google.com/file/d/1k-UWdaZIqZYgh8ms6PC8ewpSQxiPaj1y/preview';
@@ -87,7 +89,21 @@ export type Project = {
   video: string;
 };
 
+// Newest first: the first film here is the big "Newest" card on the Work page.
 export const finishedProjects: Project[] = [
+  {
+    id: 7,
+    title: "Matman Trucking",
+    slug: "matman-trucking",
+    client: "Matman Trucking",
+    location: "Gresham, OR",
+    type: "Commercial Film + Photo",
+    year: "2026",
+    role: "Director / Producer",
+    image: "/work/matman-trucking.webp",
+    description: "A website film and photo set for Matman Trucking and Oregon's first natural gas garbage transfer trucks. We shot photo and video side by side in one morning in Gresham.",
+    video: matmanVideo
+  },
   {
     id: 1,
     title: "Valentines Model Mash",
@@ -162,6 +178,94 @@ export const finishedProjects: Project[] = [
     description: "A spotlight on Hayes Hustle, a nonprofit that connects kids with nature, horses, and wildlife while teaching hands-on skills like podcasting and sewing.",
     video: projVideo3
   }
+];
+
+// Extras for the "Newest" card on the Work page, by project slug.
+export const featuredExtras: Record<string, { date: string; delivered: string; photos: Array<{ src: string; alt: string }>; credit?: string }> = {
+  "matman-trucking": {
+    date: "Nov 2026",
+    delivered: "47-second website film, full edit and a photo set",
+    photos: [
+      { src: "/work/matman-147.webp", alt: "The Matman Trucking logo on a truck door, framed by fall leaves" },
+      { src: "/work/matman-156.webp", alt: "The CNG fuel tanks on a Matman natural gas truck" },
+      { src: "/work/matman-149.webp", alt: "A Matman truck rolling onto the scale" },
+      { src: "/work/matman-170.webp", alt: "A Matman driver securing the trailer" },
+    ],
+    credit: "Grant Pauli Photography",
+  },
+};
+
+// "The last few months" on the Work page: recent shoots, sites and site updates, newest first.
+// Delete a card here once it's old news; it drops off the page.
+export type WorkKind = 'film' | 'photo' | 'website';
+export type RecentWork = {
+  title: string;
+  kinds: WorkKind[];
+  label: string;
+  date: string;
+  role: string;
+  description: string;
+  url: string;
+  photo?: string;
+  photoAlt?: string;
+  phone: string;
+  wide?: boolean;
+};
+
+export const recentWork: RecentWork[] = [
+  {
+    title: "Royal Brand Woodworking",
+    kinds: ['photo', 'website'],
+    label: "Photo shoot + website",
+    date: "Oct 2026",
+    role: "Photo shoot / Website build",
+    description: "We photographed every step of a cabinet door in Robert Burlacu's Portland shop, then designed and built his new site around those photos.",
+    url: "https://www.royalbrandwoodworking.com",
+    photo: "/work/royal-brand-shoot.webp",
+    photoAlt: "Sanding a cabinet door in the Royal Brand Woodworking shop",
+    phone: "/work/site-royal-brand.webp",
+    wide: true,
+  },
+  {
+    title: "Maple Classic Guide",
+    kinds: ['website'],
+    label: "Website · Our own",
+    date: "Oct 2026",
+    role: "Creator / Developer",
+    description: "A free, ad-free fan guide for MapleStory Classic World, built for players' phones. 1,309 visitors in the week of Oct 27.",
+    url: "https://mapleclassicguide.com",
+    phone: "/work/site-maple-classic-guide.webp",
+  },
+  {
+    title: "Kyree Films",
+    kinds: ['website'],
+    label: "Website update",
+    date: "Nov 2026",
+    role: "Web design & management",
+    description: "The portfolio site for Portland videographer Kyree Films. This month the sports and events pages got real film names.",
+    url: "https://kyreefilms.com",
+    phone: "/work/site-kyree-films.webp",
+  },
+  {
+    title: "Pasture & Paw",
+    kinds: ['website'],
+    label: "Website update",
+    date: "Oct 2026",
+    role: "Web design & management",
+    description: "A working farm and dog-training site in Enumclaw, WA. New this fall: a booking form that takes boarding dates.",
+    url: "https://www.pasturepaw.com",
+    phone: "/work/site-pasture-and-paw.webp",
+  },
+  {
+    title: "Tow Guys",
+    kinds: ['website'],
+    label: "Website update",
+    date: "Oct 2026",
+    role: "Web design & management",
+    description: "The 24/7 towing site for Gresham, with call and text buttons up top. In October it got faster loading and cleaner search titles.",
+    url: "https://www.towguysgresham.com",
+    phone: "/work/site-tow-guys.webp",
+  },
 ];
 
 export const currentProjects: Array<{

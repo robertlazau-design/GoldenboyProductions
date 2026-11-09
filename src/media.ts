@@ -9,3 +9,5 @@ export const isDriveVideo = (url: string) => {
 };
 
 export const isAnyVideo = (url: string) => isVideoFile(url) || isDriveVideo(url);
+
+export const isYouTubeEmbed = (url: string) => /youtube(-nocookie)?\.com\/embed\//.test(url ?? '');
