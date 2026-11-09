@@ -378,7 +378,7 @@ export function AboutPage({ link }: { link: LinkTo }) {
 }
 
 // The big "Newest" card: the video loads only when someone presses play, so the page stays fast.
-function FeaturedFilm({ project, link }: { project: Project; link: LinkTo }) {
+function FeaturedFilm({ project, link }: { project: Project; link: LinkTo; key?: React.Key }) {
   const [playing, setPlaying] = React.useState(false);
   const extra = featuredExtras[project.slug];
   const recap = recaps.find(r => r.project === project.slug);
@@ -386,7 +386,7 @@ function FeaturedFilm({ project, link }: { project: Project; link: LinkTo }) {
   const facts: Array<[string, string]> = [
     ...(project.client ? [['Client', project.client] as [string, string]] : []),
     ...(project.location ? [['Location', project.location] as [string, string]] : []),
-    ...(extra?.delivered ? [['Delivered', extra.delivered] as [string, string]] : []),
+    ...(extra?.facts ?? []),
   ];
   return (
     <div>
@@ -458,7 +458,9 @@ function FeaturedFilm({ project, link }: { project: Project; link: LinkTo }) {
             ))}
           </div>
           {extra.credit && (
-            <figcaption className="mt-3 text-[10px] uppercase tracking-[0.2em] text-white/40">Photos: {extra.credit}</figcaption>
+            <figcaption className="mt-3 text-[10px] uppercase tracking-[0.2em] text-white/40">
+              {/^stills/i.test(extra.credit) ? extra.credit : `Photos: ${extra.credit}`}
+            </figcaption>
           )}
         </figure>
       )}
@@ -528,13 +530,14 @@ export function WorkPage({ link }: { link: LinkTo }) {
   const [filter, setFilter] = React.useState<WorkFilter>('all');
   const videoService = services.find(s => s.slug === 'video-production');
   const webService = services.find(s => s.slug === 'web-design');
-  const [featured, ...earlier] = finishedProjects;
-  const featuredKinds: WorkKind[] = ['film', ...(featuredExtras[featured?.slug ?? '']?.photos.length ? ['photo' as WorkKind] : [])];
+  const featured = finishedProjects.filter(p => featuredExtras[p.slug]);
+  const earlier = finishedProjects.filter(p => !featuredExtras[p.slug]);
   const shows = (kinds: WorkKind[]) => filter === 'all' || kinds.includes(filter);
   const count = (k: WorkFilter) =>
-    (featured && (k === 'all' || featuredKinds.includes(k as WorkKind)) ? 1 : 0) +
+    featured.filter(p => k === 'all' || featuredExtras[p.slug].kinds.includes(k as WorkKind)).length +
     recentWork.filter(r => k === 'all' || r.kinds.includes(k as WorkKind)).length +
     (k === 'all' || k === 'film' ? earlier.length : 0);
+  const newest = featured.filter(p => shows(featuredExtras[p.slug].kinds));
   const filters: Array<[WorkFilter, string]> = [['all', 'All'], ['film', 'Films'], ['photo', 'Photo'], ['website', 'Websites']];
   const recent = recentWork.filter(r => shows(r.kinds));
   const label = 'text-xs uppercase tracking-[0.25em] text-[#dfb86c] font-medium';
@@ -564,10 +567,12 @@ export function WorkPage({ link }: { link: LinkTo }) {
         </div>
       </header>
 
-      {featured && shows(featuredKinds) && (
+      {newest.length > 0 && (
         <section className="pb-20" aria-labelledby="newest-work">
           <h2 id="newest-work" className={`${label} border-b border-white/5 pb-4 mb-8`}>Newest</h2>
-          <FeaturedFilm project={featured} link={link} />
+          <div className="space-y-16">
+            {newest.map(p => <FeaturedFilm key={p.slug} project={p} link={link} />)}
+          </div>
         </section>
       )}
 

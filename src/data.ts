@@ -9,6 +9,7 @@ const projVideo5 = 'https://drive.google.com/file/d/1qAgiLaHfsxvVoRHC15NyA79gspo
 const projVideo6 = 'https://drive.google.com/file/d/1Bub3hHrB8I1j1x7Ea8ff5wT10tbXQ5lT/preview';
 // YouTube embeds (youtube-nocookie). New films go on YouTube, then here.
 const matmanVideo = 'https://www.youtube-nocookie.com/embed/c-HqvIjidCc';
+const strainVideo = 'https://www.youtube-nocookie.com/embed/q2aydxW3B1I';
 const bts1 = 'https://drive.google.com/file/d/1QkL_-PAwx52tWigHB_egNYlH07Gleq3V/preview';
 const bts2 = 'https://drive.google.com/file/d/1WHtfiZ_iMiWSyezXGbSKaR8Q66UsAdBM/preview';
 const bts3 = 'https://drive.google.com/file/d/1k-UWdaZIqZYgh8ms6PC8ewpSQxiPaj1y/preview';
@@ -105,6 +106,17 @@ export const finishedProjects: Project[] = [
     video: matmanVideo
   },
   {
+    id: 8,
+    title: "Strain",
+    slug: "strain",
+    type: "Short Film · 48 Hour Film Project",
+    year: "2026",
+    role: "Filmmaker",
+    image: "/work/strain-1.webp",
+    description: "Strain is a short film made in 48 hours for a 48 Hour Film Project in August 2026.",
+    video: strainVideo
+  },
+  {
     id: 1,
     title: "Valentines Model Mash",
     slug: "valentines-model-mash",
@@ -180,11 +192,20 @@ export const finishedProjects: Project[] = [
   }
 ];
 
-// Extras for the "Newest" card on the Work page, by project slug.
-export const featuredExtras: Record<string, { date: string; delivered: string; photos: Array<{ src: string; alt: string }>; credit?: string }> = {
+// Films shown big in the "Newest" section of the Work page, by project slug, in
+// finishedProjects order. Remove a film's entry here to move it down to "Earlier films".
+export type FeaturedExtra = {
+  date: string;
+  kinds: Array<'film' | 'photo' | 'website'>;
+  facts?: Array<[string, string]>;
+  photos: Array<{ src: string; alt: string }>;
+  credit?: string;
+};
+export const featuredExtras: Record<string, FeaturedExtra> = {
   "matman-trucking": {
     date: "Nov 2026",
-    delivered: "47-second website film, full edit and a photo set",
+    kinds: ['film', 'photo'],
+    facts: [["Delivered", "47-second website film, full edit and a photo set"]],
     photos: [
       { src: "/work/matman-147.webp", alt: "The Matman Trucking logo on a truck door, framed by fall leaves" },
       { src: "/work/matman-156.webp", alt: "The CNG fuel tanks on a Matman natural gas truck" },
@@ -192,6 +213,18 @@ export const featuredExtras: Record<string, { date: string; delivered: string; p
       { src: "/work/matman-170.webp", alt: "A Matman driver securing the trailer" },
     ],
     credit: "Grant Pauli Photography",
+  },
+  "strain": {
+    date: "Aug 2026",
+    kinds: ['film'],
+    facts: [["Runtime", "4:34"], ["Turnaround", "48 hours, start to finish"]],
+    photos: [
+      { src: "/work/strain-2.webp", alt: "Still from Strain: an older man in a beret talks with a budtender" },
+      { src: "/work/strain-3.webp", alt: "Still from Strain: the budtender explains, hand raised" },
+      { src: "/work/strain-4.webp", alt: "Still from Strain: a worried woman on the phone while the older man stands outside" },
+      { src: "/work/strain-5.webp", alt: "Still from Strain: the older man cleaning a bathroom mirror, grinning" },
+    ],
+    credit: "Stills from the film",
   },
 };
 
