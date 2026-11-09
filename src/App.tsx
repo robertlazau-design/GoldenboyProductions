@@ -4,7 +4,7 @@ import { motion, AnimatePresence, useMotionValue, useSpring } from 'motion/react
 import { ArrowRight, ArrowLeft, Plus, Minus, Camera, X, Send, Mail } from 'lucide-react';
 import { biography, clientApproach, consultingServices, favoriteMovies, faqs, recommendableMovies, services } from './data';
 import robertBackground from '../assets/robert_background.jpg';
-import { TAB_ROUTES, pageFromPath, pageMeta, normalizePath, canonicalUrl, servicePath, ABOUT_PATH, WORK_PATH, type Tab } from './seo';
+import { TAB_ROUTES, isTabShown, pageFromPath, pageMeta, normalizePath, canonicalUrl, servicePath, ABOUT_PATH, WORK_PATH, type Tab } from './seo';
 import { AboutPage, ProjectPage, RecapPage, RecapsPage, ServicePage, WorkPage } from './pages';
 
 
@@ -396,6 +396,7 @@ export default function App({ initialPath }: { initialPath?: string }) {
                 Websites
               </a>
             </li>
+            {isTabShown('movies') && (
             <li>
               <a 
                 {...tabLink('movies')}
@@ -405,6 +406,8 @@ export default function App({ initialPath }: { initialPath?: string }) {
                 Favorite Movies
               </a>
             </li>
+            )}
+            {isTabShown('recaps') && (
             <li>
               <a 
                 {...tabLink('recaps')}
@@ -414,6 +417,7 @@ export default function App({ initialPath }: { initialPath?: string }) {
                 Project Recaps
               </a>
             </li>
+            )}
             <li>
               <a 
                 {...tabLink('contact')}
@@ -980,8 +984,9 @@ export default function App({ initialPath }: { initialPath?: string }) {
                         </div>
 
                         <div>
-                          <label className="block text-[9px] uppercase tracking-widest text-white/40 mb-2">Project / Inquiry Type</label>
+                          <label htmlFor="contact-type" className="block text-[9px] uppercase tracking-widest text-white/40 mb-2">Project / Inquiry Type</label>
                           <select 
+                            id="contact-type"
                             value={contactType}
                             onChange={(e) => setContactType(e.target.value)}
                             className="w-full bg-black/40 border border-white/10 px-4 py-3 text-sm text-white focus:outline-none focus:border-[#dfb86c] transition-colors appearance-none"
@@ -1039,7 +1044,9 @@ export default function App({ initialPath }: { initialPath?: string }) {
             {services.map(s => (
               <a key={s.slug} {...link(servicePath(s))} className="hover:text-[#dfb86c] transition-colors">{s.name}</a>
             ))}
-            <a {...tabLink('recaps')} className="hover:text-[#dfb86c] transition-colors">Project Recaps</a>
+            {isTabShown('recaps') && (
+              <a {...tabLink('recaps')} className="hover:text-[#dfb86c] transition-colors">Project Recaps</a>
+            )}
             <a {...tabLink('contact')} className="hover:text-[#dfb86c] transition-colors">Contact</a>
           </nav>
           <div className="flex flex-col md:flex-row justify-between items-center text-[10px] text-white/30 uppercase tracking-[0.25em]">
