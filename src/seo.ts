@@ -7,6 +7,12 @@ export const SITE_URL = 'https://www.robertlazau.com';
 
 export type Tab = 'home' | 'movies' | 'recaps' | 'contact';
 
+// Tabs taken off the site for now: hidden from the menus and the sitemap, and
+// vercel.json sends their old URLs elsewhere. Remove a tab from this list (and
+// its redirect in vercel.json) to bring it back.
+export const HIDDEN_TABS: Tab[] = ['movies', 'recaps'];
+export const isTabShown = (tab: Tab) => !HIDDEN_TABS.includes(tab);
+
 export const TAB_ROUTES: Record<Tab, { path: string; title: string; description: string }> = {
   home: {
     path: '/',
@@ -71,10 +77,9 @@ export const ALL_PATHS: string[] = [
   ABOUT_PATH,
   ...services.map(servicePath),
   ...finishedProjects.map(projectPath),
-  TAB_ROUTES.recaps.path,
-  ...recaps.map(recapPath),
+  ...(isTabShown('recaps') ? [TAB_ROUTES.recaps.path, ...recaps.map(recapPath)] : []),
   TAB_ROUTES.contact.path,
-  TAB_ROUTES.movies.path,
+  ...(isTabShown('movies') ? [TAB_ROUTES.movies.path] : []),
 ];
 
 // The first option that fits within max characters (the last one if none does).

@@ -102,7 +102,7 @@ export const finishedProjects: Project[] = [
     year: "2026",
     role: "Director / Producer",
     image: "/work/matman-trucking.webp",
-    description: "A website film and photo set for Matman Trucking and Oregon's first natural gas garbage transfer trucks. We shot photo and video side by side in one morning in Gresham.",
+    description: "A website film and photo set for Matman Trucking, which runs Oregon's first natural gas garbage transfer trucks. Photo and video shot together in Gresham.",
     video: matmanVideo
   },
   {
