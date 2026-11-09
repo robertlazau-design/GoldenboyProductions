@@ -111,9 +111,9 @@ export const finishedProjects: Project[] = [
     slug: "strain",
     type: "Short Film · 48 Hour Film Project",
     year: "2026",
-    role: "Filmmaker",
+    role: "Director / Producer",
     image: "/work/strain-1.webp",
-    description: "Strain is a short film made in 48 hours for a 48 Hour Film Project in August 2026.",
+    description: "A 4/20 dark comedy about a man who tries to end his life every April 20 and fails every time because he gets way too high. Made in 48 hours.",
     video: strainVideo
   },
   {
@@ -217,7 +217,7 @@ export const featuredExtras: Record<string, FeaturedExtra> = {
   "strain": {
     date: "Aug 2026",
     kinds: ['film'],
-    facts: [["Runtime", "4:34"], ["Turnaround", "48 hours, start to finish"]],
+    facts: [["Genres drawn", "Dark comedy + holiday"], ["Festival", "48 Hour Film Project, nominated"], ["Runtime", "4:34"]],
     photos: [
       { src: "/work/strain-2.webp", alt: "Still from Strain: an older man in a beret talks with a budtender" },
       { src: "/work/strain-3.webp", alt: "Still from Strain: the budtender explains, hand raised" },
