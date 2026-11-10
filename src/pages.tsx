@@ -6,7 +6,7 @@ import { biography, clientApproach, currentProjects, featuredExtras, finishedPro
 import { ABOUT_PATH, TAB_ROUTES, WORK_PATH, projectPath, recapPath, servicePath } from './seo';
 import { formatRecapDate, recaps, type Recap } from './recaps';
 import { isDriveVideo, isYouTubeEmbed } from './media';
-import { HoverPreview, Letterbox } from './effects';
+import { HoverPreview, Letterbox, Theater } from './effects';
 
 export type LinkTo = (to: string) => { href: string; onClick: (e: React.MouseEvent) => void };
 
@@ -15,13 +15,13 @@ const Kicker = ({ children }: { children: React.ReactNode }) => (
 );
 
 const SectionHeading = ({ children }: { children: React.ReactNode }) => (
-  <h2 className="font-serif text-3xl md:text-5xl text-[#f5f5f5] tracking-tight mb-10">{children}</h2>
+  <h2 className="font-serif text-3xl md:text-5xl text-paper tracking-tight mb-10">{children}</h2>
 );
 
 const TextLink = ({ link, to, children }: { link: LinkTo; to: string; children: React.ReactNode; key?: React.Key }) => (
   <a
     {...link(to)}
-    className="inline-flex items-center gap-2 text-[10px] uppercase tracking-[0.25em] text-[#dfb86c] hover:text-white transition-colors"
+    className="inline-flex items-center gap-2 text-[10px] uppercase tracking-[0.25em] text-gold hover:text-white transition-colors"
   >
     {children} <ArrowRight size={12} />
   </a>
@@ -32,6 +32,7 @@ function ProjectCard({ project, link, detailed = false }: { project: Project; li
     <a
       {...link(projectPath(project))}
       data-preview-host
+      data-cursor="Watch"
       className="glow-card group block border border-white/5 bg-white/[0.01] p-4 hover:border-white/15 transition-all duration-300"
     >
       <div className="relative aspect-[16/10] overflow-hidden mb-5 bg-white/5">
@@ -45,9 +46,9 @@ function ProjectCard({ project, link, detailed = false }: { project: Project; li
       </div>
       <div className="flex justify-between items-baseline mb-2">
         <span className="text-[9px] uppercase tracking-wider text-white/40">{project.type}</span>
-        <span className="text-[9px] text-[#dfb86c] font-semibold">{project.year}</span>
+        <span className="text-[9px] text-gold font-semibold">{project.year}</span>
       </div>
-      <h3 className="font-serif text-xl text-white/90 group-hover:text-[#dfb86c] transition-colors">{project.title}</h3>
+      <h3 className="font-serif text-xl text-white/90 group-hover:text-gold transition-colors">{project.title}</h3>
       {detailed && (
         <>
           <p className="text-[10px] text-white/40 uppercase tracking-widest mt-3 mb-3 font-semibold">Role: {project.role}</p>
@@ -61,13 +62,13 @@ function ProjectCard({ project, link, detailed = false }: { project: Project; li
 function ContactCta({ link, heading, cta }: { link: LinkTo; heading: string; cta?: { href: string; onClick: (e: React.MouseEvent) => void; label: string } }) {
   return (
     <section className="py-20 border-t border-white/5 text-center" aria-label="Get in touch">
-      <h2 className="font-serif italic text-3xl md:text-5xl text-[#f5f5f5] mb-6">{heading}</h2>
+      <h2 className="font-serif italic text-3xl md:text-5xl text-paper mb-6">{heading}</h2>
       <p className="max-w-xl mx-auto text-sm text-white/50 font-light leading-relaxed mb-10">
         Tell Robert about your project, your audience and your timeline. He reads every message himself.
       </p>
       <a
         {...(cta ? { href: cta.href, onClick: cta.onClick } : link(TAB_ROUTES.contact.path))}
-        className="inline-flex items-center gap-3 px-8 py-4 border border-[#dfb86c]/40 text-[#dfb86c] text-[10px] uppercase tracking-[0.25em] hover:bg-[#dfb86c] hover:text-[#060606] transition-all duration-300"
+        className="inline-flex items-center gap-3 px-8 py-4 border border-gold/40 text-gold text-[10px] uppercase tracking-[0.25em] hover:bg-gold hover:text-ink transition-all duration-300"
       >
         {cta?.label ?? 'Start a project'} <ArrowRight size={14} />
       </a>
@@ -113,14 +114,14 @@ export function ProjectPage({ project, link }: { project: Project; link: LinkTo 
     <article className="py-16">
       <a
         {...link(WORK_PATH)}
-        className="inline-flex items-center gap-2 text-[10px] uppercase tracking-[0.25em] text-white/40 hover:text-[#dfb86c] transition-colors mb-12"
+        className="inline-flex items-center gap-2 text-[10px] uppercase tracking-[0.25em] text-white/40 hover:text-gold transition-colors mb-12"
       >
         <ArrowLeft size={12} /> All work
       </a>
 
       <header className="mb-12">
         <Kicker>{project.type} · {project.year}</Kicker>
-        <h1 className="font-serif text-4xl md:text-7xl text-[#f5f5f5] tracking-tight">{project.title}</h1>
+        <h1 className="font-serif text-4xl md:text-7xl text-paper tracking-tight">{project.title}</h1>
       </header>
 
       <div className="aspect-[16/9] w-full overflow-hidden bg-white/5 border border-white/5 mb-16">
@@ -148,7 +149,7 @@ export function ProjectPage({ project, link }: { project: Project; link: LinkTo 
       <section className="py-20 border-t border-white/5" aria-label="More work">
         <Kicker>Portfolio</Kicker>
         <SectionHeading>More work</SectionHeading>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div className="focus-grid grid grid-cols-1 md:grid-cols-3 gap-8">
           {more.map(p => <ProjectCard key={p.slug} project={p} link={link} />)}
         </div>
       </section>
@@ -169,21 +170,21 @@ export function ServicePage({ service, link, quote }: { service: Service; link: 
     <article className="py-16">
       <header className="max-w-4xl mb-20">
         <Kicker>Services · {service.name}</Kicker>
-        <h1 className="font-serif text-4xl md:text-6xl text-[#f5f5f5] tracking-tight mb-10">{service.heading}</h1>
+        <h1 className="font-serif text-4xl md:text-6xl text-paper tracking-tight mb-10">{service.heading}</h1>
         <div className="space-y-6 text-sm md:text-base text-white/60 font-light leading-relaxed max-w-3xl">
           {service.intro.map((p, i) => <p key={i}>{p}</p>)}
         </div>
         <div className="flex flex-wrap items-center gap-6 mt-12">
           <a
             {...(quote ?? link(TAB_ROUTES.contact.path))}
-            className="inline-flex items-center gap-3 px-8 py-4 bg-[#dfb86c] text-[#060606] text-[10px] uppercase tracking-[0.25em] font-semibold hover:bg-white transition-colors duration-300"
+            className="inline-flex items-center gap-3 px-8 py-4 bg-gold text-ink text-[10px] uppercase tracking-[0.25em] font-semibold hover:bg-white transition-colors duration-300"
           >
             Get a quote <ArrowRight size={14} />
           </a>
           {(work.length > 0 || (service.sites?.length ?? 0) > 0) && (
             <a
               href="#results"
-              className="inline-flex items-center gap-2 text-[10px] uppercase tracking-[0.25em] text-white/60 hover:text-[#dfb86c] transition-colors"
+              className="inline-flex items-center gap-2 text-[10px] uppercase tracking-[0.25em] text-white/60 hover:text-gold transition-colors"
             >
               {service.sites?.length ? 'See client results' : 'See the work'} <ArrowRight size={12} />
             </a>
@@ -218,11 +219,11 @@ export function ServicePage({ service, link, quote }: { service: Service; link: 
                       aria-hidden="true"
                       className="absolute -inset-6 bg-[radial-gradient(ellipse_at_center,rgba(223,184,108,0.14),transparent_70%)] opacity-0 group-hover:opacity-100 transition-opacity duration-700"
                     />
-                    <div className="relative border border-white/10 bg-[#141414] rounded-lg overflow-hidden shadow-2xl shadow-black/60 group-hover:border-[#dfb86c]/40 transition-colors duration-500">
+                    <div className="relative border border-white/10 bg-[#141414] rounded-lg overflow-hidden shadow-2xl shadow-black/60 group-hover:border-gold/40 transition-colors duration-500">
                       <div className="flex items-center gap-2 px-4 py-3 border-b border-white/5 bg-[#1a1a1a]">
                         <span className="w-2.5 h-2.5 rounded-full bg-white/15" />
                         <span className="w-2.5 h-2.5 rounded-full bg-white/15" />
-                        <span className="w-2.5 h-2.5 rounded-full bg-[#dfb86c]/70" />
+                        <span className="w-2.5 h-2.5 rounded-full bg-gold/70" />
                         <span className="ml-3 flex-1 truncate rounded-full bg-black/40 px-4 py-1 text-[10px] tracking-wider text-white/40">{domain}</span>
                       </div>
                       <div className="aspect-[16/10] overflow-hidden bg-white/5">
@@ -246,18 +247,18 @@ export function ServicePage({ service, link, quote }: { service: Service; link: 
                     </div>
                   </a>
                   <div className={`md:col-span-5 ${flip ? 'md:order-1' : ''}`}>
-                    <span className="text-[10px] text-[#dfb86c] tracking-widest font-semibold mb-4 block">0{i + 1}/ · {site.location}</span>
-                    <h3 className="font-serif text-3xl md:text-5xl text-[#f5f5f5] tracking-tight mb-3">{site.name}</h3>
+                    <span className="text-[10px] text-gold tracking-widest font-semibold mb-4 block">0{i + 1}/ · {site.location}</span>
+                    <h3 className="font-serif text-3xl md:text-5xl text-paper tracking-tight mb-3">{site.name}</h3>
                     <p className="text-[10px] uppercase tracking-[0.25em] text-white/40 mb-6">{site.type}</p>
                     <p className="text-sm text-white/60 leading-relaxed font-light mb-6">{site.desc}</p>
                     {site.result && (
-                      <p className="text-sm text-white/85 leading-relaxed border-l-2 border-[#dfb86c] pl-4 mb-8">{site.result}</p>
+                      <p className="text-sm text-white/85 leading-relaxed border-l-2 border-gold pl-4 mb-8">{site.result}</p>
                     )}
                     <a
                       href={site.url}
                       target="_blank"
                       rel="noopener"
-                      className="inline-flex items-center gap-2 border border-[#dfb86c]/40 px-5 py-3 text-[10px] uppercase tracking-[0.25em] text-[#dfb86c] hover:bg-[#dfb86c] hover:text-black transition-colors"
+                      className="inline-flex items-center gap-2 border border-gold/40 px-5 py-3 text-[10px] uppercase tracking-[0.25em] text-gold hover:bg-gold hover:text-black transition-colors"
                     >
                       Visit {domain} <ArrowRight size={12} />
                     </a>
@@ -275,7 +276,7 @@ export function ServicePage({ service, link, quote }: { service: Service; link: 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {service.offerings.map((o, i) => (
             <div key={o.title} className="border border-white/5 bg-white/[0.01] p-6 md:p-8">
-              <span className="text-[10px] text-[#dfb86c] tracking-widest font-semibold mb-4 block">0{i + 1}/</span>
+              <span className="text-[10px] text-gold tracking-widest font-semibold mb-4 block">0{i + 1}/</span>
               <h3 className="font-serif text-xl text-white/90 mb-4">{o.title}</h3>
               <p className="text-xs text-white/50 leading-relaxed font-light">{o.desc}</p>
             </div>
@@ -287,7 +288,7 @@ export function ServicePage({ service, link, quote }: { service: Service; link: 
         <section id={service.sites?.length ? undefined : 'results'} className="py-20 border-t border-white/5" aria-label="Selected work">
           <Kicker>Portfolio</Kicker>
           <SectionHeading>Selected work</SectionHeading>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="focus-grid grid grid-cols-1 md:grid-cols-3 gap-8">
             {work.map(p => <ProjectCard key={p.slug} project={p} link={link} />)}
           </div>
         </section>
@@ -299,7 +300,7 @@ export function ServicePage({ service, link, quote }: { service: Service; link: 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {(service.steps ?? clientApproach.points).map((point, i) => (
             <div key={point.title} className="border-t border-white/10 pt-6">
-              <span className="text-[10px] text-[#dfb86c] tracking-widest font-semibold mb-3 block">0{i + 1}/</span>
+              <span className="text-[10px] text-gold tracking-widest font-semibold mb-3 block">0{i + 1}/</span>
               <h3 className="font-serif text-lg text-white/90 mb-2">{point.title}</h3>
               <p className="text-xs text-white/50 leading-relaxed font-light">{point.desc}</p>
             </div>
@@ -328,10 +329,10 @@ export function AboutPage({ link }: { link: LinkTo }) {
         </div>
         <div className="max-w-md mx-auto md:mx-0">
           <Kicker>{biography.year}</Kicker>
-          <h1 className="font-serif text-4xl md:text-6xl text-[#f5f5f5] tracking-tight mb-8">About Robert Lazau</h1>
+          <h1 className="font-serif text-4xl md:text-6xl text-paper tracking-tight mb-8">About Robert Lazau</h1>
           <div className="space-y-6 text-sm text-white/60 font-light leading-relaxed">
             {biography.text.split('\n\n').map((p, i) => <p key={i}>{p}</p>)}
-            <p className="italic font-serif text-[#dfb86c]/70 text-lg border-l border-[#dfb86c]/30 pl-4 py-1">
+            <p className="italic font-serif text-gold/70 text-lg border-l border-gold/30 pl-4 py-1">
               "{biography.quote}"
             </p>
           </div>
@@ -346,7 +347,7 @@ export function AboutPage({ link }: { link: LinkTo }) {
           <div className="lg:col-span-7 grid grid-cols-1 md:grid-cols-3 gap-8">
             {clientApproach.points.map((point, i) => (
               <div key={point.title} className="border-t border-white/10 pt-6">
-                <span className="text-[10px] text-[#dfb86c] tracking-widest font-semibold mb-3 block">0{i + 1}/</span>
+                <span className="text-[10px] text-gold tracking-widest font-semibold mb-3 block">0{i + 1}/</span>
                 <h3 className="font-serif text-lg text-white/90 mb-2">{point.title}</h3>
                 <p className="text-[11px] text-white/40 leading-relaxed font-light">{point.desc}</p>
               </div>
@@ -380,38 +381,38 @@ export function AboutPage({ link }: { link: LinkTo }) {
   );
 }
 
-// The big "Newest" card: the video loads only when someone presses play, so the page stays fast.
-// A film's poster with a play button. The video itself loads only when someone presses play.
+// A film's poster with a play button. The video itself loads only when someone presses play,
+// and then opens in "lights down" theater mode (the page fades to black around it).
 // With a preview clip, a silent loop plays on hover (or when centered on a phone).
 // reveal: black widescreen bars slide open the first time it scrolls into view.
 export function ClickToPlay({ project, className = '', reveal = false }: { project: Project; className?: string; reveal?: boolean }) {
   const [playing, setPlaying] = React.useState(false);
   const canEmbed = isYouTubeEmbed(project.video) || isDriveVideo(project.video);
   const Frame = reveal ? Letterbox : 'div';
+  const title = `${project.title} — ${project.type}`;
   return (
     <Frame className={`relative aspect-[16/9] overflow-hidden bg-black ${className}`}>
-      {playing && canEmbed ? (
-        <iframe
+      <button
+        type="button"
+        onClick={() => canEmbed && setPlaying(true)}
+        data-preview-host
+        data-cursor="Play"
+        className="group absolute inset-0 w-full h-full cursor-pointer"
+        aria-label={`Play the ${project.title} film`}
+        aria-haspopup="dialog"
+      >
+        <img src={project.image} alt="" className="w-full h-full object-cover" />
+        {project.preview && <HoverPreview src={project.preview} />}
+        <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-20 h-20 rounded-full border border-gold bg-ink/60 flex items-center justify-center group-hover:bg-gold group-hover:text-ink text-white transition-colors">
+          <Play size={26} className="ml-1" />
+        </span>
+      </button>
+      {playing && canEmbed && (
+        <Theater
           src={isYouTubeEmbed(project.video) ? `${project.video}?autoplay=1&rel=0` : project.video}
-          allow="autoplay; fullscreen; picture-in-picture"
-          allowFullScreen
-          className="absolute inset-0 w-full h-full border-0"
-          title={`${project.title} — ${project.type}`}
+          title={title}
+          onClose={() => setPlaying(false)}
         />
-      ) : (
-        <button
-          type="button"
-          onClick={() => setPlaying(true)}
-          data-preview-host
-          className="group absolute inset-0 w-full h-full cursor-pointer"
-          aria-label={`Play the ${project.title} film`}
-        >
-          <img src={project.image} alt="" className="w-full h-full object-cover" />
-          {project.preview && <HoverPreview src={project.preview} />}
-          <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-20 h-20 rounded-full border border-[#dfb86c] bg-[#060606]/60 flex items-center justify-center group-hover:bg-[#dfb86c] group-hover:text-[#060606] text-white transition-colors">
-            <Play size={26} className="ml-1" />
-          </span>
-        </button>
       )}
     </Frame>
   );
@@ -435,9 +436,9 @@ function FeaturedFilm({ project, link }: { project: Project; link: LinkTo; key?:
         <div className="lg:col-span-5 flex flex-col gap-4 pb-2 lg:pr-4">
           <div className="flex justify-between gap-4 text-[10px] uppercase tracking-[0.2em]">
             <span className="text-white/50">{project.type}</span>
-            <span className="text-[#dfb86c] font-semibold">{extra?.date ?? project.year}</span>
+            <span className="text-gold font-semibold">{extra?.date ?? project.year}</span>
           </div>
-          <h2 className="font-serif text-4xl md:text-5xl text-[#f5f5f5] tracking-tight">{project.title}</h2>
+          <h2 className="font-serif text-4xl md:text-5xl text-paper tracking-tight">{project.title}</h2>
           <p className="text-[10px] text-white/50 uppercase tracking-widest font-semibold">Role: {project.role}</p>
           <p className="text-sm md:text-base text-white/60 font-light leading-relaxed">{project.description}</p>
           {facts.length > 0 && (
@@ -453,14 +454,14 @@ function FeaturedFilm({ project, link }: { project: Project; link: LinkTo; key?:
           <div className="flex flex-wrap gap-3 pt-2">
             <a
               {...link(projectPath(project))}
-              className="inline-flex items-center gap-3 px-6 py-4 bg-[#dfb86c] text-[#060606] text-[10px] uppercase tracking-[0.25em] font-semibold hover:bg-white transition-colors"
+              className="inline-flex items-center gap-3 px-6 py-4 bg-gold text-ink text-[10px] uppercase tracking-[0.25em] font-semibold hover:bg-white transition-colors"
             >
               Watch the film <ArrowRight size={14} />
             </a>
             {recap && (
               <a
                 {...link(recapPath(recap))}
-                className="inline-flex items-center gap-3 px-6 py-4 border border-white/15 text-white/80 text-[10px] uppercase tracking-[0.25em] hover:border-[#dfb86c] hover:text-[#dfb86c] transition-colors"
+                className="inline-flex items-center gap-3 px-6 py-4 border border-white/15 text-white/80 text-[10px] uppercase tracking-[0.25em] hover:border-gold hover:text-gold transition-colors"
               >
                 Behind the scenes
               </a>
@@ -499,12 +500,12 @@ function RecentCard({ item }: { item: RecentWork; key?: React.Key }) {
     <div className="flex flex-col gap-3 p-6 flex-1">
       <div className="flex justify-between gap-4 text-[10px] uppercase tracking-[0.2em]">
         <span className="text-white/50">{item.label}</span>
-        <span className="text-[#dfb86c] font-semibold">{item.date}</span>
+        <span className="text-gold font-semibold">{item.date}</span>
       </div>
-      <h3 className="font-serif text-2xl text-white/90 group-hover:text-[#dfb86c] transition-colors">{item.title}</h3>
+      <h3 className="font-serif text-2xl text-white/90 group-hover:text-gold transition-colors">{item.title}</h3>
       <p className="text-[10px] text-white/50 uppercase tracking-widest font-semibold">Role: {item.role}</p>
       <p className="text-sm text-white/60 font-light leading-relaxed">{item.description}</p>
-      <span className="mt-auto pt-2 text-xs tracking-wider text-[#dfb86c]">{domain} ↗</span>
+      <span className="mt-auto pt-2 text-xs tracking-wider text-gold">{domain} ↗</span>
     </div>
   );
   if (item.wide && item.photo) {
@@ -513,7 +514,8 @@ function RecentCard({ item }: { item: RecentWork; key?: React.Key }) {
         href={item.url}
         target="_blank"
         rel="noopener"
-        className="glow-card group md:col-span-2 flex flex-col md:flex-row border border-white/5 bg-white/[0.02] hover:border-[#dfb86c]/40 transition-colors"
+        data-cursor="View"
+        className="glow-card group md:col-span-2 flex flex-col md:flex-row border border-white/5 bg-white/[0.02] hover:border-gold/40 transition-colors"
       >
         <div className="relative md:w-[58%] min-h-[260px] md:min-h-[340px] overflow-hidden">
           <img src={item.photo} alt={item.photoAlt ?? ''} loading="lazy" className="absolute inset-0 w-full h-full object-cover" />
@@ -528,7 +530,8 @@ function RecentCard({ item }: { item: RecentWork; key?: React.Key }) {
       href={item.url}
       target="_blank"
       rel="noopener"
-      className="glow-card group flex flex-col border border-white/5 bg-white/[0.02] hover:border-[#dfb86c]/40 transition-colors"
+      data-cursor="View"
+      className="glow-card group flex flex-col border border-white/5 bg-white/[0.02] hover:border-gold/40 transition-colors"
     >
       <div className="h-[300px] bg-[#0a0a0a] flex items-end justify-center overflow-hidden pt-8">
         <PhoneShot
@@ -558,13 +561,13 @@ export function WorkPage({ link }: { link: LinkTo }) {
   const newest = featured.filter(p => shows(featuredExtras[p.slug].kinds));
   const filters: Array<[WorkFilter, string]> = [['all', 'All'], ['film', 'Films'], ['photo', 'Photo'], ['website', 'Websites']];
   const recent = recentWork.filter(r => shows(r.kinds));
-  const label = 'text-xs uppercase tracking-[0.25em] text-[#dfb86c] font-medium';
+  const label = 'text-xs uppercase tracking-[0.25em] text-gold font-medium';
 
   return (
     <article className="py-16">
       <header className="mb-14">
         <Kicker>Work · Newest first</Kicker>
-        <h1 className="font-serif italic text-4xl md:text-6xl text-[#f5f5f5] tracking-tight mb-8">What we've been making lately</h1>
+        <h1 className="font-serif italic text-4xl md:text-6xl text-paper tracking-tight mb-8">What we've been making lately</h1>
         <p className="max-w-2xl text-sm md:text-base text-white/50 font-light leading-relaxed mb-10">
           Films, photo shoots and websites for businesses, nonprofits and cities around Portland and Gresham, newest first.
         </p>
@@ -576,10 +579,10 @@ export function WorkPage({ link }: { link: LinkTo }) {
               aria-pressed={filter === k}
               onClick={() => setFilter(k)}
               className={`inline-flex items-center gap-3 border px-5 py-3 text-[10px] uppercase tracking-[0.25em] transition-colors cursor-pointer ${
-                filter === k ? 'border-[#dfb86c] text-white' : 'border-white/15 text-white/70 hover:border-[#dfb86c] hover:text-[#dfb86c]'
+                filter === k ? 'border-gold text-white' : 'border-white/15 text-white/70 hover:border-gold hover:text-gold'
               }`}
             >
-              {name} <span className="text-[#dfb86c]">{count(k)}</span>
+              {name} <span className="text-gold">{count(k)}</span>
             </button>
           ))}
         </div>
@@ -597,7 +600,7 @@ export function WorkPage({ link }: { link: LinkTo }) {
       {recent.length > 0 && (
         <section className="pb-20" aria-labelledby="recent-work">
           <h2 id="recent-work" className={`${label} border-b border-white/5 pb-4 mb-8`}>The last few months</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="focus-grid grid grid-cols-1 md:grid-cols-3 gap-6">
             {recent.map(item => <RecentCard key={item.title} item={item} />)}
           </div>
           {webService && shows(['website']) && (
@@ -613,11 +616,11 @@ export function WorkPage({ link }: { link: LinkTo }) {
           <h2 id="in-production" className={`${label} border-b border-white/5 pb-4 mb-8`}>In production</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {currentProjects.map(p => (
-              <div key={p.id} className="border border-dashed border-[#dfb86c]/40 p-6">
+              <div key={p.id} className="border border-dashed border-gold/40 p-6">
                 <p className="text-[10px] uppercase tracking-[0.2em] text-white/50 mb-3">{p.type}</p>
                 <h3 className="font-serif italic text-2xl text-white/90 mb-3">{p.title}</h3>
                 <p className="text-sm text-white/60 leading-relaxed font-light">{p.description}</p>
-                <p className="mt-4 text-[10px] uppercase tracking-[0.2em] text-[#dfb86c]">{p.status}</p>
+                <p className="mt-4 text-[10px] uppercase tracking-[0.2em] text-gold">{p.status}</p>
               </div>
             ))}
           </div>
@@ -627,7 +630,7 @@ export function WorkPage({ link }: { link: LinkTo }) {
       {earlier.length > 0 && shows(['film']) && (
         <section id="films" className="pb-20 scroll-mt-8" aria-labelledby="earlier-films">
           <h2 id="earlier-films" className={`${label} border-b border-white/5 pb-4 mb-8`}>Earlier films</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="focus-grid grid grid-cols-1 md:grid-cols-3 gap-8">
             {earlier.map(p => <ProjectCard key={p.slug} project={p} link={link} detailed />)}
           </div>
           {videoService && (
@@ -649,7 +652,7 @@ export function RecapsPage({ link }: { link: LinkTo }) {
     <article className="py-16">
       <header className="max-w-4xl mb-20">
         <Kicker>Project Recaps</Kicker>
-        <h1 className="font-serif text-4xl md:text-6xl text-[#f5f5f5] tracking-tight mb-10">Behind the work</h1>
+        <h1 className="font-serif text-4xl md:text-6xl text-paper tracking-tight mb-10">Behind the work</h1>
         <div className="space-y-6 text-sm md:text-base text-white/60 font-light leading-relaxed max-w-3xl">
           <p>
             After every project, Robert sits down to talk it through: what went right, what surprised him and what caught
@@ -679,9 +682,9 @@ export function RecapsPage({ link }: { link: LinkTo }) {
               </div>
               <div className="flex justify-between items-baseline mb-2 gap-4">
                 <span className="text-[9px] uppercase tracking-wider text-white/40">{r.client}</span>
-                <span className="text-[9px] text-[#dfb86c] font-semibold">{formatRecapDate(r.date)}</span>
+                <span className="text-[9px] text-gold font-semibold">{formatRecapDate(r.date)}</span>
               </div>
-              <h2 className="font-serif text-2xl text-white/90 group-hover:text-[#dfb86c] transition-colors mb-3">{r.title}</h2>
+              <h2 className="font-serif text-2xl text-white/90 group-hover:text-gold transition-colors mb-3">{r.title}</h2>
               {r.summary && <p className="text-xs text-white/50 leading-relaxed font-light">{r.summary}</p>}
             </a>
           ))}
@@ -740,14 +743,14 @@ export function RecapPage({ recap, link }: { recap: Recap; link: LinkTo }) {
     <article className="py-16">
       <a
         {...link(TAB_ROUTES.recaps.path)}
-        className="inline-flex items-center gap-2 text-[10px] uppercase tracking-[0.25em] text-white/40 hover:text-[#dfb86c] transition-colors mb-12"
+        className="inline-flex items-center gap-2 text-[10px] uppercase tracking-[0.25em] text-white/40 hover:text-gold transition-colors mb-12"
       >
         <ArrowLeft size={12} /> All recaps
       </a>
 
       <header className="max-w-4xl mb-16">
         <Kicker>Project Recap{meta ? ` · ${meta}` : ''}</Kicker>
-        <h1 className="font-serif text-4xl md:text-6xl text-[#f5f5f5] tracking-tight mb-8">{recap.title}</h1>
+        <h1 className="font-serif text-4xl md:text-6xl text-paper tracking-tight mb-8">{recap.title}</h1>
         {recap.summary && <p className="text-sm md:text-base text-white/60 font-light leading-relaxed max-w-3xl">{recap.summary}</p>}
       </header>
 
@@ -763,7 +766,7 @@ export function RecapPage({ recap, link }: { recap: Recap; link: LinkTo }) {
         <section className="max-w-3xl space-y-16 mb-20" aria-label="The recap">
           {recap.sections.map(sec => (
             <div key={sec.heading}>
-              <h2 className="font-serif text-2xl md:text-3xl text-[#f5f5f5] tracking-tight mb-6">{sec.heading}</h2>
+              <h2 className="font-serif text-2xl md:text-3xl text-paper tracking-tight mb-6">{sec.heading}</h2>
               <div className="space-y-5 text-sm md:text-base text-white/60 font-light leading-relaxed">
                 {sec.paragraphs.map((p, i) => <p key={i}>{p}</p>)}
               </div>

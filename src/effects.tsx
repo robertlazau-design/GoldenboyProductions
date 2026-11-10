@@ -206,7 +206,7 @@ export function ClientStrip({ names, label }: { names: string[]; label: string }
   );
   return (
     <section className="py-14 md:py-16 border-t border-white/5" aria-label={label}>
-      <p className="text-center text-xs uppercase tracking-[0.25em] text-[#dfb86c] font-medium mb-8">{label}</p>
+      <p className="text-center text-xs uppercase tracking-[0.25em] text-gold font-medium mb-8">{label}</p>
       <div className="client-marquee">
         <div className="client-track">
           {row(false)}
@@ -214,5 +214,56 @@ export function ClientStrip({ names, label }: { names: string[]; label: string }
         </div>
       </div>
     </section>
+  );
+}
+
+// ── "Lights down": a film opens big and centered while the page fades to black ──
+// Uses the native <dialog>, so Esc closes it, keyboard focus stays inside, and
+// focus returns to the play button afterwards. Clicking the dark area closes it.
+// Closing always goes through onClose (the parent unmounts this), which keeps it
+// safe under React's double-run effects in development.
+export function Theater({ src, title, onClose }: { src: string; title: string; onClose: () => void }) {
+  const ref = React.useRef<HTMLDialogElement>(null);
+  const closeRef = React.useRef(onClose);
+  closeRef.current = onClose;
+  // close the dialog first so the browser hands focus back to the play button
+  const requestClose = () => {
+    if (ref.current?.open) ref.current.close();
+    closeRef.current();
+  };
+  React.useEffect(() => {
+    const dialog = ref.current;
+    if (!dialog) return;
+    const root = document.documentElement;
+    const onCancel = (e: Event) => {
+      e.preventDefault();
+      dialog.close();
+      closeRef.current();
+    };
+    dialog.addEventListener('cancel', onCancel);
+    if (!dialog.open) dialog.showModal();
+    root.classList.add('theater-open');
+    return () => {
+      dialog.removeEventListener('cancel', onCancel);
+      root.classList.remove('theater-open');
+      if (dialog.open) dialog.close();
+    };
+  }, []);
+  return (
+    <dialog
+      ref={ref}
+      className="theater"
+      aria-label={title}
+      onClick={e => {
+        if (e.target === e.currentTarget) requestClose();
+      }}
+    >
+      <button type="button" className="theater-close" onClick={requestClose}>
+        Close <span aria-hidden="true">✕</span>
+      </button>
+      <div className="theater-frame">
+        <iframe src={src} title={title} allow="autoplay; fullscreen; picture-in-picture" allowFullScreen />
+      </div>
+    </dialog>
   );
 }

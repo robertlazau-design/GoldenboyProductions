@@ -128,6 +128,8 @@ export default function App({ initialPath }: { initialPath?: string }) {
   const cursorYSpring = useSpring(cursorY, springConfig);
 
   const [isHovered, setIsHovered] = useState(false);
+  // Word shown inside the cursor over films ("Play", "Watch") and websites ("View"); see data-cursor.
+  const [cursorLabel, setCursorLabel] = useState<string | null>(null);
   const [isCursorVisible, setIsCursorVisible] = useState(false);
   const [isDesktop, setIsDesktop] = useState(false);
 
@@ -148,6 +150,7 @@ export default function App({ initialPath }: { initialPath?: string }) {
       const target = e.target as HTMLElement;
       const isClickable = target.closest('button, a, input, select, textarea, [role="button"], .cursor-pointer');
       setIsHovered(!!isClickable);
+      setCursorLabel(target.closest('[data-cursor]')?.getAttribute('data-cursor') ?? null);
     };
 
     const handleMouseLeave = () => setIsCursorVisible(false);
@@ -299,7 +302,7 @@ export default function App({ initialPath }: { initialPath?: string }) {
   };
 
   return (
-    <div className="relative min-h-screen bg-[#060606] text-[#e5e5e5] font-sans selection:bg-[#fff] selection:text-[#060606]">
+    <div className="relative min-h-screen bg-ink text-[#e5e5e5] font-sans selection:bg-[#fff] selection:text-ink">
       {/* Animated Film Grain Overlay */}
       <div className="film-grain" />
 
@@ -309,25 +312,42 @@ export default function App({ initialPath }: { initialPath?: string }) {
         <>
           {/* Outer Ring */}
           <motion.div
-            className="fixed top-0 left-0 w-8 h-8 border border-[#dfb86c]/70 rounded-full pointer-events-none z-[99999] -translate-x-1/2 -translate-y-1/2"
+            className="fixed top-0 left-0 w-8 h-8 border border-gold/70 rounded-full pointer-events-none z-[99999] -translate-x-1/2 -translate-y-1/2"
             style={{
               x: cursorXSpring,
               y: cursorYSpring,
             }}
             animate={{
-              scale: isHovered ? 1.6 : 1,
+              scale: cursorLabel ? 0.4 : isHovered ? 1.6 : 1,
+              opacity: cursorLabel ? 0 : 1,
               borderColor: isHovered ? "#dfb86c" : "rgba(223, 184, 108, 0.7)",
               backgroundColor: isHovered ? "rgba(223, 184, 108, 0.15)" : "rgba(223, 184, 108, 0)",
             }}
             transition={{ type: "tween", ease: "backOut", duration: 0.25 }}
           />
+          {/* Labelled cursor: a gold disc that says Play / Watch / View */}
+          <motion.div
+            aria-hidden="true"
+            className="fixed top-0 left-0 w-[76px] h-[76px] rounded-full bg-gold text-ink flex items-center justify-center pointer-events-none z-[99999] -translate-x-1/2 -translate-y-1/2 text-[10px] uppercase tracking-[0.25em] font-semibold pl-[0.25em]"
+            style={{
+              x: cursorXSpring,
+              y: cursorYSpring,
+            }}
+            initial={false}
+            animate={{ scale: cursorLabel ? 1 : 0.3, opacity: cursorLabel ? 1 : 0 }}
+            transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+          >
+            {cursorLabel}
+          </motion.div>
           {/* Inner Dot */}
           <motion.div
-            className="fixed top-0 left-0 w-1.5 h-1.5 bg-[#dfb86c] rounded-full pointer-events-none z-[99999] -translate-x-1/2 -translate-y-1/2"
+            className="fixed top-0 left-0 w-1.5 h-1.5 bg-gold rounded-full pointer-events-none z-[99999] -translate-x-1/2 -translate-y-1/2"
             style={{
               x: cursorX,
               y: cursorY,
             }}
+            animate={{ opacity: cursorLabel ? 0 : 1 }}
+            transition={{ duration: 0.2 }}
           />
         </>
       )}
@@ -341,8 +361,8 @@ export default function App({ initialPath }: { initialPath?: string }) {
             alt="" 
             aria-hidden="true"
           />
-          <div className="absolute inset-0 bg-gradient-to-r from-[#060606] via-[#060606]/70 to-transparent" />
-          <div className="absolute inset-0 bg-gradient-to-t from-[#060606] via-transparent to-[#060606]" />
+          <div className="absolute inset-0 bg-gradient-to-r from-ink via-ink/70 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-ink via-transparent to-ink" />
         </div>
       )}
 
@@ -361,7 +381,7 @@ export default function App({ initialPath }: { initialPath?: string }) {
         <nav className="w-full max-w-[1400px] mx-auto px-4 md:px-8 py-10 flex flex-col sm:flex-row justify-between items-center border-b border-white/5 gap-6" aria-label="Main navigation">
           <a 
             {...tabLink('home')}
-            className="flex items-center gap-3 font-serif italic text-white/90 text-xl tracking-wider select-none cursor-pointer hover:text-[#dfb86c] transition-colors group"
+            className="flex items-center gap-3 font-serif italic text-white/90 text-xl tracking-wider select-none cursor-pointer hover:text-gold transition-colors group"
           >
             <img 
               src="/logo-mark-small.png" 
@@ -376,7 +396,7 @@ export default function App({ initialPath }: { initialPath?: string }) {
               <a 
                 {...tabLink('home')}
                 aria-current={activeTab === 'home' ? 'page' : undefined}
-                className={`relative inline-block normal-case hover:text-white transition-all duration-300 cursor-pointer before:absolute before:-inset-3 before:content-[''] md:before:hidden ${activeTab === 'home' ? 'text-[#dfb86c] font-semibold border-b border-[#dfb86c] pb-1' : ''}`}
+                className={`relative inline-block normal-case hover:text-white transition-all duration-300 cursor-pointer before:absolute before:-inset-3 before:content-[''] md:before:hidden ${activeTab === 'home' ? 'text-gold font-semibold border-b border-gold pb-1' : ''}`}
               >
                 Home
               </a>
@@ -385,7 +405,7 @@ export default function App({ initialPath }: { initialPath?: string }) {
               <a 
                 {...link(WORK_PATH)}
                 aria-current={page.kind === 'work' ? 'page' : undefined}
-                className={`relative inline-block normal-case hover:text-white transition-all duration-300 cursor-pointer before:absolute before:-inset-3 before:content-[''] md:before:hidden ${(page.kind === 'work' || page.kind === 'project') ? 'text-[#dfb86c] font-semibold border-b border-[#dfb86c] pb-1' : ''}`}
+                className={`relative inline-block normal-case hover:text-white transition-all duration-300 cursor-pointer before:absolute before:-inset-3 before:content-[''] md:before:hidden ${(page.kind === 'work' || page.kind === 'project') ? 'text-gold font-semibold border-b border-gold pb-1' : ''}`}
               >
                 Work
               </a>
@@ -394,7 +414,7 @@ export default function App({ initialPath }: { initialPath?: string }) {
               <a 
                 {...link('/services/web-design')}
                 aria-current={page.kind === 'service' && page.service.slug === 'web-design' ? 'page' : undefined}
-                className={`relative inline-block normal-case hover:text-white transition-all duration-300 cursor-pointer before:absolute before:-inset-3 before:content-[''] md:before:hidden ${page.kind === 'service' && page.service.slug === 'web-design' ? 'text-[#dfb86c] font-semibold border-b border-[#dfb86c] pb-1' : ''}`}
+                className={`relative inline-block normal-case hover:text-white transition-all duration-300 cursor-pointer before:absolute before:-inset-3 before:content-[''] md:before:hidden ${page.kind === 'service' && page.service.slug === 'web-design' ? 'text-gold font-semibold border-b border-gold pb-1' : ''}`}
               >
                 Websites
               </a>
@@ -404,7 +424,7 @@ export default function App({ initialPath }: { initialPath?: string }) {
               <a 
                 {...tabLink('movies')}
                 aria-current={activeTab === 'movies' ? 'page' : undefined}
-                className={`relative inline-block normal-case hover:text-white transition-all duration-300 cursor-pointer before:absolute before:-inset-3 before:content-[''] md:before:hidden ${activeTab === 'movies' ? 'text-[#dfb86c] font-semibold border-b border-[#dfb86c] pb-1' : ''}`}
+                className={`relative inline-block normal-case hover:text-white transition-all duration-300 cursor-pointer before:absolute before:-inset-3 before:content-[''] md:before:hidden ${activeTab === 'movies' ? 'text-gold font-semibold border-b border-gold pb-1' : ''}`}
               >
                 Favorite Movies
               </a>
@@ -415,7 +435,7 @@ export default function App({ initialPath }: { initialPath?: string }) {
               <a 
                 {...tabLink('recaps')}
                 aria-current={activeTab === 'recaps' || page.kind === 'recap' ? 'page' : undefined}
-                className={`relative inline-block normal-case hover:text-white transition-all duration-300 cursor-pointer before:absolute before:-inset-3 before:content-[''] md:before:hidden ${activeTab === 'recaps' || page.kind === 'recap' ? 'text-[#dfb86c] font-semibold border-b border-[#dfb86c] pb-1' : ''}`}
+                className={`relative inline-block normal-case hover:text-white transition-all duration-300 cursor-pointer before:absolute before:-inset-3 before:content-[''] md:before:hidden ${activeTab === 'recaps' || page.kind === 'recap' ? 'text-gold font-semibold border-b border-gold pb-1' : ''}`}
               >
                 Project Recaps
               </a>
@@ -425,7 +445,7 @@ export default function App({ initialPath }: { initialPath?: string }) {
               <a 
                 {...tabLink('contact')}
                 aria-current={activeTab === 'contact' ? 'page' : undefined}
-                className={`relative inline-block normal-case hover:text-white transition-all duration-300 cursor-pointer before:absolute before:-inset-3 before:content-[''] md:before:hidden ${activeTab === 'contact' ? 'text-[#dfb86c] font-semibold border-b border-[#dfb86c] pb-1' : ''}`}
+                className={`relative inline-block normal-case hover:text-white transition-all duration-300 cursor-pointer before:absolute before:-inset-3 before:content-[''] md:before:hidden ${activeTab === 'contact' ? 'text-gold font-semibold border-b border-gold pb-1' : ''}`}
               >
                 Contact
               </a>
@@ -460,7 +480,7 @@ export default function App({ initialPath }: { initialPath?: string }) {
                     initial={false}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 1, ease: [0.16, 1, 0.3, 1], delay: 0.1 }}
-                    className="font-serif text-5xl md:text-8xl lg:text-9xl tracking-tight mb-4 text-[#f5f5f5]"
+                    className="font-serif text-5xl md:text-8xl lg:text-9xl tracking-tight mb-4 text-paper"
                   >
                     <RevealWords text="Robert Lazau" />
                   </motion.h1>
@@ -469,9 +489,9 @@ export default function App({ initialPath }: { initialPath?: string }) {
                     initial={false}
                     animate={{ opacity: 1 }}
                     transition={{ duration: 1.2, delay: 0.4 }}
-                    className="text-[#dfb86c]/90 font-serif italic text-xl md:text-3xl mb-8 tracking-wide"
+                    className="text-gold/90 font-serif italic text-xl md:text-3xl mb-8 tracking-wide"
                   >
-                    <span className="reveal-word" style={{ '--i': 3 } as React.CSSProperties}>Director & Producer</span>
+                    <span className="reveal-word" style={{ '--i': 3 } as React.CSSProperties}><span className="shine-text">Director & Producer</span></span>
                   </motion.div>
                   
                   <motion.p 
@@ -489,25 +509,25 @@ export default function App({ initialPath }: { initialPath?: string }) {
                 {heroFilm && (
                   <section className="pb-24 md:pb-32 relative z-10" aria-labelledby="newest-film">
                     <div className="flex items-center gap-4 mb-8">
-                      <h2 id="newest-film" className="text-xs uppercase tracking-[0.25em] text-[#dfb86c] font-medium">Newest film</h2>
+                      <h2 id="newest-film" className="text-xs uppercase tracking-[0.25em] text-gold font-medium">Newest film</h2>
                       <div className="flex-1 h-px bg-white/10" />
                     </div>
                     <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
                       <ClickToPlay project={heroFilm} className="lg:col-span-8 border border-white/10" reveal />
                       <div className="lg:col-span-4 flex flex-col gap-4">
                         <p className="text-[11px] uppercase tracking-[0.2em] text-white/60">{heroFilm.type} · {heroFilm.year}</p>
-                        <h3 className="font-serif text-3xl md:text-4xl text-[#f5f5f5] tracking-tight">{heroFilm.title}</h3>
+                        <h3 className="font-serif text-3xl md:text-4xl text-paper tracking-tight">{heroFilm.title}</h3>
                         <p className="text-sm md:text-base text-white/60 font-light leading-relaxed">{heroFilm.description}</p>
                         <div className="flex flex-wrap gap-3 pt-2">
                           <MagneticLink
                             {...link(WORK_PATH)}
-                            className="inline-flex items-center gap-3 px-7 py-4 bg-[#dfb86c] text-[#060606] text-[11px] uppercase tracking-[0.25em] font-semibold hover:bg-white transition-colors"
+                            className="inline-flex items-center gap-3 px-7 py-4 bg-gold text-ink text-[11px] uppercase tracking-[0.25em] font-semibold hover:bg-white transition-colors"
                           >
                             See the work <ArrowRight size={14} />
                           </MagneticLink>
                           <MagneticLink
                             {...tabLink('contact')}
-                            className="inline-flex items-center gap-3 px-7 py-4 border border-[#dfb86c]/50 text-[#f5f5f5] text-[11px] uppercase tracking-[0.25em] hover:border-[#dfb86c] hover:text-[#dfb86c] transition-colors"
+                            className="inline-flex items-center gap-3 px-7 py-4 border border-gold/50 text-paper text-[11px] uppercase tracking-[0.25em] hover:border-gold hover:text-gold transition-colors"
                           >
                             Start a project
                           </MagneticLink>
@@ -544,15 +564,15 @@ export default function App({ initialPath }: { initialPath?: string }) {
                     </div>
                     
                     <div className="flex flex-col items-start max-w-md mx-auto md:mx-0">
-                      <span className="text-[10px] text-[#dfb86c] tracking-[0.3em] uppercase mb-3">{biography.year}</span>
-                      <h2 className="font-serif text-4xl md:text-6xl mb-6 text-[#f5f5f5] tracking-tight">Biography</h2>
+                      <span className="text-[10px] text-gold tracking-[0.3em] uppercase mb-3">{biography.year}</span>
+                      <h2 className="font-serif text-4xl md:text-6xl mb-6 text-paper tracking-tight">Biography</h2>
                       <div className="space-y-6 text-sm text-white/60 font-light leading-relaxed">
                         {biography.text.split('\n\n').map((paragraph, i) => <p key={i}>{paragraph}</p>)}
-                        <p className="italic font-serif text-[#dfb86c]/70 text-lg border-l border-[#dfb86c]/30 pl-4 py-1">
+                        <p className="italic font-serif text-gold/70 text-lg border-l border-gold/30 pl-4 py-1">
                           "{biography.quote}"
                         </p>
                       </div>
-                      <a {...link(ABOUT_PATH)} className="mt-8 inline-flex items-center gap-2 text-[10px] uppercase tracking-[0.25em] text-[#dfb86c] hover:text-white transition-colors">
+                      <a {...link(ABOUT_PATH)} className="mt-8 inline-flex items-center gap-2 text-[10px] uppercase tracking-[0.25em] text-gold hover:text-white transition-colors">
                         More about Robert <ArrowRight size={12} />
                       </a>
                     </div>
@@ -572,7 +592,7 @@ export default function App({ initialPath }: { initialPath?: string }) {
                 >
                   <div className="flex flex-col mb-16">
                     <span className="text-[10px] text-white/40 tracking-[0.3em] uppercase mb-3">{clientApproach.subtitle}</span>
-                    <h2 className="font-serif text-4xl md:text-6xl text-[#f5f5f5] tracking-tight">{clientApproach.title}</h2>
+                    <h2 className="font-serif text-4xl md:text-6xl text-paper tracking-tight">{clientApproach.title}</h2>
                   </div>
                   
                   <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
@@ -583,7 +603,7 @@ export default function App({ initialPath }: { initialPath?: string }) {
                     <div className="lg:col-span-7 grid grid-cols-1 md:grid-cols-3 gap-8">
                       {clientApproach.points.map((point, index) => (
                         <div key={index} className="border-t border-white/10 pt-6 flex flex-col">
-                          <span className="text-[10px] text-[#dfb86c] tracking-widest font-semibold mb-3">0{index + 1}/</span>
+                          <span className="text-[10px] text-gold tracking-widest font-semibold mb-3">0{index + 1}/</span>
                           <h3 className="font-serif text-lg text-white/90 mb-2">{point.title}</h3>
                           <p className="text-[11px] text-white/40 leading-relaxed font-light">{point.desc}</p>
                         </div>
@@ -604,11 +624,11 @@ export default function App({ initialPath }: { initialPath?: string }) {
                 >
                   <div className="flex flex-col mb-16 text-center md:text-left">
                     <span className="text-[10px] text-white/40 tracking-[0.3em] uppercase mb-3">EXPERT GUIDANCE</span>
-                    <h2 className="font-serif text-4xl md:text-6xl text-[#f5f5f5] tracking-tight">Media Consulting Services</h2>
+                    <h2 className="font-serif text-4xl md:text-6xl text-paper tracking-tight">Media Consulting Services</h2>
                     <p className="max-w-2xl text-xs md:text-sm text-white/50 leading-relaxed font-light mt-4 mx-auto md:mx-0">
                       Have a project and want a second set of eyes? Robert offers one-on-one guidance for filmmakers, creators, and organizations at any stage, from first idea to final cut.
                     </p>
-                    <a {...link('/services/media-consulting')} className="mt-6 inline-flex items-center justify-center md:justify-start gap-2 text-[10px] uppercase tracking-[0.25em] text-[#dfb86c] hover:text-white transition-colors">
+                    <a {...link('/services/media-consulting')} className="mt-6 inline-flex items-center justify-center md:justify-start gap-2 text-[10px] uppercase tracking-[0.25em] text-gold hover:text-white transition-colors">
                       Media consulting details <ArrowRight size={12} />
                     </a>
                   </div>
@@ -619,8 +639,8 @@ export default function App({ initialPath }: { initialPath?: string }) {
                         key={index} 
                         className="border border-white/5 bg-white/[0.01] p-6 md:p-8 hover:border-white/20 transition-all duration-300 flex flex-col group"
                       >
-                        <span className="text-[10px] text-[#dfb86c] tracking-widest font-semibold mb-4 block">SERVICE 0{index + 1}/</span>
-                        <h3 className="font-serif text-xl text-white/90 mb-4 group-hover:text-[#dfb86c] transition-colors">{service.title}</h3>
+                        <span className="text-[10px] text-gold tracking-widest font-semibold mb-4 block">SERVICE 0{index + 1}/</span>
+                        <h3 className="font-serif text-xl text-white/90 mb-4 group-hover:text-gold transition-colors">{service.title}</h3>
                         <p className="text-xs text-white/40 leading-relaxed font-light mt-auto">{service.desc}</p>
                       </div>
                     ))}
@@ -630,7 +650,7 @@ export default function App({ initialPath }: { initialPath?: string }) {
                 {/* FAQ Section */}
                 <section id="faq" className="py-28 max-w-4xl mx-auto border-t border-white/5 scroll-mt-12" aria-label="Frequently Asked Questions">
                   <span className="text-[10px] text-white/40 tracking-[0.3em] uppercase mb-3 block">QUESTIONS</span>
-                  <h2 className="font-serif italic text-4xl md:text-6xl mb-16 text-[#f5f5f5]">FAQ</h2>
+                  <h2 className="font-serif italic text-4xl md:text-6xl mb-16 text-paper">FAQ</h2>
                   <div className="space-y-4">
                     {faqs.map((faq, index) => (
                       <FAQItem key={index} question={faq.question} answer={faq.answer} />
@@ -653,7 +673,7 @@ export default function App({ initialPath }: { initialPath?: string }) {
                   <div className="flex justify-between items-end mb-16 border-b border-white/5 pb-6">
                     <div>
                       <span className="text-[10px] text-white/40 tracking-[0.3em] uppercase mb-2 block">FILM DIARY & REVIEWS</span>
-                      <h1 className="font-serif italic text-4xl md:text-6xl text-[#f5f5f5] tracking-tight">Favorite Movies Blog</h1>
+                      <h1 className="font-serif italic text-4xl md:text-6xl text-paper tracking-tight">Favorite Movies Blog</h1>
                     </div>
                     <div className="flex items-center gap-4">
                       <button 
@@ -697,7 +717,7 @@ export default function App({ initialPath }: { initialPath?: string }) {
                                   }}
                                   onFocus={() => setRecDropdownOpen(true)}
                                   placeholder="Type a movie title, director, or year..."
-                                  className="w-full bg-black/40 border border-white/10 px-4 py-3 text-sm text-white focus:outline-none focus:border-[#dfb86c] transition-colors"
+                                  className="w-full bg-black/40 border border-white/10 px-4 py-3 text-sm text-white focus:outline-none focus:border-gold transition-colors"
                                   autoComplete="off"
                                 />
                                 {recSearchQuery && (
@@ -731,7 +751,7 @@ export default function App({ initialPath }: { initialPath?: string }) {
                                           }}
                                           className="w-full text-left px-4 py-3 hover:bg-white/5 transition-colors border-b border-white/5 last:border-0 cursor-pointer group"
                                         >
-                                          <span className="text-sm text-white/90 group-hover:text-[#dfb86c] transition-colors">{movie.title}</span>
+                                          <span className="text-sm text-white/90 group-hover:text-gold transition-colors">{movie.title}</span>
                                           <span className="block text-[10px] text-white/40 mt-0.5">{movie.director} — {movie.year}</span>
                                         </button>
                                       ))}
@@ -750,7 +770,7 @@ export default function App({ initialPath }: { initialPath?: string }) {
                                   value={recMovieDirector}
                                   onChange={(e) => setRecMovieDirector(e.target.value)}
                                   placeholder="e.g., Christopher Nolan"
-                                  className="w-full bg-black/40 border border-white/10 px-4 py-3 text-sm text-white focus:outline-none focus:border-[#dfb86c] transition-colors"
+                                  className="w-full bg-black/40 border border-white/10 px-4 py-3 text-sm text-white focus:outline-none focus:border-gold transition-colors"
                                 />
                               </div>
                               <div>
@@ -761,7 +781,7 @@ export default function App({ initialPath }: { initialPath?: string }) {
                                   onChange={(e) => setRecMovieYear(e.target.value)}
                                   placeholder="e.g., 2023"
                                   maxLength={4}
-                                  className="w-full bg-black/40 border border-white/10 px-4 py-3 text-sm text-white focus:outline-none focus:border-[#dfb86c] transition-colors"
+                                  className="w-full bg-black/40 border border-white/10 px-4 py-3 text-sm text-white focus:outline-none focus:border-gold transition-colors"
                                 />
                               </div>
                             </div>
@@ -775,7 +795,7 @@ export default function App({ initialPath }: { initialPath?: string }) {
                                   value={recName}
                                   onChange={(e) => setRecName(e.target.value)}
                                   placeholder="e.g., Jane Doe (Leave blank for Anonymous)"
-                                  className="w-full bg-black/40 border border-white/10 px-4 py-3 text-sm text-white focus:outline-none focus:border-[#dfb86c] transition-colors"
+                                  className="w-full bg-black/40 border border-white/10 px-4 py-3 text-sm text-white focus:outline-none focus:border-gold transition-colors"
                                 />
                               </div>
                               <div>
@@ -785,7 +805,7 @@ export default function App({ initialPath }: { initialPath?: string }) {
                                   value={recComment}
                                   onChange={(e) => { setRecComment(e.target.value); setRecError(''); }}
                                   placeholder="A brief note on why you recommend this..."
-                                  className="w-full bg-black/40 border border-white/10 px-4 py-3 text-sm text-white focus:outline-none focus:border-[#dfb86c] transition-colors"
+                                  className="w-full bg-black/40 border border-white/10 px-4 py-3 text-sm text-white focus:outline-none focus:border-gold transition-colors"
                                 />
                               </div>
                             </div>
@@ -799,8 +819,8 @@ export default function App({ initialPath }: { initialPath?: string }) {
 
                             {/* Success message */}
                             {recSent && (
-                              <div className="border border-[#dfb86c]/30 bg-[#dfb86c]/5 px-4 py-3 rounded-sm">
-                                <p className="text-[11px] text-[#dfb86c] font-medium">Thanks! Your recommendation was sent to Robert.</p>
+                              <div className="border border-gold/30 bg-gold/5 px-4 py-3 rounded-sm">
+                                <p className="text-[11px] text-gold font-medium">Thanks! Your recommendation was sent to Robert.</p>
                               </div>
                             )}
 
@@ -808,7 +828,7 @@ export default function App({ initialPath }: { initialPath?: string }) {
                               <button
                                 type="submit"
                                 disabled={recSending}
-                                className="px-6 py-2.5 rounded-sm bg-[#dfb86c] text-black text-[10px] uppercase tracking-widest hover:bg-white transition-all font-semibold cursor-pointer disabled:opacity-50 disabled:cursor-wait"
+                                className="px-6 py-2.5 rounded-sm bg-gold text-black text-[10px] uppercase tracking-widest hover:bg-white transition-all font-semibold cursor-pointer disabled:opacity-50 disabled:cursor-wait"
                               >
                                 {recSending ? 'Sending...' : 'Submit Recommendation'}
                               </button>
@@ -830,7 +850,7 @@ export default function App({ initialPath }: { initialPath?: string }) {
                   <div className="space-y-24">
                     {reviews.length === 0 ? (
                       <div className="text-center py-24 border border-dashed border-white/10 rounded-sm bg-white/[0.01]">
-                        <span className="text-[#dfb86c] text-[10px] uppercase tracking-widest font-semibold block mb-2">COMING SOON</span>
+                        <span className="text-gold text-[10px] uppercase tracking-widest font-semibold block mb-2">COMING SOON</span>
                         <p className="text-sm text-white/40 font-light mb-6">Robert's first film reviews are on the way. In the meantime, tell him what to watch.</p>
                         <button 
                           onClick={() => setShowRecForm(true)} 
@@ -848,14 +868,14 @@ export default function App({ initialPath }: { initialPath?: string }) {
                           {/* Article Meta Header */}
                           <div className="flex flex-col md:flex-row md:items-center justify-between text-[10px] text-white/40 uppercase tracking-[0.2em] border-b border-white/5 pb-4">
                             <div className="flex items-center gap-4 mb-2 md:mb-0">
-                              <span className="text-[#dfb86c] font-semibold">0{index + 1}/ MOVIE REVIEW</span>
+                              <span className="text-gold font-semibold">0{index + 1}/ MOVIE REVIEW</span>
                               <span>•</span>
                               <span>Directed by {movie.director}</span>
                             </div>
                             <div className="flex items-center gap-4">
                               <span>{movie.year} · {movie.duration}</span>
                               <span>•</span>
-                              <span className="text-[#dfb86c]">★ {movie.rating}/10</span>
+                              <span className="text-gold">★ {movie.rating}/10</span>
                             </div>
                           </div>
 
@@ -864,7 +884,7 @@ export default function App({ initialPath }: { initialPath?: string }) {
                             {/* Left Column: Title & Action */}
                             <div className="lg:col-span-4 flex flex-col justify-between md:h-full min-h-[140px]">
                               <div>
-                                <h3 className="font-serif text-3xl md:text-5xl text-[#f5f5f5] tracking-tight leading-tight mb-4 group-hover:text-[#dfb86c] transition-colors">
+                                <h3 className="font-serif text-3xl md:text-5xl text-paper tracking-tight leading-tight mb-4 group-hover:text-gold transition-colors">
                                   {movie.title}
                                 </h3>
                                 <p className="text-[9px] text-white/30 tracking-widest uppercase">
@@ -939,7 +959,7 @@ export default function App({ initialPath }: { initialPath?: string }) {
                 <section id="contact-page" className="py-16 max-w-4xl mx-auto" aria-label="Contact Robert Lazau">
                   <div className="text-center mb-16">
                     <span className="text-[10px] text-white/40 tracking-[0.3em] uppercase mb-3 block">COLLABORATION & COMMISSION</span>
-                    <h1 className="font-serif italic text-4xl md:text-6xl text-[#f5f5f5] tracking-tight">Contact Robert</h1>
+                    <h1 className="font-serif italic text-4xl md:text-6xl text-paper tracking-tight">Contact Robert</h1>
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-12 gap-12 items-start">
@@ -953,7 +973,7 @@ export default function App({ initialPath }: { initialPath?: string }) {
                         </p>
                         <a 
                           href="mailto:robertlazau@gmail.com" 
-                          className="text-xs uppercase tracking-widest text-[#dfb86c] hover:text-white transition-colors flex items-center gap-2"
+                          className="text-xs uppercase tracking-widest text-gold hover:text-white transition-colors flex items-center gap-2"
                         >
                           <Mail size={14} /> robertlazau@gmail.com
                         </a>
@@ -966,7 +986,7 @@ export default function App({ initialPath }: { initialPath?: string }) {
                             href="https://www.instagram.com/robertrgb/?hl=en" 
                             target="_blank" 
                             rel="noopener noreferrer"
-                            className="border border-white/5 hover:border-white/20 bg-white/[0.01] hover:bg-white/[0.03] py-4 text-[9px] uppercase tracking-widest text-white/60 hover:text-[#dfb86c] transition-all"
+                            className="border border-white/5 hover:border-white/20 bg-white/[0.01] hover:bg-white/[0.03] py-4 text-[9px] uppercase tracking-widest text-white/60 hover:text-gold transition-all"
                           >
                             Instagram
                           </a>
@@ -974,7 +994,7 @@ export default function App({ initialPath }: { initialPath?: string }) {
                             href="https://www.imdb.com/name/nm14415874/" 
                             target="_blank" 
                             rel="noreferrer"
-                            className="border border-white/5 hover:border-white/20 bg-white/[0.01] hover:bg-white/[0.03] py-4 text-[9px] uppercase tracking-widest text-white/60 hover:text-[#dfb86c] transition-all"
+                            className="border border-white/5 hover:border-white/20 bg-white/[0.01] hover:bg-white/[0.03] py-4 text-[9px] uppercase tracking-widest text-white/60 hover:text-gold transition-all"
                           >
                             IMDb
                           </a>
@@ -1002,7 +1022,7 @@ export default function App({ initialPath }: { initialPath?: string }) {
                             value={contactName}
                             onChange={(e) => setContactName(e.target.value)}
                             placeholder="John Doe"
-                            className="w-full bg-black/40 border border-white/10 px-4 py-3 text-sm text-white focus:outline-none focus:border-[#dfb86c] transition-colors"
+                            className="w-full bg-black/40 border border-white/10 px-4 py-3 text-sm text-white focus:outline-none focus:border-gold transition-colors"
                           />
                         </div>
 
@@ -1014,7 +1034,7 @@ export default function App({ initialPath }: { initialPath?: string }) {
                             value={contactEmail}
                             onChange={(e) => setContactEmail(e.target.value)}
                             placeholder="john@example.com"
-                            className="w-full bg-black/40 border border-white/10 px-4 py-3 text-sm text-white focus:outline-none focus:border-[#dfb86c] transition-colors"
+                            className="w-full bg-black/40 border border-white/10 px-4 py-3 text-sm text-white focus:outline-none focus:border-gold transition-colors"
                           />
                         </div>
 
@@ -1024,19 +1044,19 @@ export default function App({ initialPath }: { initialPath?: string }) {
                             id="contact-type"
                             value={contactType}
                             onChange={(e) => setContactType(e.target.value)}
-                            className="w-full bg-black/40 border border-white/10 px-4 py-3 text-sm text-white focus:outline-none focus:border-[#dfb86c] transition-colors appearance-none"
+                            className="w-full bg-black/40 border border-white/10 px-4 py-3 text-sm text-white focus:outline-none focus:border-gold transition-colors appearance-none"
                           >
-                            <option value="Commercial / Brand Campaign" className="bg-[#060606]">Commercial / Brand Campaign</option>
-                            <option value="Community or Nonprofit Film" className="bg-[#060606]">Community or Nonprofit Film</option>
-                            <option value="PSA / Public Sector" className="bg-[#060606]">PSA / Public Sector</option>
-                            <option value="Fashion Visual" className="bg-[#060606]">Fashion Visual</option>
-                            <option value="Event Coverage" className="bg-[#060606]">Event Coverage</option>
-                            <option value="Website Design" className="bg-[#060606]">Website Design</option>
-                            <option value="Website Visual / Promo" className="bg-[#060606]">Website Visual / Promo</option>
-                            <option value="Music Video" className="bg-[#060606]">Music Video</option>
-                            <option value="Short or Feature Film" className="bg-[#060606]">Short or Feature Film</option>
-                            <option value="Media Consulting" className="bg-[#060606]">Media Consulting</option>
-                            <option value="Press / Other" className="bg-[#060606]">Press / Other</option>
+                            <option value="Commercial / Brand Campaign" className="bg-ink">Commercial / Brand Campaign</option>
+                            <option value="Community or Nonprofit Film" className="bg-ink">Community or Nonprofit Film</option>
+                            <option value="PSA / Public Sector" className="bg-ink">PSA / Public Sector</option>
+                            <option value="Fashion Visual" className="bg-ink">Fashion Visual</option>
+                            <option value="Event Coverage" className="bg-ink">Event Coverage</option>
+                            <option value="Website Design" className="bg-ink">Website Design</option>
+                            <option value="Website Visual / Promo" className="bg-ink">Website Visual / Promo</option>
+                            <option value="Music Video" className="bg-ink">Music Video</option>
+                            <option value="Short or Feature Film" className="bg-ink">Short or Feature Film</option>
+                            <option value="Media Consulting" className="bg-ink">Media Consulting</option>
+                            <option value="Press / Other" className="bg-ink">Press / Other</option>
                           </select>
                         </div>
 
@@ -1048,14 +1068,14 @@ export default function App({ initialPath }: { initialPath?: string }) {
                             value={contactMessage}
                             onChange={(e) => setContactMessage(e.target.value)}
                             placeholder="Detail your production concept, timeline, and shoot requirements..."
-                            className="w-full bg-black/40 border border-white/10 px-4 py-3 text-sm text-white focus:outline-none focus:border-[#dfb86c] transition-colors"
+                            className="w-full bg-black/40 border border-white/10 px-4 py-3 text-sm text-white focus:outline-none focus:border-gold transition-colors"
                           />
                         </div>
 
                         <button 
                           type="submit" 
                           disabled={contactSent}
-                          className="w-full py-3 rounded-sm bg-[#dfb86c] text-black text-[10px] uppercase tracking-widest hover:bg-white transition-all font-semibold flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+                          className="w-full py-3 rounded-sm bg-gold text-black text-[10px] uppercase tracking-widest hover:bg-white transition-all font-semibold flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
                         >
                           <Send size={12} /> {contactSent ? 'Sending...' : 'Send Message'}
                         </button>
@@ -1074,26 +1094,26 @@ export default function App({ initialPath }: { initialPath?: string }) {
         {/* Footer */}
         <footer className="w-full max-w-[1400px] mx-auto px-4 md:px-8 py-16 border-t border-white/5" role="contentinfo">
           <nav aria-label="Site pages" className="flex flex-wrap justify-center md:justify-start gap-x-8 gap-y-3 mb-10 text-[10px] uppercase tracking-[0.25em] text-white/40">
-            <a {...link(WORK_PATH)} className="hover:text-[#dfb86c] transition-colors">Work</a>
-            <a {...link(ABOUT_PATH)} className="hover:text-[#dfb86c] transition-colors">About</a>
+            <a {...link(WORK_PATH)} className="hover:text-gold transition-colors">Work</a>
+            <a {...link(ABOUT_PATH)} className="hover:text-gold transition-colors">About</a>
             {services.map(s => (
-              <a key={s.slug} {...link(servicePath(s))} className="hover:text-[#dfb86c] transition-colors">{s.name}</a>
+              <a key={s.slug} {...link(servicePath(s))} className="hover:text-gold transition-colors">{s.name}</a>
             ))}
             {isTabShown('recaps') && (
-              <a {...tabLink('recaps')} className="hover:text-[#dfb86c] transition-colors">Project Recaps</a>
+              <a {...tabLink('recaps')} className="hover:text-gold transition-colors">Project Recaps</a>
             )}
-            <a {...tabLink('contact')} className="hover:text-[#dfb86c] transition-colors">Contact</a>
+            <a {...tabLink('contact')} className="hover:text-gold transition-colors">Contact</a>
           </nav>
           <div className="flex flex-col md:flex-row justify-between items-center text-[10px] text-white/30 uppercase tracking-[0.25em]">
             <p>© {new Date().getFullYear()} Golden Boy Productions — Robert Lazau</p>
             <nav aria-label="Social media links" className="flex space-x-6 mt-4 md:mt-0 text-[9px] tracking-wider text-white/40">
-              <a href="https://www.instagram.com/robertrgb/?hl=en" target="_blank" rel="noopener noreferrer" className="hover:text-[#dfb86c] transition-colors">Instagram</a>
-              <a href="https://www.imdb.com/name/nm14415874/" target="_blank" rel="noopener noreferrer" className="hover:text-[#dfb86c] transition-colors">IMDb</a>
-              <a href="mailto:robertlazau@gmail.com" className="hover:text-[#dfb86c] transition-colors">Email</a>
+              <a href="https://www.instagram.com/robertrgb/?hl=en" target="_blank" rel="noopener noreferrer" className="hover:text-gold transition-colors">Instagram</a>
+              <a href="https://www.imdb.com/name/nm14415874/" target="_blank" rel="noopener noreferrer" className="hover:text-gold transition-colors">IMDb</a>
+              <a href="mailto:robertlazau@gmail.com" className="hover:text-gold transition-colors">Email</a>
             </nav>
             <a 
               {...tabLink('home')}
-              className="mt-4 md:mt-0 font-serif italic text-[#dfb86c] cursor-pointer hover:text-white transition-colors"
+              className="mt-4 md:mt-0 font-serif italic text-gold cursor-pointer hover:text-white transition-colors"
             >
               Robert Lazau
             </a>
@@ -1115,9 +1135,9 @@ function FAQItem({ question, answer }: { question: string; answer: string; key?:
         aria-expanded={isOpen}
         className="w-full py-8 flex justify-between items-center text-left hover:text-white group transition-colors duration-300"
       >
-        <span className="font-serif text-lg md:text-2xl text-white/80 group-hover:text-[#dfb86c] transition-colors">{question}</span>
+        <span className="font-serif text-lg md:text-2xl text-white/80 group-hover:text-gold transition-colors">{question}</span>
         <div className="w-10 h-10 rounded-full border border-[#e5e5e5]/10 flex items-center justify-center flex-shrink-0 ml-4 group-hover:border-[#e5e5e5]/30 group-hover:bg-[#e5e5e5]/5 transition-all">
-          {isOpen ? <Minus size={16} strokeWidth={1} className="text-[#dfb86c]" /> : <Plus size={16} strokeWidth={1} />}
+          {isOpen ? <Minus size={16} strokeWidth={1} className="text-gold" /> : <Plus size={16} strokeWidth={1} />}
         </div>
       </button>
       <div
