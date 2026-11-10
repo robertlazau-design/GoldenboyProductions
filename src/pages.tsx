@@ -6,6 +6,7 @@ import { biography, clientApproach, currentProjects, featuredExtras, finishedPro
 import { ABOUT_PATH, TAB_ROUTES, WORK_PATH, projectPath, recapPath, servicePath } from './seo';
 import { formatRecapDate, recaps, type Recap } from './recaps';
 import { isDriveVideo, isYouTubeEmbed } from './media';
+import { HoverPreview, Letterbox } from './effects';
 
 export type LinkTo = (to: string) => { href: string; onClick: (e: React.MouseEvent) => void };
 
@@ -30,15 +31,17 @@ function ProjectCard({ project, link, detailed = false }: { project: Project; li
   return (
     <a
       {...link(projectPath(project))}
-      className="group block border border-white/5 bg-white/[0.01] p-4 hover:border-white/15 transition-all duration-300"
+      data-preview-host
+      className="glow-card group block border border-white/5 bg-white/[0.01] p-4 hover:border-white/15 transition-all duration-300"
     >
-      <div className="aspect-[16/10] overflow-hidden mb-5 bg-white/5">
+      <div className="relative aspect-[16/10] overflow-hidden mb-5 bg-white/5">
         <img
           src={project.image}
           alt={`${project.title}, ${project.type.toLowerCase()} by Golden Boy Productions`}
           loading="lazy"
           className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700 ease-out"
         />
+        {project.preview && <HoverPreview src={project.preview} />}
       </div>
       <div className="flex justify-between items-baseline mb-2">
         <span className="text-[9px] uppercase tracking-wider text-white/40">{project.type}</span>
@@ -379,11 +382,14 @@ export function AboutPage({ link }: { link: LinkTo }) {
 
 // The big "Newest" card: the video loads only when someone presses play, so the page stays fast.
 // A film's poster with a play button. The video itself loads only when someone presses play.
-export function ClickToPlay({ project, className = '' }: { project: Project; className?: string }) {
+// With a preview clip, a silent loop plays on hover (or when centered on a phone).
+// reveal: black widescreen bars slide open the first time it scrolls into view.
+export function ClickToPlay({ project, className = '', reveal = false }: { project: Project; className?: string; reveal?: boolean }) {
   const [playing, setPlaying] = React.useState(false);
   const canEmbed = isYouTubeEmbed(project.video) || isDriveVideo(project.video);
+  const Frame = reveal ? Letterbox : 'div';
   return (
-    <div className={`relative aspect-[16/9] overflow-hidden bg-black ${className}`}>
+    <Frame className={`relative aspect-[16/9] overflow-hidden bg-black ${className}`}>
       {playing && canEmbed ? (
         <iframe
           src={isYouTubeEmbed(project.video) ? `${project.video}?autoplay=1&rel=0` : project.video}
@@ -396,16 +402,18 @@ export function ClickToPlay({ project, className = '' }: { project: Project; cla
         <button
           type="button"
           onClick={() => setPlaying(true)}
+          data-preview-host
           className="group absolute inset-0 w-full h-full cursor-pointer"
           aria-label={`Play the ${project.title} film`}
         >
           <img src={project.image} alt="" className="w-full h-full object-cover" />
+          {project.preview && <HoverPreview src={project.preview} />}
           <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-20 h-20 rounded-full border border-[#dfb86c] bg-[#060606]/60 flex items-center justify-center group-hover:bg-[#dfb86c] group-hover:text-[#060606] text-white transition-colors">
             <Play size={26} className="ml-1" />
           </span>
         </button>
       )}
-    </div>
+    </Frame>
   );
 }
 
@@ -422,8 +430,8 @@ function FeaturedFilm({ project, link }: { project: Project; link: LinkTo; key?:
   ];
   return (
     <div>
-      <article className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center border border-white/5 bg-white/[0.02] p-4 md:p-5">
-        <ClickToPlay project={project} className="lg:col-span-7" />
+      <article className="glow-card grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center border border-white/5 bg-white/[0.02] p-4 md:p-5">
+        <ClickToPlay project={project} className="lg:col-span-7" reveal />
         <div className="lg:col-span-5 flex flex-col gap-4 pb-2 lg:pr-4">
           <div className="flex justify-between gap-4 text-[10px] uppercase tracking-[0.2em]">
             <span className="text-white/50">{project.type}</span>
@@ -505,7 +513,7 @@ function RecentCard({ item }: { item: RecentWork; key?: React.Key }) {
         href={item.url}
         target="_blank"
         rel="noopener"
-        className="group md:col-span-2 flex flex-col md:flex-row border border-white/5 bg-white/[0.02] hover:border-[#dfb86c]/40 transition-colors"
+        className="glow-card group md:col-span-2 flex flex-col md:flex-row border border-white/5 bg-white/[0.02] hover:border-[#dfb86c]/40 transition-colors"
       >
         <div className="relative md:w-[58%] min-h-[260px] md:min-h-[340px] overflow-hidden">
           <img src={item.photo} alt={item.photoAlt ?? ''} loading="lazy" className="absolute inset-0 w-full h-full object-cover" />
@@ -520,7 +528,7 @@ function RecentCard({ item }: { item: RecentWork; key?: React.Key }) {
       href={item.url}
       target="_blank"
       rel="noopener"
-      className="group flex flex-col border border-white/5 bg-white/[0.02] hover:border-[#dfb86c]/40 transition-colors"
+      className="glow-card group flex flex-col border border-white/5 bg-white/[0.02] hover:border-[#dfb86c]/40 transition-colors"
     >
       <div className="h-[300px] bg-[#0a0a0a] flex items-end justify-center overflow-hidden pt-8">
         <PhoneShot

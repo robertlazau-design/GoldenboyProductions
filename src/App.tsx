@@ -2,10 +2,11 @@ import React, { useState, useEffect } from 'react';
 import emailjs from '@emailjs/browser';
 import { motion, AnimatePresence, useMotionValue, useSpring } from 'motion/react';
 import { ArrowRight, ArrowLeft, Plus, Minus, Camera, X, Send, Mail } from 'lucide-react';
-import { biography, clientApproach, consultingServices, favoriteMovies, faqs, recommendableMovies, services } from './data';
+import { biography, clientApproach, clientNames, consultingServices, favoriteMovies, faqs, recommendableMovies, services } from './data';
 import robertBackground from '../assets/robert_background.jpg';
 import { TAB_ROUTES, isTabShown, pageFromPath, pageMeta, normalizePath, canonicalUrl, servicePath, ABOUT_PATH, WORK_PATH, type Tab } from './seo';
 import { AboutPage, ClickToPlay, ProjectPage, RecapPage, RecapsPage, ServicePage, WorkPage, newestFilm } from './pages';
+import { ClientStrip, LogoMark, MagneticLink, RevealWords, useCardGlow } from './effects';
 
 
 const setMeta = (selector: string, attr: string, value: string) =>
@@ -63,6 +64,7 @@ export default function App({ initialPath }: { initialPath?: string }) {
   });
   const tabLink = (tab: Tab) => link(TAB_ROUTES[tab].path);
   const heroFilm = newestFilm();
+  useCardGlow();
 
   // "Get a quote" on a service page: open the contact form with that service picked.
   const QUOTE_TYPES: Record<string, string> = {
@@ -444,18 +446,15 @@ export default function App({ initialPath }: { initialPath?: string }) {
                 transition={{ duration: 0.4 }}
               >
                 {/* Hero Section */}
-                 <section className="min-h-[70vh] flex flex-col justify-center items-center text-center pt-8 pb-16 relative z-10" aria-label="Hero">
+                 <section className="hero-clip min-h-[70vh] flex flex-col justify-center items-center text-center pt-8 pb-16 relative z-10" aria-label="Hero">
+                  <div className="hero-spotlight" aria-hidden="true" />
                   <motion.div
                     initial={false}
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1], delay: 0.2 }}
                     className="mb-8 select-none"
                   >
-                    <img 
-                      src="/logo-mark.png" 
-                      alt="Golden Boy Productions Logo" 
-                      className="h-24 md:h-32 w-auto filter drop-shadow-[0_0_20px_rgba(223,184,108,0.15)]" 
-                    />
+                    <LogoMark className="h-24 md:h-32 w-auto filter drop-shadow-[0_0_20px_rgba(223,184,108,0.15)]" />
                   </motion.div>
                   <motion.h1 
                     initial={false}
@@ -463,7 +462,7 @@ export default function App({ initialPath }: { initialPath?: string }) {
                     transition={{ duration: 1, ease: [0.16, 1, 0.3, 1], delay: 0.1 }}
                     className="font-serif text-5xl md:text-8xl lg:text-9xl tracking-tight mb-4 text-[#f5f5f5]"
                   >
-                    Robert Lazau
+                    <RevealWords text="Robert Lazau" />
                   </motion.h1>
                   
                   <motion.div 
@@ -472,7 +471,7 @@ export default function App({ initialPath }: { initialPath?: string }) {
                     transition={{ duration: 1.2, delay: 0.4 }}
                     className="text-[#dfb86c]/90 font-serif italic text-xl md:text-3xl mb-8 tracking-wide"
                   >
-                    Director & Producer
+                    <span className="reveal-word" style={{ '--i': 3 } as React.CSSProperties}>Director & Producer</span>
                   </motion.div>
                   
                   <motion.p 
@@ -494,29 +493,32 @@ export default function App({ initialPath }: { initialPath?: string }) {
                       <div className="flex-1 h-px bg-white/10" />
                     </div>
                     <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
-                      <ClickToPlay project={heroFilm} className="lg:col-span-8 border border-white/10" />
+                      <ClickToPlay project={heroFilm} className="lg:col-span-8 border border-white/10" reveal />
                       <div className="lg:col-span-4 flex flex-col gap-4">
                         <p className="text-[11px] uppercase tracking-[0.2em] text-white/60">{heroFilm.type} · {heroFilm.year}</p>
                         <h3 className="font-serif text-3xl md:text-4xl text-[#f5f5f5] tracking-tight">{heroFilm.title}</h3>
                         <p className="text-sm md:text-base text-white/60 font-light leading-relaxed">{heroFilm.description}</p>
                         <div className="flex flex-wrap gap-3 pt-2">
-                          <a
+                          <MagneticLink
                             {...link(WORK_PATH)}
                             className="inline-flex items-center gap-3 px-7 py-4 bg-[#dfb86c] text-[#060606] text-[11px] uppercase tracking-[0.25em] font-semibold hover:bg-white transition-colors"
                           >
                             See the work <ArrowRight size={14} />
-                          </a>
-                          <a
+                          </MagneticLink>
+                          <MagneticLink
                             {...tabLink('contact')}
                             className="inline-flex items-center gap-3 px-7 py-4 border border-[#dfb86c]/50 text-[#f5f5f5] text-[11px] uppercase tracking-[0.25em] hover:border-[#dfb86c] hover:text-[#dfb86c] transition-colors"
                           >
                             Start a project
-                          </a>
+                          </MagneticLink>
                         </div>
                       </div>
                     </div>
                   </section>
                 )}
+
+                {/* Clients, drifting slowly sideways */}
+                <ClientStrip names={clientNames} label="Made for" />
 
                 {/* Biography Section */}
                 <motion.section 
