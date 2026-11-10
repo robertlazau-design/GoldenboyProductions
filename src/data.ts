@@ -88,7 +88,24 @@ export type Project = {
   image: string;
   description: string;
   video: string;
+  /** Short silent loop (public/work/clips) that plays on hover / when centered on phones. */
+  preview?: string;
 };
+
+// Clients named in the slow strip on the home page. Only real clients that
+// already appear on the site; Robert's own projects are left out.
+export const clientNames: string[] = [
+  "Matman Trucking",
+  "City of Fairview",
+  "Hive Recovery Collective",
+  "EMOPI",
+  "Refined Kollective",
+  "Hayes Hustle",
+  "Royal Brand Woodworking",
+  "Kyree Films",
+  "Pasture & Paw",
+  "Tow Guys",
+];
 
 // Newest first: the first film here is the big "Newest" card on the Work page.
 export const finishedProjects: Project[] = [
@@ -96,6 +113,7 @@ export const finishedProjects: Project[] = [
     id: 7,
     title: "Matman Trucking",
     slug: "matman-trucking",
+    preview: "/work/clips/matman-trucking.mp4",
     client: "Matman Trucking",
     location: "Gresham, OR",
     type: "Commercial Film + Photo",
@@ -109,6 +127,7 @@ export const finishedProjects: Project[] = [
     id: 8,
     title: "Strain",
     slug: "strain",
+    preview: "/work/clips/strain.mp4",
     type: "Short Film · 48 Hour Film Project",
     year: "2026",
     role: "Director / Producer",
@@ -120,6 +139,7 @@ export const finishedProjects: Project[] = [
     id: 1,
     title: "Valentines Model Mash",
     slug: "valentines-model-mash",
+    preview: "/work/clips/valentines-model-mash.mp4",
     type: "Commercial Event Visual",
     year: "2026",
     role: "Production House / Director",
@@ -182,6 +202,7 @@ export const finishedProjects: Project[] = [
     id: 6,
     title: "Hayes Hustle",
     slug: "hayes-hustle",
+    preview: "/work/clips/hayes-hustle.mp4",
     client: "Hayes Hustle",
     type: "Nonprofit Spotlight Video",
     year: "2025",
