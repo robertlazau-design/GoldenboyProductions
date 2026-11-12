@@ -92,3 +92,10 @@ The tokens live in `src/index.css`, in `@theme static`. Use the token classes, n
 - Small labels in white/40 fail color contrast (axe `color-contrast`).
 - Add LocalBusiness structured data once the Google Business Profile is verified.
 - The home page title and H1 need location keywords.
+
+## Lead events
+
+- `src/leadEvents.ts` counts taps as Vercel Web Analytics custom events (Pro plan): `Call Click`, `Text Click`, `Email Click`, `Directions Click` and `Instagram Click`, from one click listener started in `src/main.tsx`. Properties: `page` and `spot` (nearest `data-spot`, else header/nav, footer, the section id, or page).
+- The contact form (`handleContactSubmit` in `src/App.tsx`) sends `Form Sent` (page + project type) when EmailJS accepts it, and `Form Error` (page) when it doesn't.
+- Two properties per event at most (Pro's limit). Never put names, emails or messages in an event.
+
