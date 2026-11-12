@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import emailjs from '@emailjs/browser';
+import { track } from '@vercel/analytics';
 import { motion, AnimatePresence, useMotionValue, useSpring } from 'motion/react';
 import { ArrowRight, ArrowLeft, Plus, Minus, Camera, X, Send, Mail } from 'lucide-react';
 import { biography, clientApproach, clientNames, consultingServices, favoriteMovies, faqs, recommendableMovies, services } from './data';
@@ -288,6 +289,8 @@ export default function App({ initialPath }: { initialPath?: string }) {
         templateParams,
         import.meta.env.VITE_EMAILJS_PUBLIC_KEY || 'HCe1iw0Kc6rDNVge8'
       );
+      // A lead for the growth report: the page and the project type picked (no personal details).
+      track('Form Sent', { page: window.location.pathname, type: templateParams.project_type });
       setContactName('');
       setContactEmail('');
       setContactType('Commercial / Brand Campaign');
@@ -295,6 +298,7 @@ export default function App({ initialPath }: { initialPath?: string }) {
       alert('Your message has been sent successfully! Robert will review it shortly.');
     } catch (error: any) {
       console.error('EmailJS Error:', error);
+      track('Form Error', { page: window.location.pathname });
       alert("Sorry, your message couldn't be sent. Please email Robert directly at robertlazau@gmail.com.");
     } finally {
       setContactSent(false);
