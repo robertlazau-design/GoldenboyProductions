@@ -8,6 +8,7 @@ import robertBackground from '../assets/robert_background.jpg';
 import { TAB_ROUTES, isTabShown, pageFromPath, pageMeta, normalizePath, canonicalUrl, servicePath, ABOUT_PATH, WORK_PATH, type Tab } from './seo';
 import { AboutPage, ClickToPlay, ProjectPage, RecapPage, RecapsPage, ServicePage, WorkPage, newestFilm } from './pages';
 import { ClientStrip, LogoMark, MagneticLink, RevealWords, useCardGlow } from './effects';
+import { trackAdsConversion } from './leadEvents';
 
 
 const setMeta = (selector: string, attr: string, value: string) =>
@@ -291,6 +292,8 @@ export default function App({ initialPath }: { initialPath?: string }) {
       );
       // A lead for the growth report: the page and the project type picked (no personal details).
       track('Form Sent', { page: window.location.pathname, type: templateParams.project_type });
+      // Google Ads contact conversion: only here, once EmailJS has accepted the message.
+      trackAdsConversion('contact');
       setContactName('');
       setContactEmail('');
       setContactType('Commercial / Brand Campaign');

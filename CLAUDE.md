@@ -122,3 +122,20 @@ The tokens live in `src/index.css`, in `@theme static`. Use the token classes, n
 - The contact form (`handleContactSubmit` in `src/App.tsx`) sends `Form Sent` (page + project type) when EmailJS accepts it, and `Form Error` (page) when it doesn't.
 - Two properties per event at most (Pro's limit). Never put names, emails or messages in an event.
 
+## Google Ads tracking
+
+| What | Value |
+| --- | --- |
+| Google tag (in `index.html`, right after `<head>`) | `GTM-NVZ26P6K` |
+| Google Ads account | `AW-18579845176` |
+| Contact form conversion label | `AW-18579845176/6tqtCK2U9rkdELjgx5tF` |
+| Phone tap conversion label | `AW-18579845176/hNhLCLCU9rkdELjgx5tF` |
+
+- Use the tag and conversion snippets exactly as Google gave them. No GA4, enhanced conversions or other Google add-ons unless Robert asks.
+- `trackAdsConversion` in `src/leadEvents.ts` is the only code that calls `gtag`. It checks `typeof window.gtag === 'function'` first and never throws, so an ad blocker can't cause errors.
+- Contact conversion: fired in `handleContactSubmit` (`src/App.tsx`) only after EmailJS accepts the message, once per send. Never on the button click or on an error.
+- Phone conversion: the site-wide click listener fires it on every `tel:` tap (header, footer, Contact), next to the Vercel `Call Click` event.
+- Each prerendered page must have the Google tag exactly once. Never test by sending a real message through the form.
+- There's no Content-Security-Policy today. If one is added, allow the hosts in Google's CSP guide for the Google tag.
+- There's no privacy page. If one is added, it should say the site uses Google Ads measurement.
+

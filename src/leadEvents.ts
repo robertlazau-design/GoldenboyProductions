@@ -30,6 +30,24 @@ export function trackLead(name: string, el?: Element | null) {
   track(name, { page: window.location.pathname, spot: el ? spotOf(el) : 'page' });
 }
 
+// Google Ads conversions, reported through the Google tag in index.html (see CLAUDE.md).
+const ADS_CONVERSIONS = {
+  contact: 'AW-18579845176/6tqtCK2U9rkdELjgx5tF',
+  phone: 'AW-18579845176/hNhLCLCU9rkdELjgx5tF',
+} as const;
+
+// The one place that calls gtag. Skips quietly when the tag is missing (an ad blocker) and
+// never throws, so tracking can't break a call tap or the form's success message.
+export function trackAdsConversion(kind: keyof typeof ADS_CONVERSIONS) {
+  try {
+    if (typeof window.gtag === 'function') {
+      window.gtag('event', 'conversion', { send_to: ADS_CONVERSIONS[kind], value: 1.0, currency: 'USD' });
+    }
+  } catch {
+    // Tracking must never get in the way of the visitor.
+  }
+}
+
 // One listener for the whole site, so every call, text, email, review, Google profile, directions
 // and Instagram link counts, including ones added later. Capture phase, so it still counts if a handler stops the click.
 export function startLeadEvents() {
@@ -40,7 +58,10 @@ export function startLeadEvents() {
       if (!link) return;
       const href = link.getAttribute('href') || '';
       const kind = KINDS.find(([re]) => re.test(href));
-      if (kind) trackLead(kind[1], link);
+      if (!kind) return;
+      // A tap on any tel: link (header, footer, Contact) is also a Google Ads phone conversion.
+      if (kind[1] === 'Call Click') trackAdsConversion('phone');
+      trackLead(kind[1], link);
     },
     { capture: true },
   );
