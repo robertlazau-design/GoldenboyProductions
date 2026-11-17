@@ -10,6 +10,28 @@ The portfolio site for Robert Lazau, director and producer, and his company Gold
 - **Don't invent facts.** No made-up numbers, client details, awards or quotes. If something is unknown, ask.
 - **Client names:** only real clients that already appear on the site and that Robert has confirmed (`clientNames` in `src/data.ts`).
 
+## Business details (match the Google Business Profile)
+
+These match Golden Boy Productions' verified Google Business Profile. Use them exactly, and change them only when the profile changes. They live in `business` in `src/data.ts` (header, footer, Contact page) and in the Organization and ProfessionalService JSON-LD in `index.html`.
+
+| Field | Value |
+| --- | --- |
+| Name | Golden Boy Productions |
+| Address | None. It's a service-area business, so never add a street address. |
+| Phone (shown) | (503) 863-8966 |
+| Phone (link) | `tel:+15038638966` |
+| Phone (JSON-LD) | `"+1-503-863-8966"` |
+| Google profile | https://maps.google.com/?cid=2653123704889832847 (`hasMap` and `sameAs`) |
+| Google review link | https://g.page/r/CY91IOfzydEkECE/review |
+| LinkedIn | https://www.linkedin.com/company/golden-boy-productions/ |
+| Golden Boy Instagram | https://www.instagram.com/goldenboyproductionss/ |
+| Robert's Instagram | https://www.instagram.com/robertrgb/ (Person `sameAs`, with IMDb) |
+| Service area on the profile | Oregon, Tigard, Gresham, Portland |
+
+- The review link is for everyone who worked with us. No screening and no "happy clients only" wording.
+- Label the two Instagrams clearly: "Golden Boy on Instagram" and "Robert on Instagram".
+- `areaServed` keeps its older entries (Fairview, Pacific Northwest) and adds the profile's (Tigard, Oregon). Change it in both `index.html` and `AREA` in `src/seo.ts`.
+
 ## Stack
 
 - Vite, React 19 and Tailwind CSS 4, hosted on Vercel.
@@ -90,12 +112,13 @@ The tokens live in `src/index.css`, in `@theme static`. Use the token classes, n
 ## Known to-dos
 
 - Small labels in white/40 fail color contrast (axe `color-contrast`).
-- Add LocalBusiness structured data once the Google Business Profile is verified.
-- The home page title and H1 need location keywords.
+- The home page H1 needs location keywords (the title got them in Nov 2026).
+- ProfessionalService (a LocalBusiness type) has the profile's phone, `hasMap` and `sameAs`; no street address, since it's a service-area business.
 
 ## Lead events
 
-- `src/leadEvents.ts` counts taps as Vercel Web Analytics custom events (Pro plan): `Call Click`, `Text Click`, `Email Click`, `Directions Click` and `Instagram Click`, from one click listener started in `src/main.tsx`. Properties: `page` and `spot` (nearest `data-spot`, else header/nav, footer, the section id, or page).
+- `src/leadEvents.ts` counts taps as Vercel Web Analytics custom events (Pro plan): `Call Click`, `Text Click`, `Email Click`, `Review Click`, `Google Profile Click`, `Directions Click` and `Instagram Click`, from one click listener started in `src/main.tsx`. Properties: `page` and `spot` (nearest `data-spot`, else footer, header/nav, the section id, or page).
+- The Google profile link (`maps.google.com/?cid=…`) counts as `Google Profile Click`, not `Directions Click`. Both Instagram links count as `Instagram Click`.
 - The contact form (`handleContactSubmit` in `src/App.tsx`) sends `Form Sent` (page + project type) when EmailJS accepts it, and `Form Error` (page) when it doesn't.
 - Two properties per event at most (Pro's limit). Never put names, emails or messages in an event.
 

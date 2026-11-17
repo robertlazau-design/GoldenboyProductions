@@ -16,7 +16,7 @@ export const isTabShown = (tab: Tab) => !HIDDEN_TABS.includes(tab);
 export const TAB_ROUTES: Record<Tab, { path: string; title: string; description: string }> = {
   home: {
     path: '/',
-    title: 'Robert Lazau — Video & Websites | Golden Boy Productions',
+    title: 'Golden Boy Productions | Video Production & Websites in Portland, OR',
     description:
       'Portland-area director and producer Robert Lazau makes commercials, short films and photos, and builds websites for Gresham and Portland small businesses.',
   },
@@ -129,7 +129,7 @@ export const canonicalUrl = (path: string) => `${SITE_URL}${path}`;
 
 const ORG = { '@type': 'Organization', name: 'Golden Boy Productions', url: `${SITE_URL}/` };
 const PERSON = { '@type': 'Person', name: 'Robert Lazau', url: `${SITE_URL}/` };
-const AREA = ['Portland, OR', 'Gresham, OR', 'Fairview, OR', 'Pacific Northwest'];
+const AREA = ['Portland, OR', 'Gresham, OR', 'Fairview, OR', 'Pacific Northwest', 'Tigard, OR', 'Oregon'];
 
 const breadcrumbs = (items: Array<[string, string]>) => ({
   '@context': 'https://schema.org',

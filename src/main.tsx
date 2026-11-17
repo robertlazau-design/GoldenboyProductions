@@ -14,7 +14,7 @@ const app = (
   </StrictMode>
 );
 
-// Count email and Instagram taps from any page (see leadEvents.ts).
+// Count call, email, review, profile and Instagram taps from any page (see leadEvents.ts).
 startLeadEvents();
 
 // Production pages are prerendered (scripts/prerender.mjs); dev serves an empty root.
