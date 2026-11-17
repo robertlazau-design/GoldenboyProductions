@@ -28,6 +28,18 @@ import bts16 from '../assets/bts/IMG_2165.webp';
 import bts17 from '../assets/bts/IMG_2540.webp';
 import bts18 from '../assets/bts/IMG_1383.webp';
 
+// Business details, matched to the verified Google Business Profile. Keep these, the
+// JSON-LD in index.html and CLAUDE.md → Business details in sync.
+// Service-area business: there is no street address, so don't add one.
+export const business = {
+  phone: '(503) 863-8966',
+  phoneHref: 'tel:+15038638966',
+  googleProfile: 'https://maps.google.com/?cid=2653123704889832847',
+  googleReview: 'https://g.page/r/CY91IOfzydEkECE/review',
+  linkedIn: 'https://www.linkedin.com/company/golden-boy-productions/',
+  instagram: 'https://www.instagram.com/goldenboyproductionss/',
+};
+
 export const biography = {
   year: "Portland, OR",
   title: "Early Vision",

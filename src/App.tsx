@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import emailjs from '@emailjs/browser';
 import { track } from '@vercel/analytics';
 import { motion, AnimatePresence, useMotionValue, useSpring } from 'motion/react';
-import { ArrowRight, ArrowLeft, Plus, Minus, Camera, X, Send, Mail } from 'lucide-react';
-import { biography, clientApproach, clientNames, consultingServices, favoriteMovies, faqs, recommendableMovies, services } from './data';
+import { ArrowRight, ArrowLeft, Plus, Minus, Camera, X, Send, Mail, Phone } from 'lucide-react';
+import { biography, business, clientApproach, clientNames, consultingServices, favoriteMovies, faqs, recommendableMovies, services } from './data';
 import robertBackground from '../assets/robert_background.jpg';
 import { TAB_ROUTES, isTabShown, pageFromPath, pageMeta, normalizePath, canonicalUrl, servicePath, ABOUT_PATH, WORK_PATH, type Tab } from './seo';
 import { AboutPage, ClickToPlay, ProjectPage, RecapPage, RecapsPage, ServicePage, WorkPage, newestFilm } from './pages';
@@ -452,6 +452,15 @@ export default function App({ initialPath }: { initialPath?: string }) {
                 className={`relative inline-block normal-case hover:text-white transition-all duration-300 cursor-pointer before:absolute before:-inset-3 before:content-[''] md:before:hidden ${activeTab === 'contact' ? 'text-gold font-semibold border-b border-gold pb-1' : ''}`}
               >
                 Contact
+              </a>
+            </li>
+            <li>
+              <a
+                href={business.phoneHref}
+                className="relative inline-flex items-center gap-2 normal-case whitespace-nowrap hover:text-white transition-all duration-300 cursor-pointer before:absolute before:-inset-3 before:content-[''] md:before:hidden"
+              >
+                <Phone size={11} className="text-gold" aria-hidden="true" />
+                <span className="sr-only">Call </span>{business.phone}
               </a>
             </li>
           </ul>
@@ -981,6 +990,12 @@ export default function App({ initialPath }: { initialPath?: string }) {
                         >
                           <Mail size={14} /> robertlazau@gmail.com
                         </a>
+                        <a
+                          href={business.phoneHref}
+                          className="mt-4 text-xs uppercase tracking-widest text-gold hover:text-white transition-colors flex items-center gap-2"
+                        >
+                          <Phone size={14} aria-hidden="true" /> <span className="sr-only">Call </span>{business.phone}
+                        </a>
                       </div>
 
                       <div className="border-t border-white/10 pt-6">
@@ -1003,6 +1018,18 @@ export default function App({ initialPath }: { initialPath?: string }) {
                             IMDb
                           </a>
                         </div>
+                      </div>
+
+                      <div className="border-t border-white/10 pt-6">
+                        <h3 className="font-serif text-lg text-white/90 mb-3">Worked with us?</h3>
+                        <a
+                          href={business.googleReview}
+                          target="_blank"
+                          rel="noopener"
+                          className="text-xs uppercase tracking-widest text-gold hover:text-white transition-colors inline-flex items-center gap-2"
+                        >
+                          Leave a Google review <ArrowRight size={14} aria-hidden="true" />
+                        </a>
                       </div>
 
                       <div className="border-t border-white/10 pt-8 flex justify-center md:justify-start">
@@ -1108,14 +1135,28 @@ export default function App({ initialPath }: { initialPath?: string }) {
             )}
             <a {...tabLink('contact')} className="hover:text-gold transition-colors">Contact</a>
           </nav>
-          <div className="flex flex-col md:flex-row justify-between items-center text-[10px] text-white/30 uppercase tracking-[0.25em]">
-            <p>© {new Date().getFullYear()} Golden Boy Productions — Robert Lazau</p>
-            <nav aria-label="Social media links" className="flex space-x-6 mt-4 md:mt-0 text-[9px] tracking-wider text-white/40">
-              <a href="https://www.instagram.com/robertrgb/?hl=en" target="_blank" rel="noopener noreferrer" className="hover:text-gold transition-colors">Instagram</a>
+          <div className="flex flex-col md:flex-row md:justify-between items-center gap-6 mb-10 pt-10 border-t border-white/5">
+            <div className="flex flex-col sm:flex-row items-center gap-x-8 gap-y-4 text-[10px] uppercase tracking-[0.25em]">
+              <a href={business.phoneHref} className="inline-flex items-center gap-2 text-paper/80 hover:text-gold transition-colors whitespace-nowrap">
+                <Phone size={12} className="text-gold" aria-hidden="true" />
+                <span className="sr-only">Call </span>{business.phone}
+              </a>
+              <a href={business.googleReview} target="_blank" rel="noopener" className="text-gold hover:text-white transition-colors whitespace-nowrap">
+                Leave a Google review
+              </a>
+            </div>
+            <nav aria-label="Social and business profiles" className="flex flex-wrap justify-center md:justify-end gap-x-6 gap-y-3 text-[9px] uppercase tracking-wider text-white/40">
+              <a href={business.instagram} target="_blank" rel="noopener" className="hover:text-gold transition-colors">Golden Boy on Instagram</a>
+              <a href="https://www.instagram.com/robertrgb/?hl=en" target="_blank" rel="noopener noreferrer" className="hover:text-gold transition-colors">Robert on Instagram</a>
+              <a href={business.linkedIn} target="_blank" rel="noopener" className="hover:text-gold transition-colors">LinkedIn</a>
+              <a href={business.googleProfile} target="_blank" rel="noopener" className="hover:text-gold transition-colors">Google profile</a>
               <a href="https://www.imdb.com/name/nm14415874/" target="_blank" rel="noopener noreferrer" className="hover:text-gold transition-colors">IMDb</a>
               <a href="mailto:robertlazau@gmail.com" className="hover:text-gold transition-colors">Email</a>
             </nav>
-            <a 
+          </div>
+          <div className="flex flex-col md:flex-row justify-between items-center text-[10px] text-white/30 uppercase tracking-[0.25em]">
+            <p className="text-center">© {new Date().getFullYear()} Golden Boy Productions — Robert Lazau</p>
+            <a
               {...tabLink('home')}
               className="mt-4 md:mt-0 font-serif italic text-gold cursor-pointer hover:text-white transition-colors"
             >
