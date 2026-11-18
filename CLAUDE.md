@@ -49,16 +49,27 @@ These match Golden Boy Productions' verified Google Business Profile. Use them e
 
 ## Brand (the one place for the look)
 
-The tokens live in `src/index.css`, in `@theme static`. Use the token classes, never hex:
+Brand v2, "Work Light" (Nov 2026). Full brand book: the Golden Boy Productions design system (https://claude.ai/artifact/RPwLHPjmLXq4EngjVhq98X). The tokens live in `src/index.css`. Use the token classes, never hex:
 
-| Token | Value | Use |
-| --- | --- | --- |
-| `gold` | `#dfb86c` | Accents, thin lines, buttons (`text-gold`, `border-gold/50`) |
-| `ink` | `#060606` | The page black (`bg-ink`) |
-| `paper` | `#f5f5f5` | Headline white (`text-paper`) |
+| Token | Overcast (default) | `.theme-dark` | Use |
+| --- | --- | --- | --- |
+| `ground` | `#ecebe6` | `#191a17` | Page background (`bg-ground`) |
+| `ground-raised` | `#f6f5f1` | `#24251f` | Cards and form fields |
+| `ink` | `#191a17` | `#ecebe6` | Text (`text-ink`), 14.6:1 |
+| `ink-muted` | `#4a4b46` | `#b9b8b1` | Secondary text. Never lighter, never `ink/40`-style opacity for text |
+| `line` | asphalt 18% | overcast 20% | Rules and card borders (`border-line`) |
+| `accent` | `#6b5000` brass | `#ebb517` gold | Gold when it has to be text: links, hovers, icons |
+| `sun` | `#ebb517` | same | October Gold. Fills only: buttons, slugline tape, the sun. Never text on Overcast (1.6:1) |
+| `on-sun` | `#191a17` | same | Text on a `sun` fill |
 
-- **Type:** Playfair Display (`font-serif`) for headings, with italics for accents. Inter (`font-sans`) for body text and small uppercase labels with wide tracking.
-- **Feel:** dark and cinematic. Film grain, a lot of black space, thin gold rules. It should feel like a title sequence, not an app.
+Also `overcast`, `asphalt`, `aluminum`, `slate`, `hi-vis` as fixed palette colors.
+
+- **Themes:** the page is Overcast (daylight). Wrap a section in `.theme-dark` for "lights down": the home header and hero, the footer, the film player.
+- **Type:** Golden Boy Gothic, our renamed cut of Special Gothic (SIL OFL), self-hosted in `public/fonts/`. `font-display` = Expanded Bold for headings; `font-sans` = Regular/Medium for text; `font-label` = Condensed Bold for uppercase labels, nav and buttons, tracking `tracking-label` (0.03em). `font-slug` = Courier Prime for sluglines and screenplay-style quotes. No italics, no wide tracking.
+- **The sun:** `SunMark` (static, `currentColor`) and `LogoMark` (draws itself) in `effects.tsx`; files in `public/brand/`. In the font, ☀ (U+2600) is the outline sun and ☼ (U+263C) the solid one.
+- **Slugline tape:** `.slug` in `index.css`. Real places and times only: `EXT. TRUCK YARD - GRESHAM, OR - MORNING`.
+- **Never:** gold italic accent words, tiny caps tracked wide, corner crop marks, gradients or glows as decoration, fake film grain, metallic gold. (A scrim over a photo is fine.)
+- **Feel:** daylight, crew not agency. It should feel like a call sheet and a truck door, not a luxury title sequence.
 
 ## Motion rules
 
@@ -82,14 +93,15 @@ The tokens live in `src/index.css`, in `@theme static`. Use the token classes, n
 
 | Effect | What it does |
 | --- | --- |
-| `LogoMark` | Hero logo, rebuilt as an SVG from the 2048px master. It draws itself. |
+| `LogoMark` | Hero sun mark, rebuilt as an SVG from the 2048px master, in `currentColor` with the v2 sturdy line. It draws itself. |
+| `SunMark` | The static sun (outline or `solid`) for the header and footer. |
 | `RevealWords` | The name comes up word by word. |
 | `.hero-spotlight` | A CSS projector beam that lands on the name. |
 | `.shine-text` | One light sweep across "Director & Producer". |
 | `Letterbox` | Widescreen bars open the first time something scrolls into view. |
 | `HoverPreview` | A silent clip plays on hover, or when centered on a phone. It loads only then. |
 | `Theater` | "Lights down" film player (native `<dialog>`). Esc or a click on the dark area closes it. |
-| `useCardGlow` + `.glow-card` | A gold light follows the mouse on cards. |
+| `useCardGlow` + `.glow-card` | A warm work light follows the mouse on cards. |
 | `.focus-grid` | Hover one card and the rest of the grid softens. |
 | `MagneticLink` | Buttons lean toward the cursor. |
 | `ClientStrip` | A slow marquee of client names. |
@@ -111,7 +123,6 @@ The tokens live in `src/index.css`, in `@theme static`. Use the token classes, n
 
 ## Known to-dos
 
-- Small labels in white/40 fail color contrast (axe `color-contrast`).
 - The home page H1 needs location keywords (the title got them in Nov 2026).
 - ProfessionalService (a LocalBusiness type) has the profile's phone, `hasMap` and `sameAs`; no street address, since it's a service-area business.
 
