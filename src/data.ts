@@ -879,8 +879,8 @@ export const homeHero = {
   films: ['Matman Trucking', 'EMOPI', 'Armadas Exterior', 'Hayes Hustle', 'Strain', 'City of Fairview'],
 };
 
-// Three films to fly through (Robert, Nov 18: more makes the scroll too long).
-// The rest of the work is in homeMore.
+// Two films to fly through: Matman and Armadas (Robert, Nov 18: more makes the
+// scroll too long, so Hayes Hustle moved down to More work). The rest is in homeMore.
 export const homeFilms: HomeFilm[] = [
   {
     word: 'MATMAN', target: 1, fit: 5.61,
@@ -902,20 +902,11 @@ export const homeFilms: HomeFilm[] = [
     text: 'A short commercial for Armadas Exterior. Cousin Jerry fumbles the tools, and the gutter wins.',
     cta: 'Start a project', to: '/contact',
   },
-  {
-    word: 'HAYES HUSTLE', target: 1, fit: 8.95,
-    loop: '/home/hayes.mp4', poster: '/home/hayes.webp',
-    kicker: '03 / Nonprofit spotlight / 2025',
-    lede: 'Kids, horses, and skills you learn with your hands.',
-    who: 'A Golden Boy production.',
-    title: 'Hayes Hustle, 2025.',
-    text: 'A spotlight on Hayes Hustle, a nonprofit that connects kids with nature, horses, and wildlife while teaching hands-on skills like podcasting and sewing.',
-    cta: 'Watch the film', to: '/work/hayes-hustle', cursor: 'Watch',
-  },
 ];
 
 // "More work": a row each, with a clip or photo that follows the mouse.
 export const homeMore = [
+  { title: 'Hayes Hustle', meta: 'Nonprofit spotlight / 2025', to: '/work/hayes-hustle', peek: '/work/clips/hayes-hustle.mp4', cursor: 'Watch' },
   { title: 'Strain', meta: 'Short film / 48 Hour Film Project / 2026', to: '/work/strain', peek: '/work/clips/strain.mp4', cursor: 'Watch' },
   { title: 'EMOPI', meta: 'Community profile / Gresham, OR / 2025', to: '/work/emopi', peek: '/home/emopi-peek.mp4', cursor: 'Watch' },
   { title: 'City of Fairview', meta: 'Disaster preparedness PSA / Fairview, OR / 2025', to: '/work/disaster-preparedness', peek: '/home/fairview.mp4', cursor: 'Watch' },
@@ -949,7 +940,14 @@ export const homeMake = {
       { src: '/work/site-kyree-films.webp', alt: 'The Kyree Films website' },
     ],
   },
-  close: { fit: 10.04, loop: '/home/close.mp4', poster: '/home/close.webp' },
+  // LET'S MAKE / ONE. The second line cycles through what Robert makes, one word a
+  // second. fit is the wider of "LET'S MAKE" and the longest word, so nothing moves.
+  close: {
+    fit: 7.1,
+    words: ['ONE.', 'FILM.', 'ART.', 'ADS.', 'PHOTOS.', 'WEBSITES.'],
+    loop: '/home/close.mp4',
+    poster: '/home/close.webp',
+  },
 };
 
 export const homeAbout =

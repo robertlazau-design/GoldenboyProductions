@@ -584,8 +584,16 @@ html.js .home-header { position: fixed; transition: transform 0.35s var(--ease-c
 .home-about img { width: 100%; max-height: 92vh; object-fit: contain; object-position: right center; filter: brightness(1.45) contrast(1.1); }
 .home-about-quote { font-size: clamp(30px, 3.2vw, 52px); line-height: 1.02; color: var(--color-sun); }
 
-/* close */
+/* close: LET'S MAKE / ONE. The second line's word changes once a second (useCloseWords) */
 .home-close { padding: 40px 2.2vw 80px; }
+.close-slot { display: grid; justify-items: start; }
+.close-w { grid-area: 1 / 1; }
+.close-slot.is-cycling .close-w {
+  opacity: 0;
+  transform: translateY(0.12em);
+  transition: opacity 0.2s var(--ease-cut), transform 0.45s var(--ease-cinematic);
+}
+.close-slot.is-cycling .close-w.on { opacity: 1; transform: none; transition-duration: 0.35s, 0.45s; }
 .home-close-phone { font-family: var(--font-display); font-weight: 700; font-size: clamp(26px, 3vw, 44px); margin-right: auto; }
 
 @media (max-width: 700px) {
