@@ -80,7 +80,7 @@ Also `overcast`, `asphalt`, `aluminum`, `slate`, `hi-vis` as fixed palette color
 - **Text:** keep all of it in the prerendered HTML. Never hide content until JavaScript runs.
 - **Libraries:** don't add animation libraries. `motion` is already in the bundle.
 - **Phones:** check that nothing makes the page scroll sideways (`scrollWidth` must equal the viewport width).
-- **Home hero (Nov 2026):** daylight, the H1 is the positioning line ("Films, photos and websites for the people who run Portland."), a real work frame with its slugline, the phone number, and the sun clock. Robert's name and title sit above the H1.
+- **Home hero (Nov 2026):** daylight, the H1 is the positioning line ("Films, photos and websites for the people who run Portland."), Robert's side-lit portrait (`assets/robert_background.jpg`) with the sun clock under it, and the phone number. Robert's name and title sit above the H1.
 - **Hero timing** follows the intro card in `index.html`. When the intro is skipped, `html.intro-seen` is set and everything starts sooner. First-visit times:
 
 | Effect | Starts at |

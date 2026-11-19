@@ -8,6 +8,7 @@ import { TAB_ROUTES, isTabShown, pageFromPath, pageMeta, normalizePath, canonica
 import { AboutPage, ClickToPlay, ProjectPage, RecapPage, RecapsPage, ServicePage, WorkPage, newestFilm } from './pages';
 import { ClientStrip, LogoMark, RevealWords, SunClock, SunMark, useCardGlow } from './effects';
 import { trackAdsConversion } from './leadEvents';
+import robertBackground from '../assets/robert_background.jpg';
 
 
 const setMeta = (selector: string, attr: string, value: string) =>
@@ -485,18 +486,15 @@ export default function App({ initialPath }: { initialPath?: string }) {
                       </div>
                     </div>
                     <div className="lg:col-span-6">
-                      <figure className="relative">
+                      <figure className="relative bg-asphalt">
                         <img
-                          src="/work/royal-brand-shoot.webp"
-                          srcSet="/work/royal-brand-shoot-720.webp 720w, /work/royal-brand-shoot.webp 1200w"
-                          sizes="(min-width: 1024px) 50vw, 100vw"
-                          alt="Sanding a cabinet door in the Royal Brand Woodworking shop"
-                          width={1200}
-                          height={800}
+                          src={robertBackground}
+                          alt="Robert Lazau in profile, lit from the side"
+                          width={1008}
+                          height={1024}
                           fetchPriority="high"
-                          className="block w-full aspect-[3/2] object-cover"
+                          className="block w-full aspect-[5/4] object-cover object-[50%_55%] brightness-125"
                         />
-                        <figcaption className="slug md:absolute md:left-0 md:bottom-0">INT. ROYAL BRAND WOODWORKING - PORTLAND, OR</figcaption>
                       </figure>
                       <SunClock className="mt-6" />
                     </div>
