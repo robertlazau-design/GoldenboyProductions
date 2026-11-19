@@ -428,6 +428,28 @@ html:has(.home) ::-webkit-scrollbar-thumb { background: rgb(236 235 230 / 0.35);
 .home-btn-ghost { background: transparent; color: var(--color-overcast); border-color: var(--color-overcast); }
 .home-btn-ghost:hover { background: var(--color-overcast); color: var(--color-asphalt); }
 
+/* the header: over the hero at the top; after that it slides away as you
+   scroll down and comes back as soon as you scroll up (data-state is set in
+   App.tsx). Without JavaScript it stays at the top of the page. */
+.home-header { position: absolute; inset-inline: 0; top: 0; z-index: 30; }
+html.js .home-header { position: fixed; transition: transform 0.35s var(--ease-cut); }
+.home-header::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--color-night);
+  border-bottom: 1px solid var(--color-line);
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+.home-header[data-state="shown"]::before,
+.home-header[data-state="hidden"]::before { opacity: 0.94; }
+.home-header[data-state="hidden"]:not(:focus-within) { transform: translateY(-100%); }
+@media (prefers-reduced-motion: reduce) {
+  html.js .home-header, .home-header::before { transition: none; }
+}
+
 /* the zoom: a stage with the film, a frame with the letters, then the text */
 .zoom { position: relative; }
 .zoom-stage { position: relative; overflow: hidden; container-type: inline-size; }

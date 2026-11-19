@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import emailjs from '@emailjs/browser';
 import { track } from '@vercel/analytics';
 import { motion, AnimatePresence, useMotionValue, useSpring } from 'motion/react';
@@ -66,6 +66,40 @@ export default function App({ initialPath }: { initialPath?: string }) {
   });
   const tabLink = (tab: Tab) => link(TAB_ROUTES[tab].path);
   useCardGlow();
+
+  // Homepage header: it sits over the film letters at the top. Once you scroll,
+  // it slides away going down (so the films get the whole screen) and comes
+  // back the moment you scroll up, anywhere on the page. State lives in
+  // data-state ("top" | "shown" | "hidden"); styles: .home-header in index.css.
+  const headerRef = useRef<HTMLElement>(null);
+  useEffect(() => {
+    const el = headerRef.current;
+    if (!el || activeTab !== 'home') return;
+    let last = window.scrollY;
+    let frame = 0;
+    const set = (state: 'top' | 'shown' | 'hidden') => {
+      if (el.dataset.state !== state) el.dataset.state = state;
+    };
+    const update = () => {
+      frame = 0;
+      const y = window.scrollY;
+      if (y < 80) set('top');
+      else if (y > last + 6) set('hidden');
+      else if (y < last - 6) set('shown');
+      else return;
+      last = y;
+    };
+    set(window.scrollY < 80 ? 'top' : 'hidden');
+    const onScroll = () => {
+      if (!frame) frame = requestAnimationFrame(update);
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => {
+      cancelAnimationFrame(frame);
+      window.removeEventListener('scroll', onScroll);
+      delete el.dataset.state;
+    };
+  }, [activeTab]);
 
   // "Get a quote" on a service page: open the contact form with that service picked.
   const QUOTE_TYPES: Record<string, string> = {
@@ -357,8 +391,8 @@ export default function App({ initialPath }: { initialPath?: string }) {
 
       <div className="relative z-10">
         {/* Navigation Header */}
-        {/* On the homepage the header sits over the film letters and scrolls away with them. */}
-        <header className={activeTab === 'home' ? 'absolute inset-x-0 top-0 z-30' : undefined}>
+        {/* On the homepage the header sits over the film letters, hides as you scroll down and comes back when you scroll up. */}
+        <header ref={headerRef} className={activeTab === 'home' ? 'home-header' : undefined}>
         <nav className={`w-full max-w-[1400px] mx-auto px-4 md:px-8 py-10 flex flex-col sm:flex-row justify-between items-center border-b gap-6 ${activeTab === 'home' ? 'border-transparent' : 'border-line'}`} aria-label="Main navigation">
           <a 
             {...tabLink('home')}
