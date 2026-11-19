@@ -52,19 +52,19 @@ export const biography = {
 export const clientApproach = {
   title: "How Robert Works",
   subtitle: "Working Together",
-  text: "Every project starts with a conversation. Robert wants to understand who you are, who you're trying to reach, and what you want them to feel, and then he builds the shoot around that. Whether it's a city PSA, a nonprofit spotlight, a website loop for a small business, or a fashion visual, the goal is the same: a film that sounds like you and looks like it belongs on the big screen.",
+  text: "Every project starts with a conversation: who you are, who you need to reach, and what they should feel. Then Robert plans the shoot around that. A city PSA, a nonprofit spotlight, a website loop for a shop or a fashion visual, the goal is the same: a film that sounds like you and shows the people who do the work.",
   points: [
     {
-      title: "Listen First",
+      title: "Listen first",
       desc: "A real conversation about your goals, your audience, and your story before any gear comes out."
     },
     {
-      title: "Plan with Purpose",
+      title: "Plan the shoot",
       desc: "Concept, shot list, locations, and schedule mapped out so the shoot runs smoothly and stays on budget."
     },
     {
-      title: "Shoot & Finish",
-      desc: "Directing, camera, and edit handled closely from start to finish, so the final piece stays true to the plan."
+      title: "Shoot and finish",
+      desc: "Robert directs, runs camera and edits, so the person you planned with is the one who finishes it."
     }
   ]
 };
@@ -72,7 +72,7 @@ export const clientApproach = {
 export const consultingServices = [
   {
     title: "Story & Script",
-    desc: "Shaping your idea into a clear, compelling story before a single frame is shot."
+    desc: "Turning your idea into a story with a clear beginning, middle and end before anything is shot."
   },
   {
     title: "Look & Visual Direction",
@@ -104,10 +104,11 @@ export type Project = {
   preview?: string;
 };
 
-// Clients named in the slow strip on the home page. Only real clients that
-// already appear on the site; Robert's own projects are left out.
+// Clients Robert has confirmed. Only these may be named on the site; his own
+// projects are left out. (Armadas Exterior: confirmed by Robert, Nov 18, 2026.)
 export const clientNames: string[] = [
   "Matman Trucking",
+  "Armadas Exterior",
   "City of Fairview",
   "Hive Recovery Collective",
   "EMOPI",
@@ -834,3 +835,140 @@ export const sunStar = {
     "For Robert, it is a nod to his Romanian roots and to craft passed down by hand: the same care he tries to bring to every frame.",
   ],
 };
+
+// ── The homepage, "Through the O" (src/home.tsx) ───────────────────────────
+// Each film plays inside its own name, and scrolling flies the camera through
+// one letter: `target` is the index in `word` of a letter with a hole in it
+// (A, D, O, P). `fit` is the word's width at a 1px font size in Golden Boy
+// Gothic Expanded, measured once, so CSS can size it to the screen with no
+// JavaScript; re-measure it if the word changes. Loops and posters live in
+// public/home. Lines come from the project text or from Robert, nothing made up.
+export type HomeFilm = {
+  word: string;
+  target: number;
+  fit: number;
+  loop: string;
+  poster: string;
+  kicker: string;
+  lede: string;
+  who: string;
+  title: string;
+  text: string;
+  cta: string;
+  to: string;
+  cursor?: string;
+};
+
+export const homeHero = {
+  word: ['GOLDEN', 'BOY'],
+  target: 1,
+  fit: 4.96,
+  loop: '/home/hero.mp4',
+  loopPortrait: '/home/hero-portrait.mp4',
+  poster: '/home/hero.webp',
+  // The reel is cut from these films; the caption names the one on screen.
+  // [first frame at 24 fps, film]
+  cuts: [
+    [0, 'Matman Trucking'], [28, 'Hayes Hustle'], [62, 'Armadas Exterior'], [77, 'EMOPI'],
+    [106, 'Matman Trucking'], [117, 'Strain'], [144, 'Hayes Hustle'], [174, 'Matman Trucking'],
+    [201, 'Armadas Exterior'], [223, 'City of Fairview'], [234, 'EMOPI'], [262, 'Matman Trucking'],
+    [284, 'Strain'], [307, 'Armadas Exterior'], [341, 'Hayes Hustle'], [366, 'EMOPI'],
+    [396, 'Matman Trucking'], [421, 'Armadas Exterior'], [449, 'EMOPI'], [479, 'Matman Trucking'],
+    [496, 'Strain'],
+  ] as Array<[number, string]>,
+  films: ['Matman Trucking', 'EMOPI', 'Armadas Exterior', 'Hayes Hustle', 'Strain', 'City of Fairview'],
+};
+
+export const homeFilms: HomeFilm[] = [
+  {
+    word: 'MATMAN', target: 1, fit: 5.61,
+    loop: '/home/matman.mp4', poster: '/home/matman.webp',
+    kicker: '01 / Commercial film + photo / Gresham, OR / 2026',
+    lede: "Oregon's first natural gas garbage transfer trucks, on film.",
+    who: 'A Golden Boy production.',
+    title: 'Matman Trucking, Gresham, 2026.',
+    text: "A website film and photo set for Matman Trucking, which runs Oregon's first natural gas garbage transfer trucks. Photo and video shot together in Gresham.",
+    cta: 'Watch the film', to: '/work/matman-trucking', cursor: 'Watch',
+  },
+  {
+    word: 'EMOPI', target: 2, fit: 3.91,
+    loop: '/home/emopi.mp4', poster: '/home/emopi.webp',
+    kicker: '02 / Community profile / Gresham, OR / 2025',
+    lede: 'The people behind EMOPI, and the kids they show up for.',
+    who: 'A Golden Boy production.',
+    title: 'EMOPI, Gresham, 2025.',
+    // The 20,000 is the program's own count, from the film's end card.
+    text: "A community profile of the people behind the EMOPI program in Gresham and the impact of their work. The film closes on the program's own count: about 20,000 youth supported.",
+    cta: 'Watch the film', to: '/work/emopi', cursor: 'Watch',
+  },
+  {
+    word: 'ARMADAS', target: 4, fit: 6.23,
+    loop: '/home/armadas.mp4', poster: '/home/armadas.webp',
+    kicker: '03 / Commercial / Armadas Exterior',
+    lede: 'Cousin Jerry versus the gutter.',
+    who: 'A Golden Boy production.',
+    title: 'Armadas Exterior.',
+    text: 'A short commercial for Armadas Exterior. Cousin Jerry fumbles the tools, and the gutter wins.',
+    cta: 'Start a project', to: '/contact',
+  },
+  {
+    word: 'HAYES HUSTLE', target: 1, fit: 8.95,
+    loop: '/home/hayes.mp4', poster: '/home/hayes.webp',
+    kicker: '04 / Nonprofit spotlight / 2025',
+    lede: 'Kids, horses, and skills you learn with your hands.',
+    who: 'A Golden Boy production.',
+    title: 'Hayes Hustle, 2025.',
+    text: 'A spotlight on Hayes Hustle, a nonprofit that connects kids with nature, horses, and wildlife while teaching hands-on skills like podcasting and sewing.',
+    cta: 'Watch the film', to: '/work/hayes-hustle', cursor: 'Watch',
+  },
+  {
+    word: 'STRAIN', target: 3, fit: 4.37,
+    loop: '/home/strain.mp4', poster: '/home/strain.webp',
+    kicker: '05 / Short film / 48 Hour Film Project / 2026',
+    lede: 'A 4/20 dark comedy, made in 48 hours.',
+    who: 'Directed and produced by Robert Lazau.',
+    title: 'Strain, 2026.',
+    text: 'Made in 48 hours for the 48 Hour Film Project, where it was nominated.',
+    cta: 'Watch the film', to: '/work/strain', cursor: 'Watch',
+  },
+];
+
+// "More work": a row each, with a clip or photo that follows the mouse.
+export const homeMore = [
+  { title: 'City of Fairview', meta: 'Disaster preparedness PSA / Fairview, OR / 2025', to: '/work/disaster-preparedness', peek: '/home/fairview.mp4', cursor: 'Watch' },
+  { title: 'Royal Brand Woodworking', meta: 'Photo shoot + website / Portland, OR / 2026', to: 'https://www.royalbrandwoodworking.com', peek: '/work/royal-brand-shoot.webp', cursor: 'View' },
+  { title: 'Refined Kollective', meta: 'Fashion visual / 2025', to: '/work/refined-kollective', peek: '/projects/refined-kollective.webp', cursor: 'Watch' },
+];
+
+// "What I make": three words with the work inside them.
+export const homeMake = {
+  films: { fit: 3.69, loop: '/home/films.mp4', poster: '/home/films.webp', note: 'Commercials, short films and community spotlights.', to: '/services/video-production' },
+  photos: {
+    fit: 4.94,
+    note: 'Photo sets on film days, and shoots of their own.',
+    to: '/work',
+    images: [
+      { src: '/home/photos/matman-175.webp', alt: 'A Matman crew member in hi-vis working on a trailer, looking up', pos: '50% 38%' },
+      { src: '/home/photos/royal-26.webp', alt: 'Red-gloved hands feeding a board into a machine at Royal Brand Woodworking', pos: '50% 55%' },
+      { src: '/work/matman-147.webp', alt: 'The Matman Trucking logo on a truck door, framed by fall leaves', pos: '50% 50%' },
+      { src: '/home/photos/royal-38.webp', alt: 'A hand guiding a board past a saw blade at Royal Brand Woodworking', pos: '50% 50%' },
+      { src: '/home/photos/matman-153.webp', alt: 'A Matman crew member in a hi-vis hoodie walking to a truck', pos: '50% 45%' },
+    ],
+  },
+  websites: {
+    fit: 6.29,
+    note: 'Built to show the work, and to get the call.',
+    to: '/services/web-design',
+    images: [
+      { src: '/work/site-royal-brand.webp', alt: 'The Royal Brand Woodworking website' },
+      { src: '/work/site-tow-guys.webp', alt: 'The Tow Guys website' },
+      { src: '/work/site-pasture-and-paw.webp', alt: 'The Pasture & Paw website' },
+      { src: '/work/site-kyree-films.webp', alt: 'The Kyree Films website' },
+    ],
+  },
+  close: { fit: 10.04, loop: '/home/close.mp4', poster: '/home/close.webp' },
+};
+
+export const homeAbout =
+  'Robert started Golden Boy Productions to tell the stories happening in his own backyard. He directs, produces, and shoots, so the person you meet on day one is the same person behind the camera and in the edit.';
+

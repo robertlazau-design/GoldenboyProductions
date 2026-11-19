@@ -3,11 +3,11 @@ import emailjs from '@emailjs/browser';
 import { track } from '@vercel/analytics';
 import { motion, AnimatePresence, useMotionValue, useSpring } from 'motion/react';
 import { ArrowRight, ArrowLeft, Plus, Minus, Camera, X, Send, Mail, Phone } from 'lucide-react';
-import { biography, business, clientApproach, clientNames, consultingServices, favoriteMovies, faqs, recommendableMovies, services } from './data';
-import robertBackground from '../assets/robert_background.jpg';
-import { TAB_ROUTES, isTabShown, pageFromPath, pageMeta, normalizePath, canonicalUrl, servicePath, ABOUT_PATH, WORK_PATH, type Tab } from './seo';
-import { AboutPage, ClickToPlay, ProjectPage, RecapPage, RecapsPage, ServicePage, WorkPage, newestFilm } from './pages';
-import { ClientStrip, LogoMark, MagneticLink, RevealWords, useCardGlow } from './effects';
+import { business, favoriteMovies, faqs, recommendableMovies, services } from './data';
+import { TAB_ROUTES, isTabShown, pageFromPath, pageMeta, normalizePath, canonicalUrl, projectPath, servicePath, ABOUT_PATH, WORK_PATH, type Tab } from './seo';
+import { AboutPage, ProjectPage, RecapPage, RecapsPage, ServicePage, WorkPage } from './pages';
+import { HomePage } from './home';
+import { SunMark, useCardGlow } from './effects';
 import { trackAdsConversion } from './leadEvents';
 
 
@@ -65,7 +65,6 @@ export default function App({ initialPath }: { initialPath?: string }) {
     },
   });
   const tabLink = (tab: Tab) => link(TAB_ROUTES[tab].path);
-  const heroFilm = newestFilm();
   useCardGlow();
 
   // "Get a quote" on a service page: open the contact form with that service picked.
@@ -309,17 +308,14 @@ export default function App({ initialPath }: { initialPath?: string }) {
   };
 
   return (
-    <div className="relative min-h-screen bg-ink text-[#e5e5e5] font-sans selection:bg-[#fff] selection:text-ink">
-      {/* Animated Film Grain Overlay */}
-      <div className="film-grain" />
-
+    <div className={`relative min-h-screen overflow-x-clip text-ink font-sans selection:bg-sun selection:text-on-sun ${activeTab === 'home' ? 'theme-dark bg-night' : 'bg-ground'}`}>
 
       {/* Custom Mouse Cursor (Desktop Only) */}
       {isDesktop && isCursorVisible && (
         <>
           {/* Outer Ring */}
           <motion.div
-            className="fixed top-0 left-0 w-8 h-8 border border-gold/70 rounded-full pointer-events-none z-[99999] -translate-x-1/2 -translate-y-1/2"
+            className="fixed top-0 left-0 w-8 h-8 border-2 border-overcast mix-blend-difference rounded-full pointer-events-none z-[99999] -translate-x-1/2 -translate-y-1/2"
             style={{
               x: cursorXSpring,
               y: cursorYSpring,
@@ -327,15 +323,15 @@ export default function App({ initialPath }: { initialPath?: string }) {
             animate={{
               scale: cursorLabel ? 0.4 : isHovered ? 1.6 : 1,
               opacity: cursorLabel ? 0 : 1,
-              borderColor: isHovered ? "#dfb86c" : "rgba(223, 184, 108, 0.7)",
-              backgroundColor: isHovered ? "rgba(223, 184, 108, 0.15)" : "rgba(223, 184, 108, 0)",
+              borderColor: isHovered ? "rgba(236, 235, 230, 1)" : "rgba(236, 235, 230, 0.8)",
+              backgroundColor: isHovered ? "rgba(236, 235, 230, 0.25)" : "rgba(236, 235, 230, 0)",
             }}
             transition={{ type: "tween", ease: "backOut", duration: 0.25 }}
           />
-          {/* Labelled cursor: a gold disc that says Play / Watch / View */}
+          {/* Labelled cursor: a sun-colored disc that says Play / Watch / View */}
           <motion.div
             aria-hidden="true"
-            className="fixed top-0 left-0 w-[76px] h-[76px] rounded-full bg-gold text-ink flex items-center justify-center pointer-events-none z-[99999] -translate-x-1/2 -translate-y-1/2 text-[10px] uppercase tracking-[0.25em] font-semibold pl-[0.25em]"
+            className="fixed top-0 left-0 w-[76px] h-[76px] rounded-full bg-sun text-on-sun flex items-center justify-center pointer-events-none z-[99999] -translate-x-1/2 -translate-y-1/2 text-[13px] uppercase font-label tracking-label font-semibold pl-[0.25em]"
             style={{
               x: cursorXSpring,
               y: cursorYSpring,
@@ -348,7 +344,7 @@ export default function App({ initialPath }: { initialPath?: string }) {
           </motion.div>
           {/* Inner Dot */}
           <motion.div
-            className="fixed top-0 left-0 w-1.5 h-1.5 bg-gold rounded-full pointer-events-none z-[99999] -translate-x-1/2 -translate-y-1/2"
+            className="fixed top-0 left-0 w-1.5 h-1.5 bg-overcast mix-blend-difference rounded-full pointer-events-none z-[99999] -translate-x-1/2 -translate-y-1/2"
             style={{
               x: cursorX,
               y: cursorY,
@@ -359,51 +355,25 @@ export default function App({ initialPath }: { initialPath?: string }) {
         </>
       )}
 
-      {/* Static Background Silhouette (Home Tab Only) */}
-      {activeTab === 'home' && (
-        <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden select-none">
-          <img 
-            src={robertBackground} 
-            className="absolute right-0 top-0 h-full w-auto object-cover object-right opacity-[0.55] md:opacity-[0.7] brightness-[1.65] pointer-events-none" 
-            alt="" 
-            aria-hidden="true"
-          />
-          <div className="absolute inset-0 bg-gradient-to-r from-ink via-ink/70 to-transparent" />
-          <div className="absolute inset-0 bg-gradient-to-t from-ink via-transparent to-ink" />
-        </div>
-      )}
-
-      {/* Background Vertical Grid Lines */}
-      <div className="pointer-events-none fixed inset-0 z-0 flex justify-center overflow-hidden opacity-10">
-        <div className="w-full max-w-[1400px] flex h-full border-x border-white/10">
-          <div className="flex-1 border-r border-white/10"></div>
-          <div className="flex-1 border-r border-white/10"></div>
-          <div className="flex-1"></div>
-        </div>
-      </div>
-
       <div className="relative z-10">
         {/* Navigation Header */}
-        <header>
-        <nav className="w-full max-w-[1400px] mx-auto px-4 md:px-8 py-10 flex flex-col sm:flex-row justify-between items-center border-b border-white/5 gap-6" aria-label="Main navigation">
+        {/* On the homepage the header sits over the film letters and scrolls away with them. */}
+        <header className={activeTab === 'home' ? 'absolute inset-x-0 top-0 z-30' : undefined}>
+        <nav className={`w-full max-w-[1400px] mx-auto px-4 md:px-8 py-10 flex flex-col sm:flex-row justify-between items-center border-b gap-6 ${activeTab === 'home' ? 'border-transparent' : 'border-line'}`} aria-label="Main navigation">
           <a 
             {...tabLink('home')}
-            className="flex items-center gap-3 font-serif italic text-white/90 text-xl tracking-wider select-none cursor-pointer hover:text-gold transition-colors group"
+            className="flex items-center gap-3 font-display text-ink text-xl select-none cursor-pointer hover:text-accent transition-colors group"
           >
-            <img 
-              src="/logo-mark-small.png" 
-              alt="Golden Boy Productions Logo" 
-              className="h-9 w-auto transition-transform duration-300 group-hover:scale-105" 
-            />
-            <span>Golden Boy Productions</span>
+            <SunMark solid className="h-9 w-9 transition-transform duration-500 group-hover:rotate-60" />
+            <span>GOLDEN BOY<span className="sr-only"> Productions</span></span>
           </a>
           {/* On phones: larger text and row spacing so the links are easy to tap (each link also gets a 12px invisible hit area). */}
-          <ul className="flex flex-wrap justify-center items-center gap-x-6 gap-y-6 md:gap-y-3 md:gap-x-12 text-xs md:text-[10px] uppercase tracking-[0.25em] text-white/50">
+          <ul className="flex flex-wrap justify-center items-center gap-x-6 gap-y-6 md:gap-y-3 md:gap-x-12 text-sm md:text-[15px] uppercase font-label tracking-label text-ink-muted">
             <li>
               <a 
                 {...tabLink('home')}
                 aria-current={activeTab === 'home' ? 'page' : undefined}
-                className={`relative inline-block normal-case hover:text-white transition-all duration-300 cursor-pointer before:absolute before:-inset-3 before:content-[''] md:before:hidden ${activeTab === 'home' ? 'text-gold font-semibold border-b border-gold pb-1' : ''}`}
+                className={`relative inline-block normal-case hover:text-ink transition-all duration-300 cursor-pointer before:absolute before:-inset-3 before:content-[''] md:before:hidden ${activeTab === 'home' ? 'text-accent font-semibold border-b border-accent pb-1' : ''}`}
               >
                 Home
               </a>
@@ -412,7 +382,7 @@ export default function App({ initialPath }: { initialPath?: string }) {
               <a 
                 {...link(WORK_PATH)}
                 aria-current={page.kind === 'work' ? 'page' : undefined}
-                className={`relative inline-block normal-case hover:text-white transition-all duration-300 cursor-pointer before:absolute before:-inset-3 before:content-[''] md:before:hidden ${(page.kind === 'work' || page.kind === 'project') ? 'text-gold font-semibold border-b border-gold pb-1' : ''}`}
+                className={`relative inline-block normal-case hover:text-ink transition-all duration-300 cursor-pointer before:absolute before:-inset-3 before:content-[''] md:before:hidden ${(page.kind === 'work' || page.kind === 'project') ? 'text-accent font-semibold border-b border-accent pb-1' : ''}`}
               >
                 Work
               </a>
@@ -421,7 +391,7 @@ export default function App({ initialPath }: { initialPath?: string }) {
               <a 
                 {...link('/services/web-design')}
                 aria-current={page.kind === 'service' && page.service.slug === 'web-design' ? 'page' : undefined}
-                className={`relative inline-block normal-case hover:text-white transition-all duration-300 cursor-pointer before:absolute before:-inset-3 before:content-[''] md:before:hidden ${page.kind === 'service' && page.service.slug === 'web-design' ? 'text-gold font-semibold border-b border-gold pb-1' : ''}`}
+                className={`relative inline-block normal-case hover:text-ink transition-all duration-300 cursor-pointer before:absolute before:-inset-3 before:content-[''] md:before:hidden ${page.kind === 'service' && page.service.slug === 'web-design' ? 'text-accent font-semibold border-b border-accent pb-1' : ''}`}
               >
                 Websites
               </a>
@@ -431,7 +401,7 @@ export default function App({ initialPath }: { initialPath?: string }) {
               <a 
                 {...tabLink('movies')}
                 aria-current={activeTab === 'movies' ? 'page' : undefined}
-                className={`relative inline-block normal-case hover:text-white transition-all duration-300 cursor-pointer before:absolute before:-inset-3 before:content-[''] md:before:hidden ${activeTab === 'movies' ? 'text-gold font-semibold border-b border-gold pb-1' : ''}`}
+                className={`relative inline-block normal-case hover:text-ink transition-all duration-300 cursor-pointer before:absolute before:-inset-3 before:content-[''] md:before:hidden ${activeTab === 'movies' ? 'text-accent font-semibold border-b border-accent pb-1' : ''}`}
               >
                 Favorite Movies
               </a>
@@ -442,7 +412,7 @@ export default function App({ initialPath }: { initialPath?: string }) {
               <a 
                 {...tabLink('recaps')}
                 aria-current={activeTab === 'recaps' || page.kind === 'recap' ? 'page' : undefined}
-                className={`relative inline-block normal-case hover:text-white transition-all duration-300 cursor-pointer before:absolute before:-inset-3 before:content-[''] md:before:hidden ${activeTab === 'recaps' || page.kind === 'recap' ? 'text-gold font-semibold border-b border-gold pb-1' : ''}`}
+                className={`relative inline-block normal-case hover:text-ink transition-all duration-300 cursor-pointer before:absolute before:-inset-3 before:content-[''] md:before:hidden ${activeTab === 'recaps' || page.kind === 'recap' ? 'text-accent font-semibold border-b border-accent pb-1' : ''}`}
               >
                 Project Recaps
               </a>
@@ -452,7 +422,7 @@ export default function App({ initialPath }: { initialPath?: string }) {
               <a 
                 {...tabLink('contact')}
                 aria-current={activeTab === 'contact' ? 'page' : undefined}
-                className={`relative inline-block normal-case hover:text-white transition-all duration-300 cursor-pointer before:absolute before:-inset-3 before:content-[''] md:before:hidden ${activeTab === 'contact' ? 'text-gold font-semibold border-b border-gold pb-1' : ''}`}
+                className={`relative inline-block normal-case hover:text-ink transition-all duration-300 cursor-pointer before:absolute before:-inset-3 before:content-[''] md:before:hidden ${activeTab === 'contact' ? 'text-accent font-semibold border-b border-accent pb-1' : ''}`}
               >
                 Contact
               </a>
@@ -460,9 +430,9 @@ export default function App({ initialPath }: { initialPath?: string }) {
             <li>
               <a
                 href={business.phoneHref}
-                className="relative inline-flex items-center gap-2 normal-case whitespace-nowrap hover:text-white transition-all duration-300 cursor-pointer before:absolute before:-inset-3 before:content-[''] md:before:hidden"
+                className="relative inline-flex items-center gap-2 normal-case whitespace-nowrap hover:text-ink transition-all duration-300 cursor-pointer before:absolute before:-inset-3 before:content-[''] md:before:hidden"
               >
-                <Phone size={11} className="text-gold" aria-hidden="true" />
+                <Phone size={11} className="text-accent" aria-hidden="true" />
                 <span className="sr-only">Call </span>{business.phone}
               </a>
             </li>
@@ -470,7 +440,7 @@ export default function App({ initialPath }: { initialPath?: string }) {
         </nav>
         </header>
 
-        <main className="w-full max-w-[1400px] mx-auto px-4 md:px-8">
+        <main className={activeTab === 'home' ? 'w-full' : 'w-full max-w-[1400px] mx-auto px-4 md:px-8'}>
           
           <AnimatePresence mode="wait" initial={false}>
             {activeTab === 'home' && (
@@ -481,198 +451,18 @@ export default function App({ initialPath }: { initialPath?: string }) {
                 exit={{ opacity: 0 }}
                 transition={{ duration: 0.4 }}
               >
-                {/* Hero Section */}
-                 <section className="hero-clip min-h-[70vh] flex flex-col justify-center items-center text-center pt-8 pb-16 relative z-10" aria-label="Hero">
-                  <div className="hero-spotlight" aria-hidden="true" />
-                  <motion.div
-                    initial={false}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1], delay: 0.2 }}
-                    className="mb-8 select-none"
-                  >
-                    <LogoMark className="h-24 md:h-32 w-auto filter drop-shadow-[0_0_20px_rgba(223,184,108,0.15)]" />
-                  </motion.div>
-                  <motion.h1 
-                    initial={false}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 1, ease: [0.16, 1, 0.3, 1], delay: 0.1 }}
-                    className="font-serif text-5xl md:text-8xl lg:text-9xl tracking-tight mb-4 text-paper"
-                  >
-                    <RevealWords text="Robert Lazau" />
-                  </motion.h1>
-                  
-                  <motion.div 
-                    initial={false}
-                    animate={{ opacity: 1 }}
-                    transition={{ duration: 1.2, delay: 0.4 }}
-                    className="text-gold/90 font-serif italic text-xl md:text-3xl mb-8 tracking-wide"
-                  >
-                    <span className="reveal-word" style={{ '--i': 3 } as React.CSSProperties}><span className="shine-text">Director & Producer</span></span>
-                  </motion.div>
-                  
-                  <motion.p 
-                    initial={false}
-                    animate={{ opacity: 1 }}
-                    transition={{ duration: 1.2, delay: 0.6 }}
-                    className="max-w-2xl text-xs md:text-sm leading-relaxed text-white/40 tracking-wider font-light mb-16"
-                  >
-                    Portland-area director and producer, and founder of Golden Boy Productions. Robert makes films for
-                    cities, nonprofits, local businesses, and fashion brands, with a cinematic eye and a real interest in their story.
-                  </motion.p>
-                </section>
-
-                {/* Newest film, right under the hero */}
-                {heroFilm && (
-                  <section className="pb-24 md:pb-32 relative z-10" aria-labelledby="newest-film">
-                    <div className="flex items-center gap-4 mb-8">
-                      <h2 id="newest-film" className="text-xs uppercase tracking-[0.25em] text-gold font-medium">Newest film</h2>
-                      <div className="flex-1 h-px bg-white/10" />
-                    </div>
-                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
-                      <ClickToPlay project={heroFilm} className="lg:col-span-8 border border-white/10" reveal />
-                      <div className="lg:col-span-4 flex flex-col gap-4">
-                        <p className="text-[11px] uppercase tracking-[0.2em] text-white/60">{heroFilm.type} · {heroFilm.year}</p>
-                        <h3 className="font-serif text-3xl md:text-4xl text-paper tracking-tight">{heroFilm.title}</h3>
-                        <p className="text-sm md:text-base text-white/60 font-light leading-relaxed">{heroFilm.description}</p>
-                        <div className="flex flex-wrap gap-3 pt-2">
-                          <MagneticLink
-                            {...link(WORK_PATH)}
-                            className="inline-flex items-center gap-3 px-7 py-4 bg-gold text-ink text-[11px] uppercase tracking-[0.25em] font-semibold hover:bg-white transition-colors"
-                          >
-                            See the work <ArrowRight size={14} />
-                          </MagneticLink>
-                          <MagneticLink
-                            {...tabLink('contact')}
-                            className="inline-flex items-center gap-3 px-7 py-4 border border-gold/50 text-paper text-[11px] uppercase tracking-[0.25em] hover:border-gold hover:text-gold transition-colors"
-                          >
-                            Start a project
-                          </MagneticLink>
-                        </div>
-                      </div>
-                    </div>
-                  </section>
-                )}
-
-                {/* Clients, drifting slowly sideways */}
-                <ClientStrip names={clientNames} label="Made for" />
-
-                {/* Biography Section */}
-                <motion.section 
-                  id="biography" 
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, margin: "-100px" }}
-                  transition={{ duration: 0.8, ease: "easeOut" }}
-                  className="py-28 md:py-44 border-t border-white/5 scroll-mt-12"
-                  aria-label="Biography"
-                >
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-24 items-center">
-                    
-                    <div className="relative group">
-                      <div className="aspect-[3/4] overflow-hidden bg-white/5 border border-white/10 max-w-md mx-auto md:ml-0">
-                        <img 
-                          src={biography.image} 
-                          alt="Portrait of director Robert Lazau"
-                          loading="lazy" 
-                          className="w-full h-full object-cover opacity-100 brightness-110 group-hover:brightness-125 group-hover:scale-105 transition-all duration-1000 ease-out"
-                        />
-                      </div>
-                    </div>
-                    
-                    <div className="flex flex-col items-start max-w-md mx-auto md:mx-0">
-                      <span className="text-[10px] text-gold tracking-[0.3em] uppercase mb-3">{biography.year}</span>
-                      <h2 className="font-serif text-4xl md:text-6xl mb-6 text-paper tracking-tight">Biography</h2>
-                      <div className="space-y-6 text-sm text-white/60 font-light leading-relaxed">
-                        {biography.text.split('\n\n').map((paragraph, i) => <p key={i}>{paragraph}</p>)}
-                        <p className="italic font-serif text-gold/70 text-lg border-l border-gold/30 pl-4 py-1">
-                          "{biography.quote}"
-                        </p>
-                      </div>
-                      <a {...link(ABOUT_PATH)} className="mt-8 inline-flex items-center gap-2 text-[10px] uppercase tracking-[0.25em] text-gold hover:text-white transition-colors">
-                        More about Robert <ArrowRight size={12} />
-                      </a>
-                    </div>
-
-                  </div>
-                </motion.section>
-
-                {/* Approach to Clientele Section */}
-                <motion.section 
-                  id="approach-to-clientele" 
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, margin: "-100px" }}
-                  transition={{ duration: 0.8, ease: "easeOut" }}
-                  className="py-28 md:py-40 border-t border-white/5"
-                  aria-label="How Robert Works"
-                >
-                  <div className="flex flex-col mb-16">
-                    <span className="text-[10px] text-white/40 tracking-[0.3em] uppercase mb-3">{clientApproach.subtitle}</span>
-                    <h2 className="font-serif text-4xl md:text-6xl text-paper tracking-tight">{clientApproach.title}</h2>
-                  </div>
-                  
-                  <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
-                    <div className="lg:col-span-5 text-sm md:text-base text-white/50 leading-relaxed font-light">
-                      <p>{clientApproach.text}</p>
-                    </div>
-                    
-                    <div className="lg:col-span-7 grid grid-cols-1 md:grid-cols-3 gap-8">
-                      {clientApproach.points.map((point, index) => (
-                        <div key={index} className="border-t border-white/10 pt-6 flex flex-col">
-                          <span className="text-[10px] text-gold tracking-widest font-semibold mb-3">0{index + 1}/</span>
-                          <h3 className="font-serif text-lg text-white/90 mb-2">{point.title}</h3>
-                          <p className="text-[11px] text-white/40 leading-relaxed font-light">{point.desc}</p>
-                        </div>
+                {/* "Through the O": films inside the letters (src/home.tsx) */}
+                <HomePage link={link}>
+                  <section id="faq" className="py-28 px-4 max-w-4xl mx-auto border-t border-line scroll-mt-12" aria-label="Frequently Asked Questions">
+                    <span className="home-mono text-aluminum mb-3 block">Questions</span>
+                    <h2 className="font-display text-4xl md:text-6xl mb-16 text-ink">FAQ</h2>
+                    <div className="space-y-4">
+                      {faqs.map((faq, index) => (
+                        <FAQItem key={index} question={faq.question} answer={faq.answer} />
                       ))}
                     </div>
-                  </div>
-                </motion.section>
-
-                {/* Media Consulting Services Section */}
-                <motion.section 
-                  id="media-consulting-services" 
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, margin: "-100px" }}
-                  transition={{ duration: 0.8, ease: "easeOut" }}
-                  className="py-28 md:py-40 border-t border-white/5"
-                  aria-label="Media Consulting Services"
-                >
-                  <div className="flex flex-col mb-16 text-center md:text-left">
-                    <span className="text-[10px] text-white/40 tracking-[0.3em] uppercase mb-3">EXPERT GUIDANCE</span>
-                    <h2 className="font-serif text-4xl md:text-6xl text-paper tracking-tight">Media Consulting Services</h2>
-                    <p className="max-w-2xl text-xs md:text-sm text-white/50 leading-relaxed font-light mt-4 mx-auto md:mx-0">
-                      Have a project and want a second set of eyes? Robert offers one-on-one guidance for filmmakers, creators, and organizations at any stage, from first idea to final cut.
-                    </p>
-                    <a {...link('/services/media-consulting')} className="mt-6 inline-flex items-center justify-center md:justify-start gap-2 text-[10px] uppercase tracking-[0.25em] text-gold hover:text-white transition-colors">
-                      Media consulting details <ArrowRight size={12} />
-                    </a>
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-                    {consultingServices.map((service, index) => (
-                      <div 
-                        key={index} 
-                        className="border border-white/5 bg-white/[0.01] p-6 md:p-8 hover:border-white/20 transition-all duration-300 flex flex-col group"
-                      >
-                        <span className="text-[10px] text-gold tracking-widest font-semibold mb-4 block">SERVICE 0{index + 1}/</span>
-                        <h3 className="font-serif text-xl text-white/90 mb-4 group-hover:text-gold transition-colors">{service.title}</h3>
-                        <p className="text-xs text-white/40 leading-relaxed font-light mt-auto">{service.desc}</p>
-                      </div>
-                    ))}
-                  </div>
-                </motion.section>
-
-                {/* FAQ Section */}
-                <section id="faq" className="py-28 max-w-4xl mx-auto border-t border-white/5 scroll-mt-12" aria-label="Frequently Asked Questions">
-                  <span className="text-[10px] text-white/40 tracking-[0.3em] uppercase mb-3 block">QUESTIONS</span>
-                  <h2 className="font-serif italic text-4xl md:text-6xl mb-16 text-paper">FAQ</h2>
-                  <div className="space-y-4">
-                    {faqs.map((faq, index) => (
-                      <FAQItem key={index} question={faq.question} answer={faq.answer} />
-                    ))}
-                  </div>
-                </section>
+                  </section>
+                </HomePage>
               </motion.div>
             )}
 
@@ -686,10 +476,10 @@ export default function App({ initialPath }: { initialPath?: string }) {
               >
                 {/* Favorite Movies / Blog Reviews Section */}
                 <section id="favorite-movies" className="py-16 scroll-mt-12">
-                  <div className="flex justify-between items-end mb-16 border-b border-white/5 pb-6">
+                  <div className="flex justify-between items-end mb-16 border-b border-line pb-6">
                     <div>
-                      <span className="text-[10px] text-white/40 tracking-[0.3em] uppercase mb-2 block">FILM DIARY & REVIEWS</span>
-                      <h1 className="font-serif italic text-4xl md:text-6xl text-paper tracking-tight">Favorite Movies Blog</h1>
+                      <span className="text-[13px] text-ink-muted tracking-label uppercase font-label mb-2 block">FILM DIARY & REVIEWS</span>
+                      <h1 className="font-display text-4xl md:text-6xl text-ink tracking-tight">Favorite Movies Blog</h1>
                     </div>
                     <div className="flex items-center gap-4">
                       <button 
@@ -697,7 +487,7 @@ export default function App({ initialPath }: { initialPath?: string }) {
                           setShowRecForm(!showRecForm);
                           setRecSent(false);
                         }}
-                        className="px-5 py-2.5 rounded-full border border-white/20 text-white/80 text-[10px] uppercase tracking-widest hover:bg-white hover:text-black hover:border-white transition-all duration-300 flex items-center gap-2 font-medium cursor-pointer"
+                        className="px-5 py-2.5 rounded-full border border-ink/40 text-ink text-[13px] uppercase font-label tracking-label hover:bg-ink hover:text-ground hover:border-ink transition-all duration-300 flex items-center gap-2 font-medium cursor-pointer"
                       >
                         {showRecForm ? 'Close Recommender' : 'Recommend a Movie'}
                       </button>
@@ -714,13 +504,13 @@ export default function App({ initialPath }: { initialPath?: string }) {
                         transition={{ duration: 0.4, ease: "easeInOut" }}
                         className="overflow-hidden mb-16"
                       >
-                        <div className="border border-white/10 bg-white/[0.02] p-6 md:p-8 rounded-sm backdrop-blur-sm">
-                          <h3 className="font-serif text-2xl mb-2 text-white/90">Recommend a Film Masterpiece</h3>
-                          <p className="text-[10px] text-white/30 mb-6 uppercase tracking-wider">Search our curated list or type in any film</p>
+                        <div className="border border-line bg-ground-raised p-6 md:p-8 rounded-sm backdrop-blur-sm">
+                          <h3 className="font-display text-2xl mb-2 text-ink">Recommend a Film Masterpiece</h3>
+                          <p className="text-[13px] text-ink-muted mb-6 uppercase font-label tracking-label">Search our curated list or type in any film</p>
                           <form onSubmit={handleRecSubmit} className="space-y-6">
                             {/* Movie Search with Autocomplete */}
                             <div>
-                              <label className="block text-[9px] uppercase tracking-widest text-white/40 mb-2">Movie Title *</label>
+                              <label className="block text-[13px] uppercase font-label tracking-label text-ink-muted mb-2">Movie Title *</label>
                               <div className="relative">
                                 <input 
                                   type="text"
@@ -733,14 +523,14 @@ export default function App({ initialPath }: { initialPath?: string }) {
                                   }}
                                   onFocus={() => setRecDropdownOpen(true)}
                                   placeholder="Type a movie title, director, or year..."
-                                  className="w-full bg-black/40 border border-white/10 px-4 py-3 text-sm text-white focus:outline-none focus:border-gold transition-colors"
+                                  className="w-full bg-ground-raised border border-line px-4 py-3 text-sm text-ink focus:outline-none focus:border-accent transition-colors"
                                   autoComplete="off"
                                 />
                                 {recSearchQuery && (
                                   <button 
                                     type="button"
                                     onClick={() => { setRecSearchQuery(''); setRecMovieTitle(''); setRecMovieDirector(''); setRecMovieYear(''); setRecDropdownOpen(false); }}
-                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-white/30 hover:text-white/60 transition-colors cursor-pointer"
+                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-ink-muted hover:text-ink-muted transition-colors cursor-pointer"
                                   >
                                     <X size={14} />
                                   </button>
@@ -753,7 +543,7 @@ export default function App({ initialPath }: { initialPath?: string }) {
                                     m.year.includes(query)
                                   ).slice(0, 8);
                                   return filtered.length > 0 ? (
-                                    <div className="absolute z-50 left-0 right-0 top-full mt-1 bg-[#111] border border-white/10 max-h-[280px] overflow-y-auto shadow-2xl">
+                                    <div className="absolute z-50 left-0 right-0 top-full mt-1 bg-ground-raised border border-line max-h-[280px] overflow-y-auto">
                                       {filtered.map((movie, idx) => (
                                         <button
                                           key={idx}
@@ -765,10 +555,10 @@ export default function App({ initialPath }: { initialPath?: string }) {
                                             setRecSearchQuery(movie.title);
                                             setRecDropdownOpen(false);
                                           }}
-                                          className="w-full text-left px-4 py-3 hover:bg-white/5 transition-colors border-b border-white/5 last:border-0 cursor-pointer group"
+                                          className="w-full text-left px-4 py-3 hover:bg-ground-raised transition-colors border-b border-line last:border-0 cursor-pointer group"
                                         >
-                                          <span className="text-sm text-white/90 group-hover:text-gold transition-colors">{movie.title}</span>
-                                          <span className="block text-[10px] text-white/40 mt-0.5">{movie.director} — {movie.year}</span>
+                                          <span className="text-sm text-ink group-hover:text-accent transition-colors">{movie.title}</span>
+                                          <span className="block text-[15px] text-ink-muted mt-0.5">{movie.director} — {movie.year}</span>
                                         </button>
                                       ))}
                                     </div>
@@ -780,24 +570,24 @@ export default function App({ initialPath }: { initialPath?: string }) {
                             {/* Director & Year (auto-filled from selection, or free-text) */}
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                               <div className="md:col-span-2">
-                                <label className="block text-[9px] uppercase tracking-widest text-white/40 mb-2">Director</label>
+                                <label className="block text-[13px] uppercase font-label tracking-label text-ink-muted mb-2">Director</label>
                                 <input 
                                   type="text"
                                   value={recMovieDirector}
                                   onChange={(e) => setRecMovieDirector(e.target.value)}
                                   placeholder="e.g., Christopher Nolan"
-                                  className="w-full bg-black/40 border border-white/10 px-4 py-3 text-sm text-white focus:outline-none focus:border-gold transition-colors"
+                                  className="w-full bg-ground-raised border border-line px-4 py-3 text-sm text-ink focus:outline-none focus:border-accent transition-colors"
                                 />
                               </div>
                               <div>
-                                <label className="block text-[9px] uppercase tracking-widest text-white/40 mb-2">Year</label>
+                                <label className="block text-[13px] uppercase font-label tracking-label text-ink-muted mb-2">Year</label>
                                 <input 
                                   type="text"
                                   value={recMovieYear}
                                   onChange={(e) => setRecMovieYear(e.target.value)}
                                   placeholder="e.g., 2023"
                                   maxLength={4}
-                                  className="w-full bg-black/40 border border-white/10 px-4 py-3 text-sm text-white focus:outline-none focus:border-gold transition-colors"
+                                  className="w-full bg-ground-raised border border-line px-4 py-3 text-sm text-ink focus:outline-none focus:border-accent transition-colors"
                                 />
                               </div>
                             </div>
@@ -805,23 +595,23 @@ export default function App({ initialPath }: { initialPath?: string }) {
                             {/* Name & Comment */}
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                               <div>
-                                <label className="block text-[9px] uppercase tracking-widest text-white/40 mb-2">Your Name</label>
+                                <label className="block text-[13px] uppercase font-label tracking-label text-ink-muted mb-2">Your Name</label>
                                 <input 
                                   type="text" 
                                   value={recName}
                                   onChange={(e) => setRecName(e.target.value)}
                                   placeholder="e.g., Jane Doe (Leave blank for Anonymous)"
-                                  className="w-full bg-black/40 border border-white/10 px-4 py-3 text-sm text-white focus:outline-none focus:border-gold transition-colors"
+                                  className="w-full bg-ground-raised border border-line px-4 py-3 text-sm text-ink focus:outline-none focus:border-accent transition-colors"
                                 />
                               </div>
                               <div>
-                                <label className="block text-[9px] uppercase tracking-widest text-white/40 mb-2">Why should Robert watch this film?</label>
+                                <label className="block text-[13px] uppercase font-label tracking-label text-ink-muted mb-2">Why should Robert watch this film?</label>
                                 <input 
                                   type="text"
                                   value={recComment}
                                   onChange={(e) => { setRecComment(e.target.value); setRecError(''); }}
                                   placeholder="A brief note on why you recommend this..."
-                                  className="w-full bg-black/40 border border-white/10 px-4 py-3 text-sm text-white focus:outline-none focus:border-gold transition-colors"
+                                  className="w-full bg-ground-raised border border-line px-4 py-3 text-sm text-ink focus:outline-none focus:border-accent transition-colors"
                                 />
                               </div>
                             </div>
@@ -829,14 +619,14 @@ export default function App({ initialPath }: { initialPath?: string }) {
                             {/* Error message */}
                             {recError && (
                               <div className="border border-red-900/30 bg-red-500/5 px-4 py-3 rounded-sm">
-                                <p className="text-[11px] text-red-400 font-medium">{recError}</p>
+                                <p className="text-[15px] text-red-400 font-medium">{recError}</p>
                               </div>
                             )}
 
                             {/* Success message */}
                             {recSent && (
-                              <div className="border border-gold/30 bg-gold/5 px-4 py-3 rounded-sm">
-                                <p className="text-[11px] text-gold font-medium">Thanks! Your recommendation was sent to Robert.</p>
+                              <div className="border border-accent/30 bg-sun/15 px-4 py-3 rounded-sm">
+                                <p className="text-[15px] text-accent font-medium">Thanks! Your recommendation was sent to Robert.</p>
                               </div>
                             )}
 
@@ -844,14 +634,14 @@ export default function App({ initialPath }: { initialPath?: string }) {
                               <button
                                 type="submit"
                                 disabled={recSending}
-                                className="px-6 py-2.5 rounded-sm bg-gold text-black text-[10px] uppercase tracking-widest hover:bg-white transition-all font-semibold cursor-pointer disabled:opacity-50 disabled:cursor-wait"
+                                className="px-6 py-2.5 rounded-sm bg-sun text-on-sun text-[13px] uppercase font-label tracking-label hover:bg-ink hover:text-ground transition-all font-semibold cursor-pointer disabled:opacity-50 disabled:cursor-wait"
                               >
                                 {recSending ? 'Sending...' : 'Submit Recommendation'}
                               </button>
                               <button 
                                 type="button" 
                                 onClick={() => { setShowRecForm(false); setRecError(''); setRecSent(false); }}
-                                className="px-6 py-2.5 rounded-sm border border-white/20 text-white/60 text-[10px] uppercase tracking-widest hover:text-white hover:border-white transition-all cursor-pointer"
+                                className="px-6 py-2.5 rounded-sm border border-ink/40 text-ink-muted text-[13px] uppercase font-label tracking-label hover:text-ink hover:border-ink transition-all cursor-pointer"
                               >
                                 Cancel
                               </button>
@@ -865,12 +655,12 @@ export default function App({ initialPath }: { initialPath?: string }) {
                   {/* Blog Style Movie Review List */}
                   <div className="space-y-24">
                     {reviews.length === 0 ? (
-                      <div className="text-center py-24 border border-dashed border-white/10 rounded-sm bg-white/[0.01]">
-                        <span className="text-gold text-[10px] uppercase tracking-widest font-semibold block mb-2">COMING SOON</span>
-                        <p className="text-sm text-white/40 font-light mb-6">Robert's first film reviews are on the way. In the meantime, tell him what to watch.</p>
+                      <div className="text-center py-24 border border-dashed border-line rounded-sm bg-ground-raised">
+                        <span className="text-accent text-[13px] uppercase font-label tracking-label font-semibold block mb-2">COMING SOON</span>
+                        <p className="text-sm text-ink-muted mb-6">Robert's first film reviews are on the way. In the meantime, tell him what to watch.</p>
                         <button 
                           onClick={() => setShowRecForm(true)} 
-                          className="px-6 py-2.5 rounded-full border border-white/20 text-white/70 text-[10px] uppercase tracking-widest hover:bg-white hover:text-black hover:border-white transition-all cursor-pointer font-medium"
+                          className="px-6 py-2.5 rounded-full border border-ink/40 text-ink text-[13px] uppercase font-label tracking-label hover:bg-ink hover:text-ground hover:border-ink transition-all cursor-pointer font-medium"
                         >
                           Recommend a Movie
                         </button>
@@ -879,19 +669,19 @@ export default function App({ initialPath }: { initialPath?: string }) {
                       reviews.map((movie, index) => (
                         <article 
                           key={movie.id} 
-                          className="border-t border-white/10 pt-16 flex flex-col gap-8 group"
+                          className="border-t border-line pt-16 flex flex-col gap-8 group"
                         >
                           {/* Article Meta Header */}
-                          <div className="flex flex-col md:flex-row md:items-center justify-between text-[10px] text-white/40 uppercase tracking-[0.2em] border-b border-white/5 pb-4">
+                          <div className="flex flex-col md:flex-row md:items-center justify-between text-[13px] text-ink-muted uppercase font-label tracking-label border-b border-line pb-4">
                             <div className="flex items-center gap-4 mb-2 md:mb-0">
-                              <span className="text-gold font-semibold">0{index + 1}/ MOVIE REVIEW</span>
+                              <span className="text-accent font-semibold">0{index + 1}/ MOVIE REVIEW</span>
                               <span>•</span>
                               <span>Directed by {movie.director}</span>
                             </div>
                             <div className="flex items-center gap-4">
-                              <span>{movie.year} · {movie.duration}</span>
+                              <span>{movie.year} / {movie.duration}</span>
                               <span>•</span>
-                              <span className="text-gold">★ {movie.rating}/10</span>
+                              <span className="text-accent">★ {movie.rating}/10</span>
                             </div>
                           </div>
 
@@ -900,10 +690,10 @@ export default function App({ initialPath }: { initialPath?: string }) {
                             {/* Left Column: Title & Action */}
                             <div className="lg:col-span-4 flex flex-col justify-between md:h-full min-h-[140px]">
                               <div>
-                                <h3 className="font-serif text-3xl md:text-5xl text-paper tracking-tight leading-tight mb-4 group-hover:text-gold transition-colors">
+                                <h3 className="font-display text-3xl md:text-5xl text-ink tracking-tight leading-tight mb-4 group-hover:text-accent transition-colors">
                                   {movie.title}
                                 </h3>
-                                <p className="text-[9px] text-white/30 tracking-widest uppercase">
+                                <p className="text-[13px] text-ink-muted tracking-label uppercase font-label">
                                   CRITIQUE BY ROBERT LAZAU
                                 </p>
                               </div>
@@ -912,7 +702,7 @@ export default function App({ initialPath }: { initialPath?: string }) {
 
                             {/* Right Column: Image Still and Full Review Text */}
                             <div className="lg:col-span-8 space-y-6">
-                              <div className="aspect-[2.35/1] w-full overflow-hidden bg-white/5 border border-white/10">
+                              <div className="aspect-[2.35/1] w-full overflow-hidden bg-ground-raised border border-line">
                                 <img 
                                   src={movie.image} 
                                   alt={movie.title} 
@@ -920,9 +710,9 @@ export default function App({ initialPath }: { initialPath?: string }) {
                                   className="w-full h-full object-cover grayscale brightness-90 group-hover:scale-101 group-hover:brightness-100 group-hover:grayscale-0 transition-all duration-700 ease-out"
                                 />
                               </div>
-                              <div className="text-sm md:text-base text-white/60 font-light leading-relaxed space-y-4 max-w-2xl">
+                              <div className="text-sm md:text-base text-ink-muted leading-relaxed space-y-4 max-w-2xl">
                                 {movie.description.split('\n\n').map((paragraph, pIdx) => (
-                                  <p key={pIdx} className="font-sans font-light">{paragraph}</p>
+                                  <p key={pIdx} className="font-sans">{paragraph}</p>
                                 ))}
                               </div>
                             </div>
@@ -974,41 +764,41 @@ export default function App({ initialPath }: { initialPath?: string }) {
                 {/* Contact Page */}
                 <section id="contact-page" className="py-16 max-w-4xl mx-auto" aria-label="Contact Robert Lazau">
                   <div className="text-center mb-16">
-                    <span className="text-[10px] text-white/40 tracking-[0.3em] uppercase mb-3 block">COLLABORATION & COMMISSION</span>
-                    <h1 className="font-serif italic text-4xl md:text-6xl text-paper tracking-tight">Contact Robert</h1>
+                    <span className="text-[13px] text-ink-muted tracking-label uppercase font-label mb-3 block">COLLABORATION & COMMISSION</span>
+                    <h1 className="font-display text-4xl md:text-6xl text-ink tracking-tight">Contact Robert</h1>
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-12 gap-12 items-start">
                     
                     {/* Left: Contact Info */}
                     <div className="md:col-span-5 space-y-8">
-                      <div className="border-t border-white/10 pt-6">
-                        <h3 className="font-serif text-lg text-white/90 mb-2">General Inquiries</h3>
-                        <p className="text-sm text-white/50 leading-relaxed font-light mb-4">
+                      <div className="border-t border-line pt-6">
+                        <h3 className="font-display text-lg text-ink mb-2">General Inquiries</h3>
+                        <p className="text-sm text-ink-muted leading-relaxed mb-4">
                           For brand campaigns, community and nonprofit films, events, and creative collaborations. Tell Robert about your project and he'll get back to you.
                         </p>
                         <a 
                           href="mailto:robertlazau@gmail.com" 
-                          className="text-xs uppercase tracking-widest text-gold hover:text-white transition-colors flex items-center gap-2"
+                          className="text-xs uppercase font-label tracking-label text-accent hover:text-ink transition-colors flex items-center gap-2"
                         >
                           <Mail size={14} /> robertlazau@gmail.com
                         </a>
                         <a
                           href={business.phoneHref}
-                          className="mt-4 text-xs uppercase tracking-widest text-gold hover:text-white transition-colors flex items-center gap-2"
+                          className="mt-4 text-xs uppercase font-label tracking-label text-accent hover:text-ink transition-colors flex items-center gap-2"
                         >
                           <Phone size={14} aria-hidden="true" /> <span className="sr-only">Call </span>{business.phone}
                         </a>
                       </div>
 
-                      <div className="border-t border-white/10 pt-6">
-                        <h3 className="font-serif text-lg text-white/90 mb-2">Professional Socials</h3>
+                      <div className="border-t border-line pt-6">
+                        <h3 className="font-display text-lg text-ink mb-2">Professional Socials</h3>
                         <div className="grid grid-cols-2 gap-4 text-center mt-4">
                           <a 
                             href="https://www.instagram.com/robertrgb/?hl=en" 
                             target="_blank" 
                             rel="noopener noreferrer"
-                            className="border border-white/5 hover:border-white/20 bg-white/[0.01] hover:bg-white/[0.03] py-4 text-[9px] uppercase tracking-widest text-white/60 hover:text-gold transition-all"
+                            className="border border-line hover:border-ink/40 bg-ground-raised hover:bg-ground-raised py-4 text-[13px] uppercase font-label tracking-label text-ink-muted hover:text-accent transition-all"
                           >
                             Instagram
                           </a>
@@ -1016,100 +806,100 @@ export default function App({ initialPath }: { initialPath?: string }) {
                             href="https://www.imdb.com/name/nm14415874/" 
                             target="_blank" 
                             rel="noreferrer"
-                            className="border border-white/5 hover:border-white/20 bg-white/[0.01] hover:bg-white/[0.03] py-4 text-[9px] uppercase tracking-widest text-white/60 hover:text-gold transition-all"
+                            className="border border-line hover:border-ink/40 bg-ground-raised hover:bg-ground-raised py-4 text-[13px] uppercase font-label tracking-label text-ink-muted hover:text-accent transition-all"
                           >
                             IMDb
                           </a>
                         </div>
                       </div>
 
-                      <div className="border-t border-white/10 pt-6">
-                        <h3 className="font-serif text-lg text-white/90 mb-3">Worked with us?</h3>
+                      <div className="border-t border-line pt-6">
+                        <h3 className="font-display text-lg text-ink mb-3">Worked with us?</h3>
                         <a
                           href={business.googleReview}
                           target="_blank"
                           rel="noopener"
-                          className="text-xs uppercase tracking-widest text-gold hover:text-white transition-colors inline-flex items-center gap-2"
+                          className="text-xs uppercase font-label tracking-label text-accent hover:text-ink transition-colors inline-flex items-center gap-2"
                         >
                           Leave a Google review <ArrowRight size={14} aria-hidden="true" />
                         </a>
                       </div>
 
-                      <div className="border-t border-white/10 pt-8 flex justify-center md:justify-start">
-                        <img 
-                          src="/logo-full.png" 
-                          alt="Golden Boy Productions Logo" 
-                          className="h-28 md:h-36 w-auto opacity-70 hover:opacity-100 transition-opacity duration-300 select-none filter drop-shadow-[0_0_15px_rgba(223,184,108,0.1)]" 
+                      <div className="border-t border-line pt-8 flex justify-center md:justify-start">
+                        <img
+                          src="/brand/gb-lockup-stacked.svg"
+                          alt="Golden Boy Productions"
+                          className="h-14 md:h-16 w-auto select-none"
                         />
                       </div>
                     </div>
 
                     {/* Right: Contact Form */}
-                    <div className="md:col-span-7 bg-white/[0.01] border border-white/5 p-6 md:p-8 rounded-sm">
-                      <h3 className="font-serif text-xl text-white/90 mb-6">Send a Message</h3>
+                    <div className="md:col-span-7 bg-ground-raised border border-line p-6 md:p-8 rounded-sm">
+                      <h3 className="font-display text-xl text-ink mb-6">Send a Message</h3>
                       <form onSubmit={handleContactSubmit} className="space-y-6">
                         <div>
-                          <label className="block text-[9px] uppercase tracking-widest text-white/40 mb-2">Your Name *</label>
+                          <label className="block text-[13px] uppercase font-label tracking-label text-ink-muted mb-2">Your Name *</label>
                           <input 
                             type="text" 
                             required
                             value={contactName}
                             onChange={(e) => setContactName(e.target.value)}
                             placeholder="John Doe"
-                            className="w-full bg-black/40 border border-white/10 px-4 py-3 text-sm text-white focus:outline-none focus:border-gold transition-colors"
+                            className="w-full bg-ground-raised border border-line px-4 py-3 text-sm text-ink focus:outline-none focus:border-accent transition-colors"
                           />
                         </div>
 
                         <div>
-                          <label className="block text-[9px] uppercase tracking-widest text-white/40 mb-2">Email Address *</label>
+                          <label className="block text-[13px] uppercase font-label tracking-label text-ink-muted mb-2">Email Address *</label>
                           <input 
                             type="email" 
                             required
                             value={contactEmail}
                             onChange={(e) => setContactEmail(e.target.value)}
                             placeholder="john@example.com"
-                            className="w-full bg-black/40 border border-white/10 px-4 py-3 text-sm text-white focus:outline-none focus:border-gold transition-colors"
+                            className="w-full bg-ground-raised border border-line px-4 py-3 text-sm text-ink focus:outline-none focus:border-accent transition-colors"
                           />
                         </div>
 
                         <div>
-                          <label htmlFor="contact-type" className="block text-[9px] uppercase tracking-widest text-white/40 mb-2">Project / Inquiry Type</label>
+                          <label htmlFor="contact-type" className="block text-[13px] uppercase font-label tracking-label text-ink-muted mb-2">Project / Inquiry Type</label>
                           <select 
                             id="contact-type"
                             value={contactType}
                             onChange={(e) => setContactType(e.target.value)}
-                            className="w-full bg-black/40 border border-white/10 px-4 py-3 text-sm text-white focus:outline-none focus:border-gold transition-colors appearance-none"
+                            className="w-full bg-ground-raised border border-line px-4 py-3 text-sm text-ink focus:outline-none focus:border-accent transition-colors appearance-none"
                           >
-                            <option value="Commercial / Brand Campaign" className="bg-ink">Commercial / Brand Campaign</option>
-                            <option value="Community or Nonprofit Film" className="bg-ink">Community or Nonprofit Film</option>
-                            <option value="PSA / Public Sector" className="bg-ink">PSA / Public Sector</option>
-                            <option value="Fashion Visual" className="bg-ink">Fashion Visual</option>
-                            <option value="Event Coverage" className="bg-ink">Event Coverage</option>
-                            <option value="Website Design" className="bg-ink">Website Design</option>
-                            <option value="Website Visual / Promo" className="bg-ink">Website Visual / Promo</option>
-                            <option value="Music Video" className="bg-ink">Music Video</option>
-                            <option value="Short or Feature Film" className="bg-ink">Short or Feature Film</option>
-                            <option value="Media Consulting" className="bg-ink">Media Consulting</option>
-                            <option value="Press / Other" className="bg-ink">Press / Other</option>
+                            <option value="Commercial / Brand Campaign" className="bg-ground">Commercial / Brand Campaign</option>
+                            <option value="Community or Nonprofit Film" className="bg-ground">Community or Nonprofit Film</option>
+                            <option value="PSA / Public Sector" className="bg-ground">PSA / Public Sector</option>
+                            <option value="Fashion Visual" className="bg-ground">Fashion Visual</option>
+                            <option value="Event Coverage" className="bg-ground">Event Coverage</option>
+                            <option value="Website Design" className="bg-ground">Website Design</option>
+                            <option value="Website Visual / Promo" className="bg-ground">Website Visual / Promo</option>
+                            <option value="Music Video" className="bg-ground">Music Video</option>
+                            <option value="Short or Feature Film" className="bg-ground">Short or Feature Film</option>
+                            <option value="Media Consulting" className="bg-ground">Media Consulting</option>
+                            <option value="Press / Other" className="bg-ground">Press / Other</option>
                           </select>
                         </div>
 
                         <div>
-                          <label className="block text-[9px] uppercase tracking-widest text-white/40 mb-2">Your Message *</label>
+                          <label className="block text-[13px] uppercase font-label tracking-label text-ink-muted mb-2">Your Message *</label>
                           <textarea 
                             required
                             rows={5}
                             value={contactMessage}
                             onChange={(e) => setContactMessage(e.target.value)}
                             placeholder="Detail your production concept, timeline, and shoot requirements..."
-                            className="w-full bg-black/40 border border-white/10 px-4 py-3 text-sm text-white focus:outline-none focus:border-gold transition-colors"
+                            className="w-full bg-ground-raised border border-line px-4 py-3 text-sm text-ink focus:outline-none focus:border-accent transition-colors"
                           />
                         </div>
 
                         <button 
                           type="submit" 
                           disabled={contactSent}
-                          className="w-full py-3 rounded-sm bg-gold text-black text-[10px] uppercase tracking-widest hover:bg-white transition-all font-semibold flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+                          className="w-full py-3 rounded-sm bg-sun text-on-sun text-[13px] uppercase font-label tracking-label hover:bg-ink hover:text-ground transition-all font-semibold flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
                         >
                           <Send size={12} /> {contactSent ? 'Sending...' : 'Send Message'}
                         </button>
@@ -1126,45 +916,48 @@ export default function App({ initialPath }: { initialPath?: string }) {
 
         
         {/* Footer */}
-        <footer className="w-full max-w-[1400px] mx-auto px-4 md:px-8 py-16 border-t border-white/5" role="contentinfo">
-          <nav aria-label="Site pages" className="flex flex-wrap justify-center md:justify-start gap-x-8 gap-y-3 mb-10 text-[10px] uppercase tracking-[0.25em] text-white/40">
-            <a {...link(WORK_PATH)} className="hover:text-gold transition-colors">Work</a>
-            <a {...link(ABOUT_PATH)} className="hover:text-gold transition-colors">About</a>
+        <footer className="theme-dark bg-ground" role="contentinfo">
+          <div className="w-full max-w-[1400px] mx-auto px-4 md:px-8 py-16">
+          <nav aria-label="Site pages" className="flex flex-wrap justify-center md:justify-start gap-x-8 gap-y-3 mb-10 text-[13px] uppercase font-label tracking-label text-ink-muted">
+            <a {...link(WORK_PATH)} className="hover:text-accent transition-colors">Work</a>
+            <a {...link(ABOUT_PATH)} className="hover:text-accent transition-colors">About</a>
             {services.map(s => (
-              <a key={s.slug} {...link(servicePath(s))} className="hover:text-gold transition-colors">{s.name}</a>
+              <a key={s.slug} {...link(servicePath(s))} className="hover:text-accent transition-colors">{s.name}</a>
             ))}
             {isTabShown('recaps') && (
-              <a {...tabLink('recaps')} className="hover:text-gold transition-colors">Project Recaps</a>
+              <a {...tabLink('recaps')} className="hover:text-accent transition-colors">Project Recaps</a>
             )}
-            <a {...tabLink('contact')} className="hover:text-gold transition-colors">Contact</a>
+            <a {...tabLink('contact')} className="hover:text-accent transition-colors">Contact</a>
           </nav>
-          <div className="flex flex-col md:flex-row md:justify-between items-center gap-6 mb-10 pt-10 border-t border-white/5">
-            <div className="flex flex-col sm:flex-row items-center gap-x-8 gap-y-4 text-[10px] uppercase tracking-[0.25em]">
-              <a href={business.phoneHref} className="inline-flex items-center gap-2 text-paper/80 hover:text-gold transition-colors whitespace-nowrap">
-                <Phone size={12} className="text-gold" aria-hidden="true" />
+          <div className="flex flex-col md:flex-row md:justify-between items-center gap-6 mb-10 pt-10 border-t border-line">
+            <div className="flex flex-col sm:flex-row items-center gap-x-8 gap-y-4 text-[13px] uppercase font-label tracking-label">
+              <a href={business.phoneHref} className="inline-flex items-center gap-2 text-ink hover:text-accent transition-colors whitespace-nowrap">
+                <Phone size={12} className="text-accent" aria-hidden="true" />
                 <span className="sr-only">Call </span>{business.phone}
               </a>
-              <a href={business.googleReview} target="_blank" rel="noopener" className="text-gold hover:text-white transition-colors whitespace-nowrap">
+              <a href={business.googleReview} target="_blank" rel="noopener" className="text-accent hover:text-ink transition-colors whitespace-nowrap">
                 Leave a Google review
               </a>
             </div>
-            <nav aria-label="Social and business profiles" className="flex flex-wrap justify-center md:justify-end gap-x-6 gap-y-3 text-[9px] uppercase tracking-wider text-white/40">
-              <a href={business.instagram} target="_blank" rel="noopener" className="hover:text-gold transition-colors">Golden Boy on Instagram</a>
-              <a href="https://www.instagram.com/robertrgb/?hl=en" target="_blank" rel="noopener noreferrer" className="hover:text-gold transition-colors">Robert on Instagram</a>
-              <a href={business.linkedIn} target="_blank" rel="noopener" className="hover:text-gold transition-colors">LinkedIn</a>
-              <a href={business.googleProfile} target="_blank" rel="noopener" className="hover:text-gold transition-colors">Google profile</a>
-              <a href="https://www.imdb.com/name/nm14415874/" target="_blank" rel="noopener noreferrer" className="hover:text-gold transition-colors">IMDb</a>
-              <a href="mailto:robertlazau@gmail.com" className="hover:text-gold transition-colors">Email</a>
+            <nav aria-label="Social and business profiles" className="flex flex-wrap justify-center md:justify-end gap-x-6 gap-y-3 text-[13px] uppercase font-label tracking-label text-ink-muted">
+              <a href={business.instagram} target="_blank" rel="noopener" className="hover:text-accent transition-colors">Golden Boy on Instagram</a>
+              <a href="https://www.instagram.com/robertrgb/?hl=en" target="_blank" rel="noopener noreferrer" className="hover:text-accent transition-colors">Robert on Instagram</a>
+              <a href={business.linkedIn} target="_blank" rel="noopener" className="hover:text-accent transition-colors">LinkedIn</a>
+              <a href={business.googleProfile} target="_blank" rel="noopener" className="hover:text-accent transition-colors">Google profile</a>
+              <a href="https://www.imdb.com/name/nm14415874/" target="_blank" rel="noopener noreferrer" className="hover:text-accent transition-colors">IMDb</a>
+              <a href="mailto:robertlazau@gmail.com" className="hover:text-accent transition-colors">Email</a>
             </nav>
           </div>
-          <div className="flex flex-col md:flex-row justify-between items-center text-[10px] text-white/30 uppercase tracking-[0.25em]">
+          <div className="flex flex-col md:flex-row justify-between items-center text-[13px] text-ink-muted uppercase font-label tracking-label">
             <p className="text-center">© {new Date().getFullYear()} Golden Boy Productions — Robert Lazau</p>
             <a
               {...tabLink('home')}
-              className="mt-4 md:mt-0 font-serif italic text-gold cursor-pointer hover:text-white transition-colors"
+              className="mt-4 md:mt-0 inline-flex items-center gap-3 font-display text-xl normal-case tracking-normal text-ink cursor-pointer hover:text-accent transition-colors"
             >
-              Robert Lazau
+              <SunMark solid className="h-8 w-8 text-sun" />
+              GOLDEN BOY<span className="sr-only"> Productions, home</span>
             </a>
+          </div>
           </div>
         </footer>
       </div>
@@ -1177,15 +970,15 @@ function FAQItem({ question, answer }: { question: string; answer: string; key?:
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <div className="border-b border-white/5">
+    <div className="border-b border-line">
       <button 
         onClick={() => setIsOpen(!isOpen)}
         aria-expanded={isOpen}
-        className="w-full py-8 flex justify-between items-center text-left hover:text-white group transition-colors duration-300"
+        className="w-full py-8 flex justify-between items-center text-left hover:text-ink group transition-colors duration-300"
       >
-        <span className="font-serif text-lg md:text-2xl text-white/80 group-hover:text-gold transition-colors">{question}</span>
-        <div className="w-10 h-10 rounded-full border border-[#e5e5e5]/10 flex items-center justify-center flex-shrink-0 ml-4 group-hover:border-[#e5e5e5]/30 group-hover:bg-[#e5e5e5]/5 transition-all">
-          {isOpen ? <Minus size={16} strokeWidth={1} className="text-gold" /> : <Plus size={16} strokeWidth={1} />}
+        <span className="font-medium text-lg md:text-2xl text-ink group-hover:text-accent transition-colors">{question}</span>
+        <div className="w-10 h-10 rounded-full border border-line flex items-center justify-center flex-shrink-0 ml-4 group-hover:border-ink/40 group-hover:bg-ink/5 transition-all">
+          {isOpen ? <Minus size={16} strokeWidth={1} className="text-accent" /> : <Plus size={16} strokeWidth={1} />}
         </div>
       </button>
       <div
@@ -1193,7 +986,7 @@ function FAQItem({ question, answer }: { question: string; answer: string; key?:
         aria-hidden={!isOpen}
       >
         <div className="overflow-hidden">
-          <p className="pb-8 text-sm md:text-base text-[#e5e5e5]/50 font-light leading-relaxed max-w-2xl">
+          <p className="pb-8 text-sm md:text-base text-ink-muted leading-relaxed max-w-2xl">
             {answer}
           </p>
         </div>
