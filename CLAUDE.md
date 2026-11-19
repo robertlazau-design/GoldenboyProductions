@@ -40,12 +40,13 @@ These match Golden Boy Productions' verified Google Business Profile. Use them e
 
 | File | What's in it |
 | --- | --- |
-| `src/App.tsx` | App shell, header, home page and custom cursor |
+| `src/App.tsx` | App shell, header, routes, contact form and custom cursor |
+| `src/home.tsx` | The homepage, "Through the O" |
 | `src/pages.tsx` | Work, project, service and about pages |
 | `src/data.ts` | All content |
 | `src/seo.ts` | Routes and meta tags |
 | `src/effects.tsx` | Motion effects |
-| `src/index.css` | Brand tokens and effect styles |
+| `src/index.css` | Brand tokens, effect styles and the homepage styles (`.home`) |
 
 ## Brand (the one place for the look)
 
@@ -64,9 +65,9 @@ Brand v2, "Work Light" (Nov 2026). Full brand book: the Golden Boy Productions d
 
 Also `overcast`, `asphalt`, `aluminum`, `slate`, `hi-vis` as fixed palette colors.
 
-- **Themes:** the page is Overcast (daylight), the home hero included. Wrap a section in `.theme-dark` for "lights down": the footer and the film player.
+- **Themes:** every page but the homepage is Overcast (daylight). Wrap a section in `.theme-dark` for "lights down": the footer and the film player. The homepage has its own look; see "The homepage" below.
 - **Type:** Golden Boy Gothic, our renamed cut of Special Gothic (SIL OFL), self-hosted in `public/fonts/`. `font-display` = Expanded Bold for headings; `font-sans` = Regular/Medium for text; `font-label` = Condensed Bold for uppercase labels, nav and buttons, tracking `tracking-label` (0.03em). `font-slug` = Courier Prime for sluglines and screenplay-style quotes. No italics, no wide tracking.
-- **The sun:** `SunMark` (static, `currentColor`) and `LogoMark` (draws itself) in `effects.tsx`; files in `public/brand/`. In the font, ☀ (U+2600) is the outline sun and ☼ (U+263C) the solid one.
+- **The sun:** `SunMark` (static, `currentColor`) in `effects.tsx`; files in `public/brand/`. In the font, ☀ (U+2600) is the outline sun and ☼ (U+263C) the solid one.
 - **Slugline tape:** `.slug` in `index.css`. Real places and times only: `EXT. TRUCK YARD - GRESHAM, OR - MORNING`.
 - **Never:** gold italic accent words, tiny caps tracked wide, corner crop marks, gradients or glows as decoration, fake film grain, metallic gold. (A scrim over a photo is fine.)
 - **Feel:** daylight, crew not agency. It should feel like a call sheet and a truck door, not a luxury title sequence.
@@ -80,30 +81,32 @@ Also `overcast`, `asphalt`, `aluminum`, `slate`, `hi-vis` as fixed palette color
 - **Text:** keep all of it in the prerendered HTML. Never hide content until JavaScript runs.
 - **Libraries:** don't add animation libraries. `motion` is already in the bundle.
 - **Phones:** check that nothing makes the page scroll sideways (`scrollWidth` must equal the viewport width).
-- **Home hero (Nov 2026):** daylight, the H1 is the positioning line ("Films, photos and websites for the people who run Portland."), Robert's side-lit portrait (`assets/robert_background.jpg`) with the sun clock under it, and the phone number. Robert's name and title sit above the H1.
-- **Hero timing** follows the intro card in `index.html`. When the intro is skipped, `html.intro-seen` is set and everything starts sooner. First-visit times:
+- **Intro card:** `index.html` shows it once per browser session; after that `html.intro-seen` is set. The same head script sets `html.js`, which the homepage zoom needs before first paint.
 
-| Effect | Starts at |
-| --- | --- |
-| Logo draws | 1.05 s |
-| Headline reveal | 1.45 s |
-| Light sweep on "Director & Producer" | 3.3 s |
+## The homepage: "Through the O" (Nov 18, 2026)
+
+Robert asked to break from the brand book for the homepage ("go pure creative") and picked this design, so the homepage alone has its own look: true black (`--color-night`, because the letters only knock out the film over pure black), Instrument Serif italic (SIL OFL, `public/fonts/InstrumentSerif-Italic.woff2`) for the spoken lines, gold for the light. The brand-book rules on italics and gold italic lines don't apply on the homepage; they still apply everywhere else.
+
+- **How it works:** each film plays inside its own name: a black layer with white type, `mix-blend-mode: multiply`, over the video. Scrolling scales that layer up around the hole (counter) of one letter until the camera is through it; then the title, text and button come up. Code in `src/home.tsx`, styles under `.home` / `.zoom` in `index.css`.
+- **Order:** hero (the reel inside GOLDEN BOY; through the O) → five film chapters (Matman, EMOPI, Armadas Exterior, Hayes Hustle, Strain) → More work (rows; a clip or photo follows the mouse) → What I make (FILMS, PHOTOS, WEBSITES with the work inside the words) → about → FAQ (kept for the FAQ structured data) → LET'S MAKE ONE. with the phone.
+- **H1:** the hero line "Robert Lazau makes films, photos and websites for the people who run Portland.", visible on load. The positioning line ("Films, photos and websites for the people who run Portland.") comes up after the zoom.
+- **Content:** `homeHero`, `homeFilms`, `homeMore`, `homeMake`, `homeAbout` in `data.ts`. Videos and posters in `public/home/` (desktop hero 16:9, `hero-portrait.mp4` is a 9:16 center crop for portrait screens). Valentines Model Mash and Hive Recovery Collective are off the homepage (Robert, Nov 18); they're still on the Work page.
+- **Adding or swapping a film:** cut a 10–15 s loop of single clean shots (no burned-in titles), 1280x720, CRF 24–26, no audio, `+faststart`, plus a first-frame poster `.webp`; add an entry to `homeFilms` with a `target` letter that has a hole (A, D, O, P, B, R) and its `fit`.
+- **`fit`:** the word's width at a 1px font size, so CSS can size it with no JavaScript (`font-size: calc(95.6cqw / var(--fit))`). Measure in the browser console on the site, then round up a hair:
+  `s=document.createElement('span');s.style.cssText='font:700 100px "Golden Boy Gothic Expanded";letter-spacing:-0.02em;position:absolute;white-space:nowrap';s.textContent='MATMAN';document.body.append(s);console.log((s.getBoundingClientRect().width/100*1.005).toFixed(2));s.remove()`
+- **Hero caption:** `homeHero.cuts` lists the first frame (24 fps) of each shot in `hero.mp4` and its film. Re-cut the reel → update the list.
+- **Still versions:** with reduce motion or no JavaScript nothing zooms: the letters show the poster, and all the text sits under them in view. Videos never play with reduce motion or Save-Data, and chapter videos load only near the screen.
 
 ## Effects in `src/effects.tsx` (styles in `index.css`)
 
 | Effect | What it does |
 | --- | --- |
-| `LogoMark` | Hero sun mark, rebuilt as an SVG from the 2048px master, in `currentColor` with the v2 sturdy line. It draws itself. |
 | `SunMark` | The static sun (outline or `solid`) for the header and footer. |
-| `RevealWords` | The home headline comes up word by word (opacity and transform only). |
-| `SunClock` | Live golden hour over Portland in the hero: the sun mark rides a sunrise-to-sunset arc, gold segments mark today's golden hours. Math in `src/sun.ts` (no API); the prerendered HTML has a fallback line. Golden hour = sun between 6° above and 4° below the horizon. |
-| `.shine-text` | One light sweep across "Director & Producer". |
 | `Letterbox` | Widescreen bars open the first time something scrolls into view. |
 | `HoverPreview` | A silent clip plays on hover, or when centered on a phone. It loads only then. |
 | `Theater` | "Lights down" film player (native `<dialog>`). Esc or a click on the dark area closes it. |
 | `useCardGlow` + `.glow-card` | A warm work light follows the mouse on cards. |
 | `.focus-grid` | Hover one card and the rest of the grid softens. |
-| `ClientStrip` | A slow marquee of client names. |
 | `data-cursor` | The custom cursor shows a word: `Play` (plays here), `Watch` (opens a film page), `View` (opens a website). |
 
 ## Adding a preview clip
@@ -123,6 +126,8 @@ Also `overcast`, `asphalt`, `aluminum`, `slate`, `hi-vis` as fixed palette color
 ## Known to-dos
 
 - ProfessionalService (a LocalBusiness type) has the profile's phone, `hasMap` and `sameAs`; no street address, since it's a service-area business.
+- Armadas Exterior has no project page yet (no full film on YouTube); its homepage button goes to Contact. Add a project once Robert sends the film and its year.
+- The Disaster Preparedness ad's storm, rescue and grocery shots look like stock footage, so the homepage uses only its siren, exit-bar and map shots. Ask Robert before using the others.
 
 ## Lead events
 

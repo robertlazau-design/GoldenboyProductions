@@ -48,8 +48,8 @@
     <link rel="preload" href="/fonts/GoldenBoyGothicExpanded-Bold.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="preload" href="/fonts/GoldenBoyGothic-Regular.woff2" as="font" type="font/woff2" crossorigin />
 
-    <!-- Intro plays once per browser session -->
-    <script>try{if(sessionStorage.getItem('gb-intro'))document.documentElement.classList.add('intro-seen');else sessionStorage.setItem('gb-intro','1')}catch(e){}</script>
+    <!-- js: lets CSS set up scroll effects before first paint (the homepage zoom). Intro plays once per browser session. -->
+    <script>document.documentElement.classList.add('js');try{if(sessionStorage.getItem('gb-intro'))document.documentElement.classList.add('intro-seen');else sessionStorage.setItem('gb-intro','1')}catch(e){}</script>
 
     <!-- JSON-LD Structured Data: Person -->
     <script type="application/ld+json">

@@ -3,12 +3,12 @@ import emailjs from '@emailjs/browser';
 import { track } from '@vercel/analytics';
 import { motion, AnimatePresence, useMotionValue, useSpring } from 'motion/react';
 import { ArrowRight, ArrowLeft, Plus, Minus, Camera, X, Send, Mail, Phone } from 'lucide-react';
-import { biography, business, clientApproach, clientNames, consultingServices, favoriteMovies, faqs, recommendableMovies, services } from './data';
+import { business, favoriteMovies, faqs, recommendableMovies, services } from './data';
 import { TAB_ROUTES, isTabShown, pageFromPath, pageMeta, normalizePath, canonicalUrl, projectPath, servicePath, ABOUT_PATH, WORK_PATH, type Tab } from './seo';
-import { AboutPage, ClickToPlay, ProjectPage, RecapPage, RecapsPage, ServicePage, WorkPage, newestFilm } from './pages';
-import { ClientStrip, LogoMark, RevealWords, SunClock, SunMark, useCardGlow } from './effects';
+import { AboutPage, ProjectPage, RecapPage, RecapsPage, ServicePage, WorkPage } from './pages';
+import { HomePage } from './home';
+import { SunMark, useCardGlow } from './effects';
 import { trackAdsConversion } from './leadEvents';
-import robertBackground from '../assets/robert_background.jpg';
 
 
 const setMeta = (selector: string, attr: string, value: string) =>
@@ -65,7 +65,6 @@ export default function App({ initialPath }: { initialPath?: string }) {
     },
   });
   const tabLink = (tab: Tab) => link(TAB_ROUTES[tab].path);
-  const heroFilm = newestFilm();
   useCardGlow();
 
   // "Get a quote" on a service page: open the contact form with that service picked.
@@ -309,7 +308,7 @@ export default function App({ initialPath }: { initialPath?: string }) {
   };
 
   return (
-    <div className="relative min-h-screen overflow-x-clip bg-ground text-ink font-sans selection:bg-sun selection:text-on-sun">
+    <div className={`relative min-h-screen overflow-x-clip text-ink font-sans selection:bg-sun selection:text-on-sun ${activeTab === 'home' ? 'theme-dark bg-night' : 'bg-ground'}`}>
 
       {/* Custom Mouse Cursor (Desktop Only) */}
       {isDesktop && isCursorVisible && (
@@ -358,8 +357,9 @@ export default function App({ initialPath }: { initialPath?: string }) {
 
       <div className="relative z-10">
         {/* Navigation Header */}
-        <header>
-        <nav className="w-full max-w-[1400px] mx-auto px-4 md:px-8 py-10 flex flex-col sm:flex-row justify-between items-center border-b border-line gap-6" aria-label="Main navigation">
+        {/* On the homepage the header sits over the film letters and scrolls away with them. */}
+        <header className={activeTab === 'home' ? 'absolute inset-x-0 top-0 z-30' : undefined}>
+        <nav className={`w-full max-w-[1400px] mx-auto px-4 md:px-8 py-10 flex flex-col sm:flex-row justify-between items-center border-b gap-6 ${activeTab === 'home' ? 'border-transparent' : 'border-line'}`} aria-label="Main navigation">
           <a 
             {...tabLink('home')}
             className="flex items-center gap-3 font-display text-ink text-xl select-none cursor-pointer hover:text-accent transition-colors group"
@@ -440,7 +440,7 @@ export default function App({ initialPath }: { initialPath?: string }) {
         </nav>
         </header>
 
-        <main className="w-full max-w-[1400px] mx-auto px-4 md:px-8">
+        <main className={activeTab === 'home' ? 'w-full' : 'w-full max-w-[1400px] mx-auto px-4 md:px-8'}>
           
           <AnimatePresence mode="wait" initial={false}>
             {activeTab === 'home' && (
@@ -451,211 +451,18 @@ export default function App({ initialPath }: { initialPath?: string }) {
                 exit={{ opacity: 0 }}
                 transition={{ duration: 0.4 }}
               >
-                {/* Hero: daylight. The positioning line is the H1; a real frame
-                    of hands at work; the live golden-hour sun clock. */}
-                <section className="relative z-10 pt-10 pb-20 md:pt-14 md:pb-28" aria-label="Hero" data-spot="hero">
-                  <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center">
-                    <div className="lg:col-span-6 flex flex-col items-start">
-                      <div className="mb-8 select-none text-ink">
-                        <LogoMark className="h-14 md:h-16 w-auto" />
-                      </div>
-                      <p className="font-label uppercase tracking-label text-base md:text-lg text-ink-muted mb-5">
-                        Robert Lazau / <span className="shine-text">Director & Producer</span>
-                      </p>
-                      <h1 className="font-display text-[clamp(2.4rem,4.5vw,4.6rem)] leading-[0.95] tracking-tight text-ink mb-6">
-                        <RevealWords text="Films, photos and websites for the people who run Portland." />
-                      </h1>
-                      <p className="max-w-lg text-base md:text-lg leading-relaxed text-ink-muted mb-8">
-                        Golden Boy Productions is Robert Lazau's studio in the Portland area. He directs, shoots and edits for
-                        trucking companies, woodworkers, cities and nonprofits, then builds the websites that show the work.
-                      </p>
-                      <div className="flex flex-wrap gap-3">
-                        <a
-                          {...link(WORK_PATH)}
-                          className="inline-flex items-center gap-3 px-7 py-4 bg-sun text-on-sun text-[15px] uppercase font-label tracking-label hover:bg-ink hover:text-ground transition-colors"
-                        >
-                          See the work <ArrowRight size={14} aria-hidden="true" />
-                        </a>
-                        <a
-                          href={business.phoneHref}
-                          className="inline-flex items-center gap-3 px-7 py-4 border-2 border-ink text-ink text-[15px] uppercase font-label tracking-label hover:bg-ink hover:text-ground transition-colors"
-                        >
-                          <Phone size={14} aria-hidden="true" />
-                          <span className="sr-only">Call </span>{business.phone}
-                        </a>
-                      </div>
-                    </div>
-                    <div className="lg:col-span-6">
-                      <figure className="relative bg-asphalt">
-                        <img
-                          src={robertBackground}
-                          alt="Robert Lazau in profile, lit from the side"
-                          width={1008}
-                          height={1024}
-                          fetchPriority="high"
-                          className="block w-full aspect-[5/4] object-cover object-[50%_55%] brightness-125"
-                        />
-                      </figure>
-                      <SunClock className="mt-6" />
-                    </div>
-                  </div>
-                </section>
-
-                {/* Newest film, right under the hero */}
-                {heroFilm && (
-                  <section className="pb-24 md:pb-32 relative z-10" aria-labelledby="newest-film">
-                    <div className="flex items-center gap-4 mb-8">
-                      <h2 id="newest-film" className="slug">Newest film</h2>
-                      <div className="flex-1 h-0.5 bg-ink" />
-                    </div>
-                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
-                      <ClickToPlay project={heroFilm} className="lg:col-span-8 border border-line" reveal />
-                      <div className="lg:col-span-4 flex flex-col gap-4">
-                        <p className="text-[13px] uppercase font-label tracking-label text-ink-muted">{heroFilm.type} / {heroFilm.year}</p>
-                        <h3 className="font-display text-3xl md:text-4xl text-ink tracking-tight">{heroFilm.title}</h3>
-                        <p className="text-sm md:text-base text-ink-muted leading-relaxed">{heroFilm.description}</p>
-                        <div className="flex flex-wrap gap-3 pt-2">
-                          <a
-                            {...link(projectPath(heroFilm))}
-                            data-cursor="Watch"
-                            className="inline-flex items-center gap-3 px-7 py-4 bg-sun text-on-sun text-[15px] uppercase font-label tracking-label hover:bg-ink hover:text-ground transition-colors"
-                          >
-                            Watch the film <ArrowRight size={14} />
-                          </a>
-                          <a
-                            {...tabLink('contact')}
-                            className="inline-flex items-center gap-3 px-7 py-4 border-2 border-ink text-ink text-[15px] uppercase font-label tracking-label hover:bg-ink hover:text-ground transition-colors"
-                          >
-                            Start a project
-                          </a>
-                        </div>
-                      </div>
-                    </div>
-                  </section>
-                )}
-
-                {/* Clients, drifting slowly sideways */}
-                <ClientStrip names={clientNames} label="Made for" />
-
-                {/* Biography Section */}
-                <motion.section 
-                  id="biography" 
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, margin: "-100px" }}
-                  transition={{ duration: 0.8, ease: "easeOut" }}
-                  className="py-28 md:py-44 border-t border-line scroll-mt-12"
-                  aria-label="Biography"
-                >
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-24 items-center">
-                    
-                    <div className="relative group">
-                      <div className="aspect-[3/4] overflow-hidden bg-ground-raised border border-line max-w-md mx-auto md:ml-0">
-                        <img 
-                          src={biography.image} 
-                          alt="Portrait of director Robert Lazau"
-                          loading="lazy" 
-                          className="w-full h-full object-cover opacity-100 brightness-110 group-hover:brightness-125 group-hover:scale-105 transition-all duration-1000 ease-out"
-                        />
-                      </div>
-                    </div>
-                    
-                    <div className="flex flex-col items-start max-w-md mx-auto md:mx-0">
-                      <span className="text-[13px] text-accent tracking-label uppercase font-label mb-3">{biography.year}</span>
-                      <h2 className="font-display text-4xl md:text-6xl mb-6 text-ink tracking-tight">Biography</h2>
-                      <div className="space-y-6 text-sm text-ink-muted leading-relaxed">
-                        {biography.text.split('\n\n').map((paragraph, i) => <p key={i}>{paragraph}</p>)}
-                        {/* The pull quote, set as screenplay dialogue */}
-                        <figure className="font-slug text-ink text-base md:text-lg leading-snug border-l-[3px] border-sun pl-5 py-1">
-                          <figcaption className="pl-[6ch] mb-1">ROBERT</figcaption>
-                          <blockquote>{biography.quote}</blockquote>
-                        </figure>
-                      </div>
-                      <a {...link(ABOUT_PATH)} className="mt-8 inline-flex items-center gap-2 text-[13px] uppercase font-label tracking-label text-accent hover:text-ink transition-colors">
-                        More about Robert <ArrowRight size={12} />
-                      </a>
-                    </div>
-
-                  </div>
-                </motion.section>
-
-                {/* Approach to Clientele Section */}
-                <motion.section 
-                  id="approach-to-clientele" 
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, margin: "-100px" }}
-                  transition={{ duration: 0.8, ease: "easeOut" }}
-                  className="py-28 md:py-40 border-t border-line"
-                  aria-label="How Robert Works"
-                >
-                  <div className="flex flex-col mb-16">
-                    <span className="text-[13px] text-ink-muted tracking-label uppercase font-label mb-3">{clientApproach.subtitle}</span>
-                    <h2 className="font-display text-4xl md:text-6xl text-ink tracking-tight">{clientApproach.title}</h2>
-                  </div>
-                  
-                  <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
-                    <div className="lg:col-span-5 text-sm md:text-base text-ink-muted leading-relaxed">
-                      <p>{clientApproach.text}</p>
-                    </div>
-                    
-                    <div className="lg:col-span-7 grid grid-cols-1 md:grid-cols-3 gap-8">
-                      {clientApproach.points.map((point, index) => (
-                        <div key={index} className="border-t border-line pt-6 flex flex-col">
-                          <span className="font-slug font-bold text-[15px] text-ink mb-3">0{index + 1}/</span>
-                          <h3 className="font-display text-lg text-ink mb-2">{point.title}</h3>
-                          <p className="text-[15px] text-ink-muted leading-relaxed">{point.desc}</p>
-                        </div>
+                {/* "Through the O": films inside the letters (src/home.tsx) */}
+                <HomePage link={link}>
+                  <section id="faq" className="py-28 px-4 max-w-4xl mx-auto border-t border-line scroll-mt-12" aria-label="Frequently Asked Questions">
+                    <span className="home-mono text-aluminum mb-3 block">Questions</span>
+                    <h2 className="font-display text-4xl md:text-6xl mb-16 text-ink">FAQ</h2>
+                    <div className="space-y-4">
+                      {faqs.map((faq, index) => (
+                        <FAQItem key={index} question={faq.question} answer={faq.answer} />
                       ))}
                     </div>
-                  </div>
-                </motion.section>
-
-                {/* Media Consulting Services Section */}
-                <motion.section 
-                  id="media-consulting-services" 
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, margin: "-100px" }}
-                  transition={{ duration: 0.8, ease: "easeOut" }}
-                  className="py-28 md:py-40 border-t border-line"
-                  aria-label="Media Consulting Services"
-                >
-                  <div className="flex flex-col mb-16 text-center md:text-left">
-                    <span className="text-[13px] text-ink-muted tracking-label uppercase font-label mb-3">For filmmakers and creators</span>
-                    <h2 className="font-display text-4xl md:text-6xl text-ink tracking-tight">Media Consulting Services</h2>
-                    <p className="max-w-2xl text-xs md:text-sm text-ink-muted leading-relaxed mt-4 mx-auto md:mx-0">
-                      Have a project and want a second set of eyes? Robert offers one-on-one guidance for filmmakers, creators, and organizations at any stage, from first idea to final cut.
-                    </p>
-                    <a {...link('/services/media-consulting')} className="mt-6 inline-flex items-center justify-center md:justify-start gap-2 text-[13px] uppercase font-label tracking-label text-accent hover:text-ink transition-colors">
-                      Media consulting details <ArrowRight size={12} />
-                    </a>
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-                    {consultingServices.map((service, index) => (
-                      <div 
-                        key={index} 
-                        className="border border-line bg-ground-raised p-6 md:p-8 hover:border-ink/40 transition-all duration-300 flex flex-col group"
-                      >
-                        <span className="font-slug font-bold text-[15px] text-ink mb-4 block">SERVICE 0{index + 1}/</span>
-                        <h3 className="font-display text-xl text-ink mb-4 group-hover:text-accent transition-colors">{service.title}</h3>
-                        <p className="text-sm text-ink-muted leading-relaxed mt-auto">{service.desc}</p>
-                      </div>
-                    ))}
-                  </div>
-                </motion.section>
-
-                {/* FAQ Section */}
-                <section id="faq" className="py-28 max-w-4xl mx-auto border-t border-line scroll-mt-12" aria-label="Frequently Asked Questions">
-                  <span className="text-[13px] text-ink-muted tracking-label uppercase font-label mb-3 block">QUESTIONS</span>
-                  <h2 className="font-display text-4xl md:text-6xl mb-16 text-ink">FAQ</h2>
-                  <div className="space-y-4">
-                    {faqs.map((faq, index) => (
-                      <FAQItem key={index} question={faq.question} answer={faq.answer} />
-                    ))}
-                  </div>
-                </section>
+                  </section>
+                </HomePage>
               </motion.div>
             )}
 
