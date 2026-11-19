@@ -879,6 +879,8 @@ export const homeHero = {
   films: ['Matman Trucking', 'EMOPI', 'Armadas Exterior', 'Hayes Hustle', 'Strain', 'City of Fairview'],
 };
 
+// Three films to fly through (Robert, Nov 18: more makes the scroll too long).
+// The rest of the work is in homeMore.
 export const homeFilms: HomeFilm[] = [
   {
     word: 'MATMAN', target: 1, fit: 5.61,
@@ -891,20 +893,9 @@ export const homeFilms: HomeFilm[] = [
     cta: 'Watch the film', to: '/work/matman-trucking', cursor: 'Watch',
   },
   {
-    word: 'EMOPI', target: 2, fit: 3.91,
-    loop: '/home/emopi.mp4', poster: '/home/emopi.webp',
-    kicker: '02 / Community profile / Gresham, OR / 2025',
-    lede: 'The people behind EMOPI, and the kids they show up for.',
-    who: 'A Golden Boy production.',
-    title: 'EMOPI, Gresham, 2025.',
-    // The 20,000 is the program's own count, from the film's end card.
-    text: "A community profile of the people behind the EMOPI program in Gresham and the impact of their work. The film closes on the program's own count: about 20,000 youth supported.",
-    cta: 'Watch the film', to: '/work/emopi', cursor: 'Watch',
-  },
-  {
     word: 'ARMADAS', target: 4, fit: 6.23,
     loop: '/home/armadas.mp4', poster: '/home/armadas.webp',
-    kicker: '03 / Commercial / Armadas Exterior',
+    kicker: '02 / Commercial / Armadas Exterior',
     lede: 'Cousin Jerry versus the gutter.',
     who: 'A Golden Boy production.',
     title: 'Armadas Exterior.',
@@ -914,27 +905,19 @@ export const homeFilms: HomeFilm[] = [
   {
     word: 'HAYES HUSTLE', target: 1, fit: 8.95,
     loop: '/home/hayes.mp4', poster: '/home/hayes.webp',
-    kicker: '04 / Nonprofit spotlight / 2025',
+    kicker: '03 / Nonprofit spotlight / 2025',
     lede: 'Kids, horses, and skills you learn with your hands.',
     who: 'A Golden Boy production.',
     title: 'Hayes Hustle, 2025.',
     text: 'A spotlight on Hayes Hustle, a nonprofit that connects kids with nature, horses, and wildlife while teaching hands-on skills like podcasting and sewing.',
     cta: 'Watch the film', to: '/work/hayes-hustle', cursor: 'Watch',
   },
-  {
-    word: 'STRAIN', target: 3, fit: 4.37,
-    loop: '/home/strain.mp4', poster: '/home/strain.webp',
-    kicker: '05 / Short film / 48 Hour Film Project / 2026',
-    lede: 'A 4/20 dark comedy, made in 48 hours.',
-    who: 'Directed and produced by Robert Lazau.',
-    title: 'Strain, 2026.',
-    text: 'Made in 48 hours for the 48 Hour Film Project, where it was nominated.',
-    cta: 'Watch the film', to: '/work/strain', cursor: 'Watch',
-  },
 ];
 
 // "More work": a row each, with a clip or photo that follows the mouse.
 export const homeMore = [
+  { title: 'Strain', meta: 'Short film / 48 Hour Film Project / 2026', to: '/work/strain', peek: '/work/clips/strain.mp4', cursor: 'Watch' },
+  { title: 'EMOPI', meta: 'Community profile / Gresham, OR / 2025', to: '/work/emopi', peek: '/home/emopi-peek.mp4', cursor: 'Watch' },
   { title: 'City of Fairview', meta: 'Disaster preparedness PSA / Fairview, OR / 2025', to: '/work/disaster-preparedness', peek: '/home/fairview.mp4', cursor: 'Watch' },
   { title: 'Royal Brand Woodworking', meta: 'Photo shoot + website / Portland, OR / 2026', to: 'https://www.royalbrandwoodworking.com', peek: '/work/royal-brand-shoot.webp', cursor: 'View' },
   { title: 'Refined Kollective', meta: 'Fashion visual / 2025', to: '/work/refined-kollective', peek: '/projects/refined-kollective.webp', cursor: 'Watch' },
