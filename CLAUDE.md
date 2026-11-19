@@ -64,7 +64,7 @@ Brand v2, "Work Light" (Nov 2026). Full brand book: the Golden Boy Productions d
 
 Also `overcast`, `asphalt`, `aluminum`, `slate`, `hi-vis` as fixed palette colors.
 
-- **Themes:** the page is Overcast (daylight). Wrap a section in `.theme-dark` for "lights down": the home header and hero, the footer, the film player.
+- **Themes:** the page is Overcast (daylight), the home hero included. Wrap a section in `.theme-dark` for "lights down": the footer and the film player.
 - **Type:** Golden Boy Gothic, our renamed cut of Special Gothic (SIL OFL), self-hosted in `public/fonts/`. `font-display` = Expanded Bold for headings; `font-sans` = Regular/Medium for text; `font-label` = Condensed Bold for uppercase labels, nav and buttons, tracking `tracking-label` (0.03em). `font-slug` = Courier Prime for sluglines and screenplay-style quotes. No italics, no wide tracking.
 - **The sun:** `SunMark` (static, `currentColor`) and `LogoMark` (draws itself) in `effects.tsx`; files in `public/brand/`. In the font, ☀ (U+2600) is the outline sun and ☼ (U+263C) the solid one.
 - **Slugline tape:** `.slug` in `index.css`. Real places and times only: `EXT. TRUCK YARD - GRESHAM, OR - MORNING`.
@@ -80,14 +80,14 @@ Also `overcast`, `asphalt`, `aluminum`, `slate`, `hi-vis` as fixed palette color
 - **Text:** keep all of it in the prerendered HTML. Never hide content until JavaScript runs.
 - **Libraries:** don't add animation libraries. `motion` is already in the bundle.
 - **Phones:** check that nothing makes the page scroll sideways (`scrollWidth` must equal the viewport width).
+- **Home hero (Nov 2026):** daylight, the H1 is the positioning line ("Films, photos and websites for the people who run Portland."), a real work frame with its slugline, the phone number, and the sun clock. Robert's name and title sit above the H1.
 - **Hero timing** follows the intro card in `index.html`. When the intro is skipped, `html.intro-seen` is set and everything starts sooner. First-visit times:
 
 | Effect | Starts at |
 | --- | --- |
 | Logo draws | 1.05 s |
-| Name reveal | 1.45 s |
-| Spotlight | 1.5 s |
-| Light sweep on the title | 3.3 s |
+| Headline reveal | 1.45 s |
+| Light sweep on "Director & Producer" | 3.3 s |
 
 ## Effects in `src/effects.tsx` (styles in `index.css`)
 
@@ -95,15 +95,14 @@ Also `overcast`, `asphalt`, `aluminum`, `slate`, `hi-vis` as fixed palette color
 | --- | --- |
 | `LogoMark` | Hero sun mark, rebuilt as an SVG from the 2048px master, in `currentColor` with the v2 sturdy line. It draws itself. |
 | `SunMark` | The static sun (outline or `solid`) for the header and footer. |
-| `RevealWords` | The name comes up word by word. |
-| `.hero-spotlight` | A CSS projector beam that lands on the name. |
+| `RevealWords` | The home headline comes up word by word (opacity and transform only). |
+| `SunClock` | Live golden hour over Portland in the hero: the sun mark rides a sunrise-to-sunset arc, gold segments mark today's golden hours. Math in `src/sun.ts` (no API); the prerendered HTML has a fallback line. Golden hour = sun between 6° above and 4° below the horizon. |
 | `.shine-text` | One light sweep across "Director & Producer". |
 | `Letterbox` | Widescreen bars open the first time something scrolls into view. |
 | `HoverPreview` | A silent clip plays on hover, or when centered on a phone. It loads only then. |
 | `Theater` | "Lights down" film player (native `<dialog>`). Esc or a click on the dark area closes it. |
 | `useCardGlow` + `.glow-card` | A warm work light follows the mouse on cards. |
 | `.focus-grid` | Hover one card and the rest of the grid softens. |
-| `MagneticLink` | Buttons lean toward the cursor. |
 | `ClientStrip` | A slow marquee of client names. |
 | `data-cursor` | The custom cursor shows a word: `Play` (plays here), `Watch` (opens a film page), `View` (opens a website). |
 
@@ -123,7 +122,6 @@ Also `overcast`, `asphalt`, `aluminum`, `slate`, `hi-vis` as fixed palette color
 
 ## Known to-dos
 
-- The home page H1 needs location keywords (the title got them in Nov 2026).
 - ProfessionalService (a LocalBusiness type) has the profile's phone, `hasMap` and `sameAs`; no street address, since it's a service-area business.
 
 ## Lead events

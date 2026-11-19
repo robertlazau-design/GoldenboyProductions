@@ -4,10 +4,9 @@ import { track } from '@vercel/analytics';
 import { motion, AnimatePresence, useMotionValue, useSpring } from 'motion/react';
 import { ArrowRight, ArrowLeft, Plus, Minus, Camera, X, Send, Mail, Phone } from 'lucide-react';
 import { biography, business, clientApproach, clientNames, consultingServices, favoriteMovies, faqs, recommendableMovies, services } from './data';
-import robertBackground from '../assets/robert_background.jpg';
-import { TAB_ROUTES, isTabShown, pageFromPath, pageMeta, normalizePath, canonicalUrl, servicePath, ABOUT_PATH, WORK_PATH, type Tab } from './seo';
+import { TAB_ROUTES, isTabShown, pageFromPath, pageMeta, normalizePath, canonicalUrl, projectPath, servicePath, ABOUT_PATH, WORK_PATH, type Tab } from './seo';
 import { AboutPage, ClickToPlay, ProjectPage, RecapPage, RecapsPage, ServicePage, WorkPage, newestFilm } from './pages';
-import { ClientStrip, LogoMark, MagneticLink, RevealWords, SunMark, useCardGlow } from './effects';
+import { ClientStrip, LogoMark, RevealWords, SunClock, SunMark, useCardGlow } from './effects';
 import { trackAdsConversion } from './leadEvents';
 
 
@@ -358,7 +357,7 @@ export default function App({ initialPath }: { initialPath?: string }) {
 
       <div className="relative z-10">
         {/* Navigation Header */}
-        <header className={activeTab === 'home' ? 'theme-dark bg-ground' : undefined}>
+        <header>
         <nav className="w-full max-w-[1400px] mx-auto px-4 md:px-8 py-10 flex flex-col sm:flex-row justify-between items-center border-b border-line gap-6" aria-label="Main navigation">
           <a 
             {...tabLink('home')}
@@ -451,54 +450,56 @@ export default function App({ initialPath }: { initialPath?: string }) {
                 exit={{ opacity: 0 }}
                 transition={{ duration: 0.4 }}
               >
-                {/* Hero: lights down. A full-bleed asphalt band that continues the
-                    header, with the silhouette portrait on the right. */}
-                <section className="theme-dark relative z-10 pt-12 pb-20 md:pt-16 md:pb-28 mb-20 md:mb-28" aria-label="Hero">
-                  <div aria-hidden="true" className="absolute inset-y-0 left-1/2 w-screen -translate-x-1/2 bg-ground -z-10" />
-                  <img
-                    src={robertBackground}
-                    alt=""
-                    aria-hidden="true"
-                    className="absolute top-0 right-[calc(50%-50vw)] h-full w-auto max-w-none object-cover object-right opacity-50 md:opacity-90 brightness-125 [mask-image:linear-gradient(90deg,transparent,#000_45%)] -z-10 pointer-events-none select-none"
-                  />
-                  <div aria-hidden="true" className="absolute inset-y-0 left-1/2 w-screen -translate-x-1/2 -z-10 bg-[linear-gradient(90deg,var(--color-ground)_35%,transparent_70%)]" />
-                  <div className="hero-spotlight" aria-hidden="true" />
-                  <div className="relative flex flex-col items-start text-left max-w-4xl">
-                    <motion.div
-                      initial={false}
-                      animate={{ opacity: 1, scale: 1 }}
-                      transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1], delay: 0.2 }}
-                      className="mb-10 select-none text-sun"
-                    >
-                      <LogoMark className="h-20 md:h-28 w-auto" />
-                    </motion.div>
-                    <motion.h1
-                      initial={false}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 1, ease: [0.16, 1, 0.3, 1], delay: 0.1 }}
-                      className="font-display text-[clamp(3.25rem,11vw,9.5rem)] leading-[0.9] tracking-tight mb-6 text-ink"
-                    >
-                      <RevealWords text="Robert Lazau" />
-                    </motion.h1>
-
-                    <motion.div
-                      initial={false}
-                      animate={{ opacity: 1 }}
-                      transition={{ duration: 1.2, delay: 0.4 }}
-                      className="font-label uppercase tracking-label text-2xl md:text-3xl mb-8 text-accent"
-                    >
-                      <span className="reveal-word" style={{ '--i': 3 } as React.CSSProperties}><span className="shine-text">Director & Producer</span></span>
-                    </motion.div>
-
-                    <motion.p
-                      initial={false}
-                      animate={{ opacity: 1 }}
-                      transition={{ duration: 1.2, delay: 0.6 }}
-                      className="max-w-xl text-base md:text-lg leading-relaxed text-ink-muted"
-                    >
-                      Portland-area director and producer, and founder of Golden Boy Productions. Robert makes films for
-                      cities, nonprofits, local businesses, and fashion brands, with a cinematic eye and a real interest in their story.
-                    </motion.p>
+                {/* Hero: daylight. The positioning line is the H1; a real frame
+                    of hands at work; the live golden-hour sun clock. */}
+                <section className="relative z-10 pt-10 pb-20 md:pt-14 md:pb-28" aria-label="Hero" data-spot="hero">
+                  <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center">
+                    <div className="lg:col-span-6 flex flex-col items-start">
+                      <div className="mb-8 select-none text-ink">
+                        <LogoMark className="h-14 md:h-16 w-auto" />
+                      </div>
+                      <p className="font-label uppercase tracking-label text-base md:text-lg text-ink-muted mb-5">
+                        Robert Lazau / <span className="shine-text">Director & Producer</span>
+                      </p>
+                      <h1 className="font-display text-[clamp(2.4rem,4.5vw,4.6rem)] leading-[0.95] tracking-tight text-ink mb-6">
+                        <RevealWords text="Films, photos and websites for the people who run Portland." />
+                      </h1>
+                      <p className="max-w-lg text-base md:text-lg leading-relaxed text-ink-muted mb-8">
+                        Golden Boy Productions is Robert Lazau's studio in the Portland area. He directs, shoots and edits for
+                        trucking companies, woodworkers, cities and nonprofits, then builds the websites that show the work.
+                      </p>
+                      <div className="flex flex-wrap gap-3">
+                        <a
+                          {...link(WORK_PATH)}
+                          className="inline-flex items-center gap-3 px-7 py-4 bg-sun text-on-sun text-[15px] uppercase font-label tracking-label hover:bg-ink hover:text-ground transition-colors"
+                        >
+                          See the work <ArrowRight size={14} aria-hidden="true" />
+                        </a>
+                        <a
+                          href={business.phoneHref}
+                          className="inline-flex items-center gap-3 px-7 py-4 border-2 border-ink text-ink text-[15px] uppercase font-label tracking-label hover:bg-ink hover:text-ground transition-colors"
+                        >
+                          <Phone size={14} aria-hidden="true" />
+                          <span className="sr-only">Call </span>{business.phone}
+                        </a>
+                      </div>
+                    </div>
+                    <div className="lg:col-span-6">
+                      <figure className="relative">
+                        <img
+                          src="/work/royal-brand-shoot.webp"
+                          srcSet="/work/royal-brand-shoot-720.webp 720w, /work/royal-brand-shoot.webp 1200w"
+                          sizes="(min-width: 1024px) 50vw, 100vw"
+                          alt="Sanding a cabinet door in the Royal Brand Woodworking shop"
+                          width={1200}
+                          height={800}
+                          fetchPriority="high"
+                          className="block w-full aspect-[3/2] object-cover"
+                        />
+                        <figcaption className="slug md:absolute md:left-0 md:bottom-0">INT. ROYAL BRAND WOODWORKING - PORTLAND, OR</figcaption>
+                      </figure>
+                      <SunClock className="mt-6" />
+                    </div>
                   </div>
                 </section>
 
@@ -516,18 +517,19 @@ export default function App({ initialPath }: { initialPath?: string }) {
                         <h3 className="font-display text-3xl md:text-4xl text-ink tracking-tight">{heroFilm.title}</h3>
                         <p className="text-sm md:text-base text-ink-muted leading-relaxed">{heroFilm.description}</p>
                         <div className="flex flex-wrap gap-3 pt-2">
-                          <MagneticLink
-                            {...link(WORK_PATH)}
-                            className="inline-flex items-center gap-3 px-7 py-4 bg-sun text-on-sun text-[13px] uppercase font-label tracking-label font-semibold hover:bg-ink hover:text-ground transition-colors"
+                          <a
+                            {...link(projectPath(heroFilm))}
+                            data-cursor="Watch"
+                            className="inline-flex items-center gap-3 px-7 py-4 bg-sun text-on-sun text-[15px] uppercase font-label tracking-label hover:bg-ink hover:text-ground transition-colors"
                           >
-                            See the work <ArrowRight size={14} />
-                          </MagneticLink>
-                          <MagneticLink
+                            Watch the film <ArrowRight size={14} />
+                          </a>
+                          <a
                             {...tabLink('contact')}
-                            className="inline-flex items-center gap-3 px-7 py-4 border-2 border-ink text-ink text-[13px] uppercase font-label tracking-label hover:bg-ink hover:text-ground transition-colors"
+                            className="inline-flex items-center gap-3 px-7 py-4 border-2 border-ink text-ink text-[15px] uppercase font-label tracking-label hover:bg-ink hover:text-ground transition-colors"
                           >
                             Start a project
-                          </MagneticLink>
+                          </a>
                         </div>
                       </div>
                     </div>
@@ -622,7 +624,7 @@ export default function App({ initialPath }: { initialPath?: string }) {
                   aria-label="Media Consulting Services"
                 >
                   <div className="flex flex-col mb-16 text-center md:text-left">
-                    <span className="text-[13px] text-ink-muted tracking-label uppercase font-label mb-3">EXPERT GUIDANCE</span>
+                    <span className="text-[13px] text-ink-muted tracking-label uppercase font-label mb-3">For filmmakers and creators</span>
                     <h2 className="font-display text-4xl md:text-6xl text-ink tracking-tight">Media Consulting Services</h2>
                     <p className="max-w-2xl text-xs md:text-sm text-ink-muted leading-relaxed mt-4 mx-auto md:mx-0">
                       Have a project and want a second set of eyes? Robert offers one-on-one guidance for filmmakers, creators, and organizations at any stage, from first idea to final cut.

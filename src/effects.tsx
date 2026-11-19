@@ -2,7 +2,7 @@
 // leaves all text in the prerendered HTML, and animates only transform/opacity
 // (plus SVG stroke offsets for the logo) so it stays smooth on phones.
 import React from 'react';
-import { motion, useMotionValue, useSpring, type HTMLMotionProps } from 'motion/react';
+import { formatTime, sunDay, type SunDay } from './sun';
 
 const matches = (query: string) => typeof window !== 'undefined' && window.matchMedia(query).matches;
 const reducedMotion = () => matches('(prefers-reduced-motion: reduce)');
@@ -53,6 +53,79 @@ export function SunMark({ solid = false, className = '' }: { solid?: boolean; cl
     <svg viewBox="0 0 760.0 763.0" className={className} aria-hidden="true" focusable="false">
       <path fill="currentColor" d={solid ? SUN_SOLID : SUN_OUTLINE} />
     </svg>
+  );
+}
+
+// ── Sun clock: golden hour over Portland, live ─────────────────────────────
+// The sun mark rides a half-arc from sunrise (left) to sunset (right); the
+// two gold segments are today's golden hours. Times are worked out in the
+// browser (src/sun.ts). The prerendered HTML carries a plain fallback line,
+// so nothing is hidden before JavaScript runs.
+const ARC = { cx: 120, cy: 104, r: 92 };
+const arcPoint = (f: number) => {
+  const a = Math.PI * (1 - Math.min(1, Math.max(0, f)));
+  return { x: ARC.cx + ARC.r * Math.cos(a), y: ARC.cy - ARC.r * Math.sin(a) };
+};
+const arcPath = (from: number, to: number) => {
+  const p = arcPoint(from);
+  const q = arcPoint(to);
+  return `M${p.x.toFixed(1)} ${p.y.toFixed(1)} A${ARC.r} ${ARC.r} 0 0 1 ${q.x.toFixed(1)} ${q.y.toFixed(1)}`;
+};
+const range = ([a, b]: [Date, Date]) => `${formatTime(a).replace(/ [AP]M$/, '')}\u2013${formatTime(b)}`;
+
+function sunStatus(now: Date, day: SunDay, tomorrow: SunDay | null) {
+  const t = now.getTime();
+  const [m0, m1] = day.morningGolden;
+  const [e0, e1] = day.eveningGolden;
+  if (t >= m0.getTime() && t < m1.getTime()) return { head: `Golden hour now, until ${formatTime(m1)}`, when: 'now' as const };
+  if (t >= e0.getTime() && t < e1.getTime()) return { head: `Golden hour now, until ${formatTime(e1)}`, when: 'now' as const };
+  if (t < m0.getTime()) return { head: `Next: ${range(day.morningGolden)}`, when: 'later' as const };
+  if (t < e0.getTime()) return { head: `Today ${range(day.eveningGolden)}`, when: 'later' as const };
+  return { head: tomorrow ? `Tomorrow ${range(tomorrow.morningGolden)}` : 'Tomorrow morning', when: 'later' as const };
+}
+
+export function SunClock({ className = '' }: { className?: string }) {
+  const [now, setNow] = React.useState<Date | null>(null);
+  React.useEffect(() => {
+    setNow(new Date());
+    const id = window.setInterval(() => setNow(new Date()), 60_000);
+    return () => window.clearInterval(id);
+  }, []);
+  const minute = now ? Math.floor(now.getTime() / 60_000) : 0;
+  const day = React.useMemo(() => (now ? sunDay(now) : null), [minute]); // eslint-disable-line react-hooks/exhaustive-deps
+  const tomorrow = React.useMemo(() => (now ? sunDay(new Date(now.getTime() + 86_400_000)) : null), [minute]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const len = day ? day.sunset.getTime() - day.sunrise.getTime() : 1;
+  const frac = (d: Date) => (day ? (d.getTime() - day.sunrise.getTime()) / len : 0);
+  const f = now && day ? frac(now) : null;
+  const up = f !== null && f >= 0 && f <= 1;
+  const sun = f === null ? null : up ? arcPoint(f) : { x: ARC.cx, y: ARC.cy + 16 };
+  const status = now && day ? sunStatus(now, day, tomorrow) : null;
+
+  return (
+    <section className={`sun-clock flex items-center gap-5 md:gap-7 ${className}`} aria-label="Golden hour in Portland">
+      <svg viewBox="0 0 240 140" className="w-28 sm:w-36 md:w-44 h-auto flex-none text-ink" aria-hidden="true" focusable="false">
+        <path d={arcPath(0, 1)} fill="none" stroke="currentColor" strokeWidth="2" strokeDasharray="2 7" strokeLinecap="round" />
+        <line x1="8" y1={ARC.cy} x2="232" y2={ARC.cy} stroke="currentColor" strokeWidth="2" />
+        {day && <path d={arcPath(0, frac(day.morningGolden[1]))} fill="none" stroke="var(--color-sun)" strokeWidth="7" />}
+        {day && <path d={arcPath(frac(day.eveningGolden[0]), 1)} fill="none" stroke="var(--color-sun)" strokeWidth="7" />}
+        {sun && (
+          <svg x={sun.x - 13} y={sun.y - 13} width="26" height="26" viewBox="0 0 760.0 763.0" className="sun-clock-sun">
+            <circle cx="380" cy="380" r="372" fill={up ? 'var(--color-ground)' : 'none'} />
+            <path fill="currentColor" d={up ? SUN_SOLID : SUN_OUTLINE} />
+          </svg>
+        )}
+      </svg>
+      <div className="min-w-0">
+        <p className="font-label uppercase tracking-label text-[13px] md:text-sm text-ink-muted">Golden hour in Portland</p>
+        <p className="font-display text-lg sm:text-xl md:text-2xl leading-tight text-ink mt-1">{status ? status.head : 'Every day, the hour before sunset'}</p>
+        {day && (
+          <p className="font-slug text-[13px] md:text-sm text-ink-muted mt-1">
+            Sunrise {formatTime(day.sunrise)} <span aria-hidden="true">/</span> Sunset {formatTime(day.sunset)}
+          </p>
+        )}
+      </div>
+    </section>
   );
 }
 
@@ -160,38 +233,6 @@ export function HoverPreview({ src }: { src: string }) {
   );
 }
 
-// ── Buttons that lean toward the cursor ────────────────────────────────────
-type MagneticProps = HTMLMotionProps<'a'> & { strength?: number; max?: number };
-export function MagneticLink({ strength = 0.3, max = 10, onPointerMove, onPointerLeave, style, ...rest }: MagneticProps) {
-  const x = useMotionValue(0);
-  const y = useMotionValue(0);
-  const springX = useSpring(x, { stiffness: 260, damping: 18, mass: 0.4 });
-  const springY = useSpring(y, { stiffness: 260, damping: 18, mass: 0.4 });
-  const enabled = React.useRef(false);
-  React.useEffect(() => {
-    enabled.current = finePointer() && !reducedMotion();
-  }, []);
-  const clamp = (v: number) => Math.max(-max, Math.min(max, v));
-  return (
-    <motion.a
-      {...rest}
-      style={{ ...style, x: springX, y: springY }}
-      onPointerMove={e => {
-        if (enabled.current) {
-          const r = e.currentTarget.getBoundingClientRect();
-          x.set(clamp((e.clientX - (r.left + r.width / 2)) * strength));
-          y.set(clamp((e.clientY - (r.top + r.height / 2)) * strength));
-        }
-        onPointerMove?.(e);
-      }}
-      onPointerLeave={e => {
-        x.set(0);
-        y.set(0);
-        onPointerLeave?.(e);
-      }}
-    />
-  );
-}
 
 // ── Soft gold light that follows the mouse across any .glow-card ───────────
 export function useCardGlow() {

@@ -52,19 +52,19 @@ export const biography = {
 export const clientApproach = {
   title: "How Robert Works",
   subtitle: "Working Together",
-  text: "Every project starts with a conversation. Robert wants to understand who you are, who you're trying to reach, and what you want them to feel, and then he builds the shoot around that. Whether it's a city PSA, a nonprofit spotlight, a website loop for a small business, or a fashion visual, the goal is the same: a film that sounds like you and looks like it belongs on the big screen.",
+  text: "Every project starts with a conversation: who you are, who you need to reach, and what they should feel. Then Robert plans the shoot around that. A city PSA, a nonprofit spotlight, a website loop for a shop or a fashion visual, the goal is the same: a film that sounds like you and shows the people who do the work.",
   points: [
     {
-      title: "Listen First",
+      title: "Listen first",
       desc: "A real conversation about your goals, your audience, and your story before any gear comes out."
     },
     {
-      title: "Plan with Purpose",
+      title: "Plan the shoot",
       desc: "Concept, shot list, locations, and schedule mapped out so the shoot runs smoothly and stays on budget."
     },
     {
-      title: "Shoot & Finish",
-      desc: "Directing, camera, and edit handled closely from start to finish, so the final piece stays true to the plan."
+      title: "Shoot and finish",
+      desc: "Robert directs, runs camera and edits, so the person you planned with is the one who finishes it."
     }
   ]
 };
@@ -72,7 +72,7 @@ export const clientApproach = {
 export const consultingServices = [
   {
     title: "Story & Script",
-    desc: "Shaping your idea into a clear, compelling story before a single frame is shot."
+    desc: "Turning your idea into a story with a clear beginning, middle and end before anything is shot."
   },
   {
     title: "Look & Visual Direction",
