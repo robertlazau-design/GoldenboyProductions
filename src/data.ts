@@ -940,11 +940,12 @@ export const homeMake = {
       { src: '/work/site-kyree-films.webp', alt: 'The Kyree Films website' },
     ],
   },
-  // LET'S MAKE / ONE. The second line cycles through what Robert makes, one word a
+  // LET'S MAKE / FILM. The second line cycles through what Robert makes, one word a
   // second. fit is the wider of "LET'S MAKE" and the longest word, so nothing moves.
+  // Before adding a word, measure it: COMMERCIALS. (9.5) would shrink the whole line.
   close: {
     fit: 7.1,
-    words: ['ONE.', 'FILM.', 'ART.', 'ADS.', 'PHOTOS.', 'WEBSITES.'],
+    words: ['FILM.', 'ART.', 'ADS.', 'PHOTOS.', 'REELS.', 'WEBSITES.', 'STORIES.'],
     loop: '/home/close.mp4',
     poster: '/home/close.webp',
   },

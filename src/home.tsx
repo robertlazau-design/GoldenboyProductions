@@ -401,8 +401,8 @@ function useMoreWorkPeek(list: React.RefObject<HTMLUListElement | null>, peek: R
 }
 
 // ── LET'S MAKE ___: the last word changes once a second while it's on screen ──
-// The page is built with ONE. only; the other words join after load, and never
-// with reduce motion. Screen readers keep hearing "Let's make one."
+// The page is built with the first word only; the others join after load, and
+// never with reduce motion. Screen readers get one sentence with every word.
 function useCloseWords(slot: React.RefObject<HTMLSpanElement | null>, count: number) {
   const [cycling, setCycling] = React.useState(false);
   const [at, setAt] = React.useState(0);
@@ -448,6 +448,9 @@ export function HomePage({ link, children }: { link: LinkTo; children?: React.Re
   useHeroCaption(heroVideo, heroCaption);
   useMoreWorkPeek(moreList, peek);
   const close = useCloseWords(closeSlot, homeMake.close.words.length);
+  // "film, art, ads, photos, reels, websites and stories."
+  const closeWords = homeMake.close.words.map(w => w.replace('.', '').toLowerCase());
+  const closeSentence = `${closeWords.slice(0, -1).join(', ')} and ${closeWords[closeWords.length - 1]}.`;
 
   const external = (to: string) => /^https?:/.test(to);
   const go = (to: string) => (external(to) ? { href: to, target: '_blank', rel: 'noopener' } : link(to));
@@ -639,12 +642,13 @@ export function HomePage({ link, children }: { link: LinkTo; children?: React.Re
               tabIndex={-1}
             />
           </div>
-          <span className="make-k" style={fit(homeMake.close.fit)}>
+          <span className="sr-only">Let&rsquo;s make {closeSentence}</span>
+          <span className="make-k" style={fit(homeMake.close.fit)} aria-hidden="true">
             LET&rsquo;S MAKE{' '}
             <span ref={closeSlot} className={`close-slot${close.cycling ? ' is-cycling' : ''}`}>
               {homeMake.close.words.map((w, i) =>
                 i === 0 || close.cycling ? (
-                  <span key={w} className={`close-w${i === close.at ? ' on' : ''}`} aria-hidden={i === 0 ? undefined : true}>
+                  <span key={w} className={`close-w${i === close.at ? ' on' : ''}`}>
                     {w}
                   </span>
                 ) : null,
