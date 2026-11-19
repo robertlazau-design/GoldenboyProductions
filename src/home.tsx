@@ -86,7 +86,7 @@ function Chapter({ film, link }: { film: HomeFilm; link: LinkTo }) {
       kind="chapter"
       label={film.title}
       spot={`home-${film.word.split(' ')[0].toLowerCase()}`}
-      height="165vh"
+      height="180vh"
       video={
         <video
           className="zoom-reel"
@@ -491,7 +491,7 @@ export function HomePage({ link, children }: { link: LinkTo; children?: React.Re
         kind="hero"
         label="Golden Boy Productions"
         spot="hero"
-        height="260vh"
+        height="285vh"
         video={
           <video
             ref={heroVideo}
