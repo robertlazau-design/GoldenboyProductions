@@ -86,7 +86,7 @@ function Chapter({ film, link }: { film: HomeFilm; link: LinkTo }) {
       kind="chapter"
       label={film.title}
       spot={`home-${film.word.split(' ')[0].toLowerCase()}`}
-      height="210vh"
+      height="165vh"
       video={
         <video
           className="zoom-reel"
@@ -215,9 +215,15 @@ function useThroughTheO(root: React.RefObject<HTMLDivElement | null>) {
       after: sec.querySelector<HTMLElement>('.zoom-after')!,
       shade: sec.querySelector<HTMLElement>('.zoom-shade')!,
       maxScale: 40,
+      shown: 0,
     }));
+    type Z = (typeof zooms)[number];
     let frame = 0;
     let live = false;
+    // A mouse wheel moves in steps; ease toward each step so the zoom glides.
+    // Touch scrolling is already smooth, so phones follow the finger directly.
+    const glide = finePointer();
+    let last = 0;
 
     const clear = () => {
       for (const z of zooms) {
@@ -228,24 +234,47 @@ function useThroughTheO(root: React.RefObject<HTMLDivElement | null>) {
       }
     };
 
-    const update = () => {
+    // How far through its section the page is scrolled, 0 to 1.
+    const progress = (z: Z) => {
+      const travel = z.sec.offsetHeight - window.innerHeight;
+      // A screen taller than the section (or a crawler's tall window): show the finished state.
+      return travel > 0 ? Math.min(1, Math.max(0, -z.sec.getBoundingClientRect().top / travel)) : 1;
+    };
+    const draw = (z: Z, p: number) => {
+      const start = z.hero ? 0.06 : 0.1;
+      const len = z.hero ? 0.6 : 0.56;
+      const q = p < start ? 0 : Math.min(1, (p - start) / len);
+      // Zoom at an even rate (equal scroll = equal zoom), easing in and out of the letter.
+      const e = q * q * (3 - 2 * q);
+      z.knock.style.transform = `scale(${Math.pow(z.maxScale + 1, e)})`;
+      z.knock.style.opacity = q >= 0.999 ? '0' : '1';
+      const fade = String(Math.max(0, 1 - q * 3));
+      for (const el of z.fades) el.style.opacity = fade;
+      const a = Math.max(0, Math.min(1, (p - (start + len * 0.95)) / 0.14));
+      z.after.style.opacity = String(a);
+      z.after.style.transform = `translateY(${(1 - a) * 24}px)`;
+      z.shade.style.opacity = String(a);
+    };
+    const snap = () => {
+      for (const z of zooms) draw(z, (z.shown = progress(z)));
+    };
+    const update = (now: number) => {
       frame = 0;
+      const dt = last ? Math.min(50, now - last) : 16;
+      let moving = false;
       for (const z of zooms) {
-        const travel = z.sec.offsetHeight - window.innerHeight;
-        const start = z.hero ? 0.08 : 0.12;
-        const len = z.hero ? 0.6 : 0.55;
-        // A screen taller than the section (or a crawler's tall window): show the finished state.
-        const p = travel > 0 ? Math.min(1, Math.max(0, -z.sec.getBoundingClientRect().top / travel)) : 1;
-        const q = p < start ? 0 : Math.min(1, (p - start) / len);
-        z.knock.style.transform = `scale(${1 + Math.pow(q, 3.2) * z.maxScale})`;
-        z.knock.style.opacity = q >= 0.999 ? '0' : '1';
-        const fade = String(Math.max(0, 1 - q * 3));
-        for (const el of z.fades) el.style.opacity = fade;
-        const a = Math.max(0, Math.min(1, (p - (start + len * 0.95)) / 0.14));
-        z.after.style.opacity = String(a);
-        z.after.style.transform = `translateY(${(1 - a) * 24}px)`;
-        z.shade.style.opacity = String(a);
+        const p = progress(z);
+        // Big jumps (a link to #work, the keyboard's End key) land straight away.
+        if (!glide || Math.abs(p - z.shown) > 0.35) z.shown = p;
+        else {
+          z.shown += (p - z.shown) * (1 - Math.exp(-dt / 90));
+          if (Math.abs(p - z.shown) < 0.0004) z.shown = p;
+          else moving = true;
+        }
+        draw(z, z.shown);
       }
+      last = moving ? now : 0;
+      if (moving) frame = requestAnimationFrame(update);
     };
     const onScroll = () => {
       if (live && !frame) frame = requestAnimationFrame(update);
@@ -266,7 +295,7 @@ function useThroughTheO(root: React.RefObject<HTMLDivElement | null>) {
         z.knock.style.transformOrigin = `${tr.left - kr.left + c.x}px ${tr.top - kr.top + c.y}px`;
         z.maxScale = (Math.hypot(window.innerWidth, window.innerHeight) / Math.max(8, c.size)) * 1.9;
       }
-      update();
+      snap();
     };
 
     let resizeTimer = 0;
@@ -462,7 +491,7 @@ export function HomePage({ link, children }: { link: LinkTo; children?: React.Re
         kind="hero"
         label="Golden Boy Productions"
         spot="hero"
-        height="340vh"
+        height="260vh"
         video={
           <video
             ref={heroVideo}
