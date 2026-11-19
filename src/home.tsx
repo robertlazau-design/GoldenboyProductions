@@ -400,16 +400,54 @@ function useMoreWorkPeek(list: React.RefObject<HTMLUListElement | null>, peek: R
   }, [list, peek]);
 }
 
+// ── LET'S MAKE ___: the last word changes once a second while it's on screen ──
+// The page is built with ONE. only; the other words join after load, and never
+// with reduce motion. Screen readers keep hearing "Let's make one."
+function useCloseWords(slot: React.RefObject<HTMLSpanElement | null>, count: number) {
+  const [cycling, setCycling] = React.useState(false);
+  const [at, setAt] = React.useState(0);
+  React.useEffect(() => {
+    const el = slot.current;
+    if (!el || count < 2 || reducedMotion() || typeof IntersectionObserver === 'undefined') return;
+    setCycling(true);
+    let timer = 0;
+    let seen = false;
+    const stop = () => {
+      window.clearInterval(timer);
+      timer = 0;
+    };
+    const start = () => {
+      if (!timer && seen && !document.hidden) timer = window.setInterval(() => setAt(i => (i + 1) % count), 1000);
+    };
+    const io = new IntersectionObserver(([e]) => {
+      seen = e.isIntersecting;
+      if (seen) start();
+      else stop();
+    });
+    io.observe(el);
+    const visibility = () => (document.hidden ? stop() : start());
+    document.addEventListener('visibilitychange', visibility);
+    return () => {
+      io.disconnect();
+      stop();
+      document.removeEventListener('visibilitychange', visibility);
+    };
+  }, [slot, count]);
+  return { cycling, at };
+}
+
 export function HomePage({ link, children }: { link: LinkTo; children?: React.ReactNode }) {
   const root = React.useRef<HTMLDivElement>(null);
   const heroVideo = React.useRef<HTMLVideoElement>(null);
   const heroCaption = React.useRef<HTMLSpanElement>(null);
   const moreList = React.useRef<HTMLUListElement>(null);
   const peek = React.useRef<HTMLDivElement>(null);
+  const closeSlot = React.useRef<HTMLSpanElement>(null);
   useThroughTheO(root);
   useFilms(root);
   useHeroCaption(heroVideo, heroCaption);
   useMoreWorkPeek(moreList, peek);
+  const close = useCloseWords(closeSlot, homeMake.close.words.length);
 
   const external = (to: string) => /^https?:/.test(to);
   const go = (to: string) => (external(to) ? { href: to, target: '_blank', rel: 'noopener' } : link(to));
@@ -602,7 +640,16 @@ export function HomePage({ link, children }: { link: LinkTo; children?: React.Re
             />
           </div>
           <span className="make-k" style={fit(homeMake.close.fit)}>
-            LET&rsquo;S MAKE ONE.
+            LET&rsquo;S MAKE{' '}
+            <span ref={closeSlot} className={`close-slot${close.cycling ? ' is-cycling' : ''}`}>
+              {homeMake.close.words.map((w, i) =>
+                i === 0 || close.cycling ? (
+                  <span key={w} className={`close-w${i === close.at ? ' on' : ''}`} aria-hidden={i === 0 ? undefined : true}>
+                    {w}
+                  </span>
+                ) : null,
+              )}
+            </span>
           </span>
         </div>
         <div className="flex flex-wrap items-center gap-3.5 mt-7">
