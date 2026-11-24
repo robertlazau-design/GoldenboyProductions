@@ -37,6 +37,7 @@ These match Golden Boy Productions' verified Google Business Profile. Use them e
 - Vite, React 19 and Tailwind CSS 4, hosted on Vercel.
 - Every route is prerendered to static HTML by `scripts/prerender.mjs`.
 - `npm run build` builds and prerenders. `npm run lint` type-checks.
+- **IndexNow:** `.github/workflows/indexnow.yml` runs `scripts/indexnow.py`. After a merge to main that changes the site, it waits for Vercel's deploy of that commit, checks the key file is live and sends every page in the live sitemap to IndexNow (Bing and the others that use it). Run it by hand from the Actions tab. The key is `public/e765a3b30fe8455f3db351a8d43031c2.txt` and is public by design: it only proves the site owns the submissions. Google doesn't use IndexNow; it reads the sitemap.
 
 | File | What's in it |
 | --- | --- |

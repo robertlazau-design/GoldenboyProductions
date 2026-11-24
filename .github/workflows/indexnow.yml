@@ -1,0 +1,36 @@
+# Tells Bing and the other IndexNow search engines (Yandex, Seznam, Naver...) about the site's
+# pages right after Vercel deploys a merge to main. Google doesn't use IndexNow; it reads the sitemap.
+name: IndexNow
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "src/**"
+      - "public/**"
+      - "assets/**"
+      - "index.html"
+      - "scripts/**"
+      - "vercel.json"
+  workflow_dispatch:
+    inputs:
+      all:
+        description: "Submit every page in the sitemap"
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+  statuses: read
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - name: Submit pages to IndexNow
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SUBMIT_ALL: ${{ github.event.inputs.all }}
+        run: python3 scripts/indexnow.py
