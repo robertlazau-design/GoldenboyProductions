@@ -2,8 +2,8 @@
 // (/services/<slug>) and /about. Styled to match the tabs in App.tsx.
 import React from 'react';
 import { ArrowLeft, ArrowRight, Play } from 'lucide-react';
-import { biography, clientApproach, currentProjects, featuredExtras, finishedProjects, nextSteps, recentWork, replyPromise, services, sunStar, type Project, type RecentWork, type Service, type WorkKind } from './data';
-import { ABOUT_PATH, TAB_ROUTES, WORK_PATH, projectPath, recapPath, servicePath } from './seo';
+import { biography, clientApproach, currentProjects, featuredExtras, finishedProjects, nextSteps, recentWork, replyPromise, services, sunStar, trades, type Package, type Project, type RecentWork, type Service, type Story, type WorkKind } from './data';
+import { ABOUT_PATH, TAB_ROUTES, TRADES_PATH, WORK_PATH, projectPath, recapPath, servicePath } from './seo';
 import { formatRecapDate, recaps, type Recap } from './recaps';
 import { isDriveVideo, isYouTubeEmbed } from './media';
 import { HoverPreview, Letterbox, SunMark, Theater } from './effects';
@@ -75,6 +75,64 @@ export function NextSteps({ className = '' }: { className?: string }) {
   );
 }
 
+const usd = (n: number) => `$${n.toLocaleString('en-US')}`;
+
+// The three website packages (web design page). The one with a tag is the
+// default choice and gets the heavier top rule.
+function Packages({ packages, quote, link }: { packages: Package[]; quote?: ReturnType<LinkTo>; link: LinkTo }) {
+  return (
+    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-stretch">
+      {packages.map(pk => (
+        <div
+          key={pk.name}
+          className={`flex flex-col border border-line bg-ground-raised p-6 md:p-8 ${pk.tag ? 'border-t-[6px] border-t-ink' : ''}`}
+        >
+          <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
+            <h3 className="font-display text-2xl text-ink">{pk.name}</h3>
+            {pk.tag && <span className="bg-sun text-on-sun text-[13px] uppercase font-label tracking-label px-2 py-1">{pk.tag}</span>}
+          </div>
+          <p className="font-display text-4xl md:text-5xl text-ink tracking-tight mb-4">{usd(pk.price)}</p>
+          <p className="text-sm text-ink-muted leading-relaxed mb-6">{pk.summary}</p>
+          <ul className="space-y-3 border-t border-line pt-6 mb-8 flex-1">
+            {pk.items.map(item => (
+              <li key={item} className="flex gap-3 text-sm text-ink leading-relaxed">
+                <span aria-hidden="true" className="text-accent font-slug font-bold">+</span>
+                <span>{item}</span>
+              </li>
+            ))}
+          </ul>
+          {pk.note && <p className="text-[13px] text-ink-muted leading-relaxed mb-6">{pk.note}</p>}
+          <a
+            {...(quote ?? link(TAB_ROUTES.contact.path))}
+            aria-label={`Ask about the ${pk.name} package`}
+            className={`inline-flex items-center justify-center gap-2 px-6 py-3 text-[13px] uppercase font-label tracking-label transition-colors ${pk.tag ? 'bg-sun text-on-sun font-semibold hover:bg-ink hover:text-ground' : 'border border-accent/40 text-accent hover:bg-sun hover:text-on-sun'}`}
+          >
+            Ask about {pk.name} <ArrowRight size={12} />
+          </a>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// Behind-the-scenes photos for a project story (trades page and project pages).
+function StoryPhotos({ story }: { story: Story }) {
+  return (
+    <figure>
+      <div className="grid grid-cols-2 gap-3 md:gap-4">
+        {story.photos.map(ph => (
+          <div key={ph.src} className="aspect-[3/2] overflow-hidden bg-ground-raised border border-line">
+            <img src={ph.src} alt={ph.alt} loading="lazy" decoding="async" width={1200} height={800} className="w-full h-full object-cover" />
+          </div>
+        ))}
+      </div>
+      <figcaption className="mt-3 text-[13px] text-ink-muted">{story.credit}</figcaption>
+    </figure>
+  );
+}
+
+const isInternal = (to: string) => to.startsWith('/');
+
 function ContactCta({ link, heading, cta, steps }: { link: LinkTo; heading: string; cta?: { href: string; onClick: (e: React.MouseEvent) => void; label: string }; steps?: boolean }) {
   return (
     <section className="py-20 border-t border-line text-center" aria-label="Get in touch">
@@ -126,6 +184,7 @@ export function ProjectPage({ project, link }: { project: Project; link: LinkTo 
   ];
   const more = finishedProjects.filter(p => p.slug !== project.slug).slice(0, 3);
   const videoService = services.find(s => s.slug === 'video-production');
+  const story = trades.stories.find(st => st.project === project.slug);
 
   return (
     <article className="py-16">
@@ -162,6 +221,18 @@ export function ProjectPage({ project, link }: { project: Project; link: LinkTo 
           ))}
         </dl>
       </div>
+
+      {story && (
+        <section className="py-20 border-t border-line" aria-labelledby="bts-h">
+          <span className="slug mb-6">{story.slugline}</span>
+          <h2 id="bts-h" className="font-display text-3xl md:text-5xl text-ink tracking-tight mb-6">Behind the scenes</h2>
+          <p className="max-w-2xl text-sm md:text-base text-ink-muted leading-relaxed mb-10">{story.text[story.text.length - 1]}</p>
+          <StoryPhotos story={story} />
+          <div className="mt-8">
+            <TextLink link={link} to={TRADES_PATH}>More for trucking, towing &amp; trades</TextLink>
+          </div>
+        </section>
+      )}
 
       <section className="py-20 border-t border-line" aria-label="More work">
         <Kicker>Portfolio</Kicker>
@@ -204,6 +275,14 @@ export function ServicePage({ service, link, quote }: { service: Service; link: 
               className="inline-flex items-center gap-2 text-[13px] uppercase font-label tracking-label text-ink-muted hover:text-accent transition-colors"
             >
               {service.sites?.length ? 'See client results' : 'See the work'} <ArrowRight size={12} />
+            </a>
+          )}
+          {service.packages && (
+            <a
+              href="#packages"
+              className="inline-flex items-center gap-2 text-[13px] uppercase font-label tracking-label text-ink-muted hover:text-accent transition-colors"
+            >
+              Packages and prices <ArrowRight size={12} />
             </a>
           )}
         </div>
@@ -287,6 +366,50 @@ export function ServicePage({ service, link, quote }: { service: Service; link: 
         </section>
       )}
 
+      {service.packages && (
+        <section className="py-20 border-t border-line scroll-mt-8" id="packages" aria-labelledby="packages-h">
+          <Kicker>Packages</Kicker>
+          <h2 id="packages-h" className="font-display text-3xl md:text-5xl text-ink tracking-tight mb-6">Three ways to start</h2>
+          <p className="max-w-2xl text-sm md:text-base text-ink-muted leading-relaxed mb-12">
+            Clear prices for the build. Every package starts the same way: a 15-minute call, then a written plan and price.
+          </p>
+          <Packages packages={service.packages} quote={quote} link={link} />
+          {service.slug === 'web-design' && (
+            <p className="mt-10 text-sm text-ink-muted leading-relaxed max-w-2xl">
+              Run a trucking, towing or trade business?{' '}
+              <a {...link(TRADES_PATH)} className="text-accent underline underline-offset-4 hover:text-ink">See the work for businesses like yours</a>.
+            </p>
+          )}
+        </section>
+      )}
+
+      {service.hub && (
+        <section className="py-20 border-t border-line" aria-labelledby="hub-h">
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-12 md:gap-16 items-center">
+            <div className="md:col-span-7">
+              <Kicker>Your client page</Kicker>
+              <h2 id="hub-h" className="font-display text-3xl md:text-5xl text-ink tracking-tight mb-8">{service.hub.heading}</h2>
+              <div className="space-y-5 text-sm md:text-base text-ink-muted leading-relaxed max-w-xl mb-8">
+                {service.hub.text.map((t, i) => <p key={i}>{t}</p>)}
+              </div>
+              <a
+                href={service.hub.url}
+                target="_blank"
+                rel="noopener"
+                className="inline-flex items-center gap-2 border border-accent/40 px-5 py-3 text-[13px] uppercase font-label tracking-label text-accent hover:bg-sun hover:text-on-sun transition-colors"
+              >
+                {service.hub.label} <ArrowRight size={12} />
+              </a>
+            </div>
+            <div className="md:col-span-5 flex justify-center md:justify-end">
+              <div className="w-[70%] max-w-[280px] rounded-[1.6rem] border-[6px] border-asphalt bg-asphalt overflow-hidden">
+                <img src={service.hub.image} alt={service.hub.alt} loading="lazy" decoding="async" width={540} height={1169} className="block w-full h-auto rounded-[1.1rem]" />
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
+
       <section className="py-20 border-t border-line" aria-label="What's included">
         <Kicker>What Robert offers</Kicker>
         <SectionHeading>What's included</SectionHeading>
@@ -328,11 +451,116 @@ export function ServicePage({ service, link, quote }: { service: Service; link: 
       {others.length > 0 && (
         <nav className="py-12 border-t border-line flex flex-wrap gap-8" aria-label="Other services">
           {others.map(s => <TextLink key={s.slug} link={link} to={servicePath(s)}>{s.name}</TextLink>)}
+          <TextLink link={link} to={TRADES_PATH}>Trucking, towing &amp; trades</TextLink>
           <TextLink link={link} to={ABOUT_PATH}>About Robert</TextLink>
         </nav>
       )}
 
       <ContactCta link={link} heading="Let's make something together" cta={quote && { ...quote, label: 'Get a quote' }} steps />
+    </article>
+  );
+}
+
+// /trucking-towing-trades: films, photos and websites for the businesses that
+// keep Portland moving (content in `trades`, data.ts).
+export function TradesPage({ link }: { link: LinkTo }) {
+  const web = services.find(s => s.slug === 'web-design');
+  const pk = web?.packages ?? [];
+  const standard = pk.find(p => p.tag);
+  const starter = pk[0];
+  const signature = pk[pk.length - 1];
+  const buttonCls = 'inline-flex items-center gap-2 text-[13px] uppercase font-label tracking-label text-accent hover:text-ink transition-colors';
+
+  return (
+    <article className="py-16">
+      <header className="max-w-4xl mb-20">
+        <Kicker>{trades.kicker}</Kicker>
+        <h1 className="font-display text-4xl md:text-6xl text-ink tracking-tight mb-10">{trades.heading}</h1>
+        <div className="space-y-6 text-sm md:text-base text-ink-muted leading-relaxed max-w-3xl">
+          {trades.intro.map((p, i) => <p key={i}>{p}</p>)}
+        </div>
+        <div className="flex flex-wrap items-center gap-6 mt-12">
+          <a
+            {...link(TAB_ROUTES.contact.path)}
+            className="inline-flex items-center gap-3 px-8 py-4 bg-sun text-on-sun text-[13px] uppercase font-label tracking-label font-semibold hover:bg-ink hover:text-ground transition-colors duration-300"
+          >
+            Start a project <ArrowRight size={14} />
+          </a>
+          <a href="#stories" className="inline-flex items-center gap-2 text-[13px] uppercase font-label tracking-label text-ink-muted hover:text-accent transition-colors">
+            Behind the scenes <ArrowRight size={12} />
+          </a>
+        </div>
+      </header>
+
+      <section className="py-20 border-t border-line" aria-labelledby="needs-h">
+        <Kicker>What the site has to do</Kicker>
+        <h2 id="needs-h" className="font-display text-3xl md:text-5xl text-ink tracking-tight mb-10">Built for the way your customers find you</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          {trades.needs.map((n, i) => (
+            <div key={n.title} className="border-t border-line pt-6">
+              <span className="font-slug font-bold text-[15px] text-ink mb-3 block">0{i + 1}/</span>
+              <h3 className="font-display text-lg text-ink mb-2">{n.title}</h3>
+              <p className="text-sm text-ink-muted leading-relaxed">{n.desc}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section className="py-20 border-t border-line" aria-labelledby="work-h">
+        <Kicker>The work</Kicker>
+        <h2 id="work-h" className="font-display text-3xl md:text-5xl text-ink tracking-tight mb-10">Clients who haul, tow and build</h2>
+        <ul className="border-t border-line">
+          {trades.work.map(w => (
+            <li key={w.name} className="grid grid-cols-1 md:grid-cols-12 gap-3 md:gap-8 py-6 border-b border-line md:items-baseline">
+              <h3 className="md:col-span-4 font-display text-xl md:text-2xl text-ink">{w.name}</h3>
+              <p className="md:col-span-3 text-[13px] uppercase font-label tracking-label text-ink-muted">{w.what}{w.where ? ` / ${w.where}` : ''}</p>
+              <p className="md:col-span-3 text-sm text-ink-muted leading-relaxed">{w.desc}</p>
+              <div className="md:col-span-2 md:text-right">
+                {w.to && (isInternal(w.to)
+                  ? <a {...link(w.to)} className={buttonCls}>{w.label} <ArrowRight size={12} /></a>
+                  : <a href={w.to} target="_blank" rel="noopener" className={buttonCls}>{w.label} <ArrowRight size={12} /></a>)}
+              </div>
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      <section id="stories" className="py-20 border-t border-line scroll-mt-8" aria-labelledby="stories-h">
+        <Kicker>Behind the scenes</Kicker>
+        <h2 id="stories-h" className="font-display text-3xl md:text-5xl text-ink tracking-tight mb-16">Two jobs, start to finish</h2>
+        <div className="space-y-24">
+          {trades.stories.map((st, i) => (
+            <article key={st.slug} className="grid grid-cols-1 md:grid-cols-12 gap-10 md:gap-16 items-start" aria-labelledby={`story-${st.slug}`}>
+              <div className={`md:col-span-5 ${i % 2 ? 'md:order-2' : ''}`}>
+                <span className="slug mb-6">{st.slugline}</span>
+                <h3 id={`story-${st.slug}`} className="font-display text-2xl md:text-4xl text-ink tracking-tight mb-6">{st.heading}</h3>
+                <div className="space-y-5 text-sm md:text-base text-ink-muted leading-relaxed mb-8">
+                  {st.text.map((t, j) => <p key={j}>{t}</p>)}
+                </div>
+                {isInternal(st.link.to)
+                  ? <a {...link(st.link.to)} className={buttonCls}>{st.link.label} <ArrowRight size={12} /></a>
+                  : <a href={st.link.to} target="_blank" rel="noopener" className={buttonCls}>{st.link.label} <ArrowRight size={12} /></a>}
+              </div>
+              <div className={`md:col-span-7 ${i % 2 ? 'md:order-1' : ''}`}>
+                <StoryPhotos story={st} />
+              </div>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      {web && starter && standard && signature && (
+        <section className="py-20 border-t border-line" aria-labelledby="price-h">
+          <Kicker>Websites</Kicker>
+          <h2 id="price-h" className="font-display text-3xl md:text-5xl text-ink tracking-tight mb-8">What a site costs</h2>
+          <p className="max-w-2xl text-sm md:text-base text-ink-muted leading-relaxed mb-8">
+            Websites start at {usd(starter.price)}. Most clients start with {standard.name} at {usd(standard.price)}: a page for every service, a quote form and full local SEO. {signature.name}, at {usd(signature.price)}, adds a half-day Golden Boy shoot of your crew and equipment.
+          </p>
+          <TextLink link={link} to={`${servicePath(web)}#packages`}>See all three packages</TextLink>
+        </section>
+      )}
+
+      <ContactCta link={link} heading="Tell Robert what you haul, fix or build" steps />
     </article>
   );
 }
