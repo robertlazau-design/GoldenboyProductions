@@ -43,7 +43,7 @@ These match Golden Boy Productions' verified Google Business Profile. Use them e
 | --- | --- |
 | `src/App.tsx` | App shell, header, routes, contact form and custom cursor |
 | `src/home.tsx` | The homepage, "Through the O" |
-| `src/pages.tsx` | Work, project, service and about pages |
+| `src/pages.tsx` | Work, project, service, trades and about pages |
 | `src/data.ts` | All content |
 | `src/seo.ts` | Routes and meta tags |
 | `src/effects.tsx` | Motion effects |
@@ -133,6 +133,13 @@ Robert asked to break from the brand book for the homepage ("go pure creative") 
 - ProfessionalService (a LocalBusiness type) has the profile's phone, `hasMap` and `sameAs`; no street address, since it's a service-area business.
 - Armadas Exterior has no project page yet (no full film on YouTube); its homepage button goes to Contact. Add a project once Robert sends the film and its year.
 - The Disaster Preparedness ad's storm, rescue and grocery shots look like stock footage, so the homepage uses only its siren, exit-bar and map shots. Ask Robert before using the others.
+
+## Packages, the client page and the trades page (Nov 24, 2026)
+
+- **Website packages** are `packages` on the web design service in `src/data.ts`: Starter $950, Standard $1,500 ("Most clients start here"), Signature $3,800 (adds a half-day shoot; $4,300 booked separately). Robert set these prices. They show at `/services/web-design#packages` and as priced `Offer`s in that page's Service JSON-LD. Change a price only when Robert does.
+- **"You'll always know where your project stands"** (`hub` on the same service) shows a phone screenshot of the made-up sample client page, `https://clients.robertlazau.com/sample-8r83` ("Example Roofing Co.", in the Golden-Boy-Clients repo). Never show a real client's hub. Re-shoot `public/work/hub-sample.webp` (540 px wide) if the hub's look changes.
+- **`/trucking-towing-trades`** (`TradesPage` in `src/pages.tsx`, content in `trades` in `src/data.ts`): the niche page for "the people who run Portland". It names only clients in `clientNames` and links from the footer, the web design packages and every service page.
+- **Project stories** (`trades.stories`): Matman Trucking and Royal Brand Woodworking, with real behind-the-scenes photos in `public/work/stories/` (1200 px webp from Robert's Desktop folder "Golden Boy BTS and Port", shot by Grant Pauli). The slug lines use the photos' own capture times. A story with a `project` slug also shows on that project page as "Behind the scenes". Add a story only from real photos and facts Robert has confirmed.
 
 ## Contact form and the reply promise
 

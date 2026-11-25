@@ -117,7 +117,8 @@ export type Project = {
 };
 
 // Clients Robert has confirmed. Only these may be named on the site; his own
-// projects are left out. (Armadas Exterior: confirmed by Robert, Nov 18, 2026.)
+// projects are left out. (Armadas Exterior: confirmed by Robert, Nov 18, 2026.
+// FX4 Logistics: confirmed by Robert, Nov 24, 2026.)
 export const clientNames: string[] = [
   "Matman Trucking",
   "Armadas Exterior",
@@ -130,6 +131,7 @@ export const clientNames: string[] = [
   "Kyree Films",
   "Pasture & Paw",
   "Tow Guys",
+  "FX4 Logistics",
 ];
 
 // Newest first: the first film here is the big "Newest" card on the Work page.
@@ -758,6 +760,10 @@ export const recommendableMovies = [
 
 // Service pages (/services/<slug>). Copy is drawn from the projects and
 // process described elsewhere on the site.
+// Website packages (Robert, Nov 24, 2026). Prices are for the build. One is
+// marked "most clients start here" so the choice is easy.
+export type Package = { name: string; price: number; tag?: string; summary: string; items: string[]; note?: string };
+
 export type Service = {
   slug: string;
   name: string;
@@ -769,6 +775,10 @@ export type Service = {
   projectSlugs: string[];
   sites?: Array<{ name: string; type: string; location: string; url: string; desc: string; result?: string }>;
   steps?: Array<{ title: string; desc: string }>;
+  packages?: Package[];
+  // "You'll always know where your project stands": the client hub, shown with
+  // a screenshot of the made-up sample page (never a real client's page).
+  hub?: { heading: string; text: string[]; image: string; alt: string; url: string; label: string };
 };
 
 export const services: Service[] = [
@@ -815,7 +825,7 @@ export const services: Service[] = [
     heading: "Websites that bring in calls, bookings and clients",
     intro: [
       "Golden Boy Productions builds and manages websites for small businesses in Gresham, Portland and across East Multnomah County. Robert designs each site, writes it around the way your customers actually search, and keeps it fast, secure and up to date after launch.",
-      "Because the same studio shoots video and photos, your site can launch with real footage of your work instead of stock images. Current clients include a towing company in Gresham, a working farm and dog-training academy in Enumclaw and a Portland videographer.",
+      "Because the same studio shoots video and photos, your site can launch with real footage of your work instead of stock images. Current clients include a towing company in Gresham, a flatbed and dry van carrier in Wood Village, a working farm and dog-training academy in Enumclaw and a Portland videographer.",
     ],
     offerings: [
       { title: "Custom design & build", desc: "A fast, mobile-first site designed around your business, with clear buttons to call, book or request a quote on every page." },
@@ -828,6 +838,7 @@ export const services: Service[] = [
     projectSlugs: [],
     sites: [
       { name: "Tow Guys", type: "Towing & roadside assistance", location: "Gresham, OR", url: "https://www.towguysgresham.com", desc: "A call-first site for a 24/7 towing company, with its own page for every service and every town they cover, plus a regularly updated blog.", result: "Shows up on Google for its name and for local towing searches around Gresham, and brings in visitors from search every week." },
+      { name: "FX4 Logistics", type: "Trucking & warehousing", location: "Wood Village, OR", url: "https://www.fx4logistics.com", desc: "A site for a locally owned flatbed, step deck and dry van carrier with warehouse storage off I-84, with its own pages for trucking, warehousing, the service area and driver jobs.", result: "Live since November 2026." },
       { name: "Pasture & Paw", type: "Farm, dog boarding & training", location: "Enumclaw, WA", url: "https://www.pasturepaw.com", desc: "A working farm and canine academy site with an online booking form for boarding and training, a dedicated dog boarding page and answers to common questions.", result: "Boarding requests started coming in through the site soon after launch." },
       { name: "Kyree Films", type: "Videographer", location: "Portland, OR", url: "https://kyreefilms.com", desc: "A portfolio site for a Portland videographer, with separate pages for weddings, events and sports so each one can be found on Google.", result: "Every service page is indexed by Google." },
     ],
@@ -836,8 +847,140 @@ export const services: Service[] = [
       { title: "Design & Build", desc: "Pages, copy, photos and SEO planned around how your customers search, then built fast and mobile-first." },
       { title: "Launch & Manage", desc: "Search Console, analytics and forms set up at launch, then ongoing updates and a regular check on how the site is performing." },
     ],
+    packages: [
+      {
+        name: "Starter",
+        price: 950,
+        summary: "A clean, fast site that gets you found and gets you calls.",
+        items: [
+          "Up to 3 pages: Home, Services, Contact",
+          "Tap-to-call and text buttons",
+          "Contact form",
+          "Basic local SEO: titles, sitemap, business schema",
+          "Analytics with lead tracking",
+          "Your domain connected",
+          "Your own client page to follow the work",
+          "Built with your own photos",
+        ],
+      },
+      {
+        name: "Standard",
+        price: 1500,
+        tag: "Most clients start here",
+        summary: "A page for every service, so you show up for what you actually do.",
+        items: [
+          "Everything in Starter",
+          "Up to 7 pages: a page per service, About, Service Area, Contact",
+          "Quote or booking form",
+          "Full local SEO: Google Search Console, Bing and IndexNow",
+          "Google Business Profile setup help",
+        ],
+      },
+      {
+        name: "Signature",
+        price: 3800,
+        summary: "Your site and your story, shot and built by the same crew.",
+        items: [
+          "Everything in Standard",
+          "A half-day Golden Boy shoot: real photos and a short hero film of your crew and work",
+          "Up to 12 pages, with town or location pages",
+          "Motion effects",
+        ],
+        note: "$4,300 if you book the shoot and the site separately.",
+      },
+    ],
+    hub: {
+      heading: "You'll always know where your project stands",
+      text: [
+        "Every website client gets a private page of their own while the work is under way: the steps, what's happening now, what comes next and anything Robert needs from you. Robert updates it as the work moves, so you never have to ask where things are.",
+        "It also walks you through connecting your domain and setting up your Google Business Profile, one step at a time.",
+      ],
+      image: "/work/hub-sample.webp",
+      alt: "A sample client page on a phone: the project steps, with Revisions marked \"We're here\"",
+      url: "https://clients.robertlazau.com/sample-8r83",
+      label: "See a sample client page",
+    },
   },
 ];
+
+// ── Trucking, towing & trades (/trucking-towing-trades) ────────────────────
+// The niche page (Robert, Nov 24, 2026): "the people who run Portland". Only
+// confirmed clients (clientNames) and facts from the work itself. Stories use
+// real behind-the-scenes photos (public/work/stories); the slug lines come from
+// the photos' own dates and times.
+export type StoryPhoto = { src: string; alt: string };
+export type Story = {
+  slug: string;
+  client: string;
+  project?: string; // a finishedProjects slug: its page shows the same photos
+  slugline: string;
+  heading: string;
+  text: string[];
+  photos: StoryPhoto[];
+  credit: string;
+  link: { label: string; to: string };
+};
+
+export const trades = {
+  kicker: "For the people who run Portland",
+  heading: "Films, photos and websites for trucking, towing and trade businesses",
+  intro: [
+    "Golden Boy Productions works with the businesses that keep Portland and Gresham moving: haulers, tow operators, builders and remodelers. Their customers usually find them on a phone, in a hurry, so the site has to do the selling: the number up top, real photos of real trucks and crews, and a page for every service and town they cover.",
+    "The same small crew shoots and builds, so the photos and film on your site come from your own yard, shop or job site, not a stock library.",
+  ],
+  needs: [
+    { title: "Call first", desc: "Tap-to-call and text buttons at the top of every page, for customers searching on their phone." },
+    { title: "Your trucks, your crew", desc: "Photos and film of your own equipment and people. Customers can tell a stock photo from your yard." },
+    { title: "A page for every service and town", desc: "So you show up when someone nearby searches for exactly what you do, from flatbed hauling to cabinet installs." },
+    { title: "Leads that reach you on the job", desc: "Quote and booking forms that land in your inbox, and a Google Business Profile that matches your site." },
+  ],
+  work: [
+    { name: "Matman Trucking", what: "Commercial film + photo set", where: "Gresham, OR", desc: "Oregon's first natural gas garbage transfer trucks, on film.", to: "/work/matman-trucking", label: "Watch the film" },
+    { name: "Tow Guys", what: "Website", where: "Gresham, OR", desc: "A call-first site for a 24/7 towing company, with a page for every service and every town they cover.", to: "https://www.towguysgresham.com", label: "Visit the site" },
+    { name: "FX4 Logistics", what: "Website", where: "Wood Village, OR", desc: "Flatbed, step deck, dry van and warehousing, with pages for trucking, warehousing and driver jobs.", to: "https://www.fx4logistics.com", label: "Visit the site" },
+    { name: "Royal Brand Woodworking", what: "Photo shoot + website", where: "Portland, OR", desc: "Custom cabinets and kitchen and bathroom remodels, with photos shot in the client's own shop.", to: "https://www.royalbrandwoodworking.com", label: "Visit the site" },
+    { name: "Armadas Exterior", what: "Commercial", where: "", desc: "Cousin Jerry versus the gutter: a short commercial where the gutter wins.", to: "", label: "" },
+  ] as Array<{ name: string; what: string; where: string; desc: string; to: string; label: string }>,
+  stories: [
+    {
+      slug: "matman",
+      client: "Matman Trucking",
+      project: "matman-trucking",
+      slugline: "EXT. TRUCK LOT - GRESHAM, OR - MIDDAY",
+      heading: "Matman Trucking: film and photos, shot together",
+      text: [
+        "Matman Trucking runs Oregon's first natural gas garbage transfer trucks. Golden Boy made them a 47-second website film, a full edit and a photo set.",
+        "It was all shot in Gresham on November 2, 2026, with Matman's own trucks and drivers. The film crew and photographer Grant Pauli worked side by side, so the film and the photos match: the same trucks, the same drivers, the same day.",
+      ],
+      photos: [
+        { src: "/work/stories/matman-bts-1.webp", alt: "Filming two Matman drivers as they climb into a truck cab" },
+        { src: "/work/stories/matman-bts-2.webp", alt: "Checking a take on the camera while the Matman crew stands by" },
+        { src: "/work/stories/matman-bts-3.webp", alt: "Setting up a shot beside a Matman transfer trailer" },
+        { src: "/work/stories/matman-bts-4.webp", alt: "Two Matman trucks and trailers parked for the shoot" },
+      ],
+      credit: "Behind-the-scenes photos: Grant Pauli Photography",
+      link: { label: "Watch the film", to: "/work/matman-trucking" },
+    },
+    {
+      slug: "royal-brand",
+      client: "Royal Brand Woodworking",
+      slugline: "INT. WOODWORKING SHOP - PORTLAND, OR - MORNING",
+      heading: "Royal Brand Woodworking: one cabinet door, start to finish",
+      text: [
+        "Royal Brand Woodworking is Robert Burlacu's shop in Portland: custom cabinets, plus kitchen and bathroom remodels.",
+        "On September 26, 2026, photographer Grant Pauli followed one cabinet door through the shop in a single morning, from the first cut on the miter saw to the finished door. Golden Boy then designed and built the new site around those photos, so it shows Burlacu's own shop and his own work. It went live in October.",
+      ],
+      photos: [
+        { src: "/work/stories/royal-step-1.webp", alt: "Cutting cabinet door stock on the miter saw" },
+        { src: "/work/stories/royal-step-2.webp", alt: "Machining a door rail, in red work gloves" },
+        { src: "/work/stories/royal-step-3.webp", alt: "The cabinet door glued up in bar clamps" },
+        { src: "/work/stories/royal-step-4.webp", alt: "The finished cabinet door" },
+      ],
+      credit: "Photos: Grant Pauli Photography",
+      link: { label: "Visit royalbrandwoodworking.com", to: "https://www.royalbrandwoodworking.com" },
+    },
+  ] as Story[],
+};
 
 // About page: the story behind the Golden Boy Productions mark.
 export const sunStar = {

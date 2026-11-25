@@ -1,6 +1,6 @@
 // Routing and per-page search metadata. Used by the app when navigating and
 // by scripts/prerender.mjs when it writes a static HTML file for each page.
-import { faqs, finishedProjects, recentWork, services, biography, type Project, type Service } from './data';
+import { faqs, finishedProjects, recentWork, services, biography, trades, type Project, type Service } from './data';
 import { recaps, type Recap } from './recaps';
 
 export const SITE_URL = 'https://www.robertlazau.com';
@@ -42,6 +42,7 @@ export const TAB_ROUTES: Record<Tab, { path: string; title: string; description:
 
 export const ABOUT_PATH = '/about';
 export const WORK_PATH = '/work';
+export const TRADES_PATH = '/trucking-towing-trades';
 export const projectPath = (p: Project) => `/work/${p.slug}`;
 export const servicePath = (s: Service) => `/services/${s.slug}`;
 export const recapPath = (r: Recap) => `/recaps/${r.slug}`;
@@ -50,6 +51,7 @@ export type Page =
   | { kind: 'tab'; tab: Tab }
   | { kind: 'about' }
   | { kind: 'work' }
+  | { kind: 'trades' }
   | { kind: 'project'; project: Project }
   | { kind: 'service'; service: Service }
   | { kind: 'recap'; recap: Recap };
@@ -60,6 +62,7 @@ export const pageFromPath = (pathname: string): Page => {
   const path = normalizePath(pathname);
   if (path === ABOUT_PATH) return { kind: 'about' };
   if (path === WORK_PATH) return { kind: 'work' };
+  if (path === TRADES_PATH) return { kind: 'trades' };
   const project = finishedProjects.find(p => projectPath(p) === path);
   if (project) return { kind: 'project', project };
   const service = services.find(s => servicePath(s) === path);
@@ -76,6 +79,7 @@ export const ALL_PATHS: string[] = [
   WORK_PATH,
   ABOUT_PATH,
   ...services.map(servicePath),
+  TRADES_PATH,
   ...finishedProjects.map(projectPath),
   ...(isTabShown('recaps') ? [TAB_ROUTES.recaps.path, ...recaps.map(recapPath)] : []),
   TAB_ROUTES.contact.path,
@@ -112,6 +116,14 @@ export const pageMeta = (page: Page): { path: string; title: string; description
         description: fit(155, `${p.description} By Robert Lazau, Golden Boy Productions.`, `${p.description} By Robert Lazau.`, p.description),
       };
     }
+    case 'trades':
+      return {
+        path: TRADES_PATH,
+        title: fit(60, 'Websites & Video for Trucking, Towing & Trades | Golden Boy', 'Trucking, Towing & Trades Websites | Golden Boy'),
+        description: fit(155,
+          'Websites, films and photos for trucking, towing and trade businesses in Portland and Gresham, by Robert Lazau: Matman Trucking, Tow Guys, FX4 and more.',
+          'Websites, films and photos for trucking, towing and trade businesses in Portland and Gresham, by Robert Lazau of Golden Boy Productions.'),
+      };
     case 'service':
       return { path: servicePath(page.service), title: page.service.title, description: page.service.description };
     case 'recap': {
@@ -219,6 +231,27 @@ export const pageJsonLd = (page: Page): object[] => {
         breadcrumbs([['Home', '/'], ['Work', WORK_PATH], [p.title, projectPath(p)]]),
       ];
     }
+    case 'trades':
+      return [
+        {
+          '@context': 'https://schema.org',
+          '@type': 'CollectionPage',
+          name: 'Websites and video for trucking, towing and trade businesses',
+          url: canonicalUrl(TRADES_PATH),
+          about: ['Trucking', 'Towing', 'Skilled trades'].map(name => ({ '@type': 'Thing', name })),
+          provider: ORG,
+          mainEntity: {
+            '@type': 'ItemList',
+            itemListElement: trades.work.map((w, i) => ({
+              '@type': 'ListItem',
+              position: i + 1,
+              name: `${w.name}: ${w.what}`,
+              ...(w.to ? { url: w.to.startsWith('/') ? canonicalUrl(w.to) : w.to } : {}),
+            })),
+          },
+        },
+        breadcrumbs([['Home', '/'], ['Trucking, Towing & Trades', TRADES_PATH]]),
+      ];
     case 'service': {
       const s = page.service;
       return [
@@ -234,10 +267,20 @@ export const pageJsonLd = (page: Page): object[] => {
           hasOfferCatalog: {
             '@type': 'OfferCatalog',
             name: s.name,
-            itemListElement: s.offerings.map(o => ({
-              '@type': 'Offer',
-              itemOffered: { '@type': 'Service', name: o.title, description: o.desc },
-            })),
+            itemListElement: [
+              ...(s.packages ?? []).map(pk => ({
+                '@type': 'Offer',
+                name: `${pk.name} website package`,
+                price: pk.price,
+                priceCurrency: 'USD',
+                description: pk.summary,
+                itemOffered: { '@type': 'Service', name: `${pk.name} website`, description: pk.items.join('; ') },
+              })),
+              ...s.offerings.map(o => ({
+                '@type': 'Offer',
+                itemOffered: { '@type': 'Service', name: o.title, description: o.desc },
+              })),
+            ],
           },
         },
         breadcrumbs([['Home', '/'], [s.name, servicePath(s)]]),

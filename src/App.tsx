@@ -4,8 +4,8 @@ import { track } from '@vercel/analytics';
 import { motion, AnimatePresence, useMotionValue, useSpring } from 'motion/react';
 import { ArrowRight, ArrowLeft, Plus, Minus, Camera, X, Send, Mail, Phone } from 'lucide-react';
 import { business, favoriteMovies, faqs, nextSteps, recommendableMovies, replyPromise, services } from './data';
-import { TAB_ROUTES, isTabShown, pageFromPath, pageMeta, normalizePath, canonicalUrl, projectPath, servicePath, ABOUT_PATH, WORK_PATH, type Tab } from './seo';
-import { AboutPage, NextSteps, ProjectPage, RecapPage, RecapsPage, ServicePage, WorkPage } from './pages';
+import { TAB_ROUTES, isTabShown, pageFromPath, pageMeta, normalizePath, canonicalUrl, projectPath, servicePath, ABOUT_PATH, TRADES_PATH, WORK_PATH, type Tab } from './seo';
+import { AboutPage, NextSteps, ProjectPage, RecapPage, RecapsPage, ServicePage, TradesPage, WorkPage } from './pages';
 import { HomePage } from './home';
 import { SunMark, useCardGlow } from './effects';
 import { trackAdsConversion } from './leadEvents';
@@ -795,6 +795,7 @@ export default function App({ initialPath }: { initialPath?: string }) {
               >
                 {page.kind === 'about' && <AboutPage link={link} />}
                 {page.kind === 'work' && <WorkPage link={link} />}
+                {page.kind === 'trades' && <TradesPage link={link} />}
                 {page.kind === 'project' && <ProjectPage project={page.project} link={link} />}
                 {page.kind === 'recap' && <RecapPage recap={page.recap} link={link} />}
                 {page.kind === 'service' && <ServicePage service={page.service} link={link} quote={quoteLink(page.service.slug)} />}
@@ -909,8 +910,9 @@ export default function App({ initialPath }: { initialPath?: string }) {
                       <form onSubmit={handleContactSubmit} className="space-y-6">
                         <input type="checkbox" name="botcheck" className="hidden" tabIndex={-1} autoComplete="off" aria-hidden="true" />
                         <div>
-                          <label className="block text-[13px] uppercase font-label tracking-label text-ink-muted mb-2">Your Name *</label>
+                          <label htmlFor="contact-name" className="block text-[13px] uppercase font-label tracking-label text-ink-muted mb-2">Your Name *</label>
                           <input 
+                            id="contact-name"
                             type="text" 
                             required
                             value={contactName}
@@ -921,8 +923,9 @@ export default function App({ initialPath }: { initialPath?: string }) {
                         </div>
 
                         <div>
-                          <label className="block text-[13px] uppercase font-label tracking-label text-ink-muted mb-2">Email Address *</label>
+                          <label htmlFor="contact-email" className="block text-[13px] uppercase font-label tracking-label text-ink-muted mb-2">Email Address *</label>
                           <input 
+                            id="contact-email"
                             type="email" 
                             required
                             value={contactEmail}
@@ -948,8 +951,9 @@ export default function App({ initialPath }: { initialPath?: string }) {
                         </div>
 
                         <div>
-                          <label className="block text-[13px] uppercase font-label tracking-label text-ink-muted mb-2">Your Message *</label>
-                          <textarea 
+                          <label htmlFor="contact-message" className="block text-[13px] uppercase font-label tracking-label text-ink-muted mb-2">Your Message *</label>
+                          <textarea
+                            id="contact-message"
                             required
                             rows={5}
                             value={contactMessage}
@@ -997,6 +1001,7 @@ export default function App({ initialPath }: { initialPath?: string }) {
             {services.map(s => (
               <a key={s.slug} {...link(servicePath(s))} className="hover:text-accent transition-colors">{s.name}</a>
             ))}
+            <a {...link(TRADES_PATH)} className="hover:text-accent transition-colors">Trucking, Towing &amp; Trades</a>
             {isTabShown('recaps') && (
               <a {...tabLink('recaps')} className="hover:text-accent transition-colors">Project Recaps</a>
             )}
