@@ -3,12 +3,16 @@ import emailjs from '@emailjs/browser';
 import { track } from '@vercel/analytics';
 import { motion, AnimatePresence, useMotionValue, useSpring } from 'motion/react';
 import { ArrowRight, ArrowLeft, Plus, Minus, Camera, X, Send, Mail, Phone } from 'lucide-react';
-import { business, favoriteMovies, faqs, recommendableMovies, services } from './data';
+import { business, favoriteMovies, faqs, nextSteps, recommendableMovies, replyPromise, services } from './data';
 import { TAB_ROUTES, isTabShown, pageFromPath, pageMeta, normalizePath, canonicalUrl, projectPath, servicePath, ABOUT_PATH, WORK_PATH, type Tab } from './seo';
-import { AboutPage, ProjectPage, RecapPage, RecapsPage, ServicePage, WorkPage } from './pages';
+import { AboutPage, NextSteps, ProjectPage, RecapPage, RecapsPage, ServicePage, WorkPage } from './pages';
 import { HomePage } from './home';
 import { SunMark, useCardGlow } from './effects';
 import { trackAdsConversion } from './leadEvents';
+
+// What the contact form asks for (Nov 24, 2026): a few plain choices instead of
+// eleven production categories. The pick goes into the Form Sent event.
+const CONTACT_TYPES = ['Not sure yet', 'A website', 'A video or commercial', 'Photos', 'Media consulting', 'Something else'];
 
 
 const setMeta = (selector: string, attr: string, value: string) =>
@@ -103,9 +107,9 @@ export default function App({ initialPath }: { initialPath?: string }) {
 
   // "Get a quote" on a service page: open the contact form with that service picked.
   const QUOTE_TYPES: Record<string, string> = {
-    'video-production': 'Commercial / Brand Campaign',
-    'web-design': 'Website Design',
-    'media-consulting': 'Media Consulting',
+    'video-production': 'A video or commercial',
+    'web-design': 'A website',
+    'media-consulting': 'Media consulting',
   };
   const quoteLink = (slug: string) => {
     const base = tabLink('contact');
@@ -150,9 +154,10 @@ export default function App({ initialPath }: { initialPath?: string }) {
   // Contact Form State
   const [contactName, setContactName] = useState('');
   const [contactEmail, setContactEmail] = useState('');
-  const [contactType, setContactType] = useState('Commercial / Brand Campaign');
+  const [contactType, setContactType] = useState(CONTACT_TYPES[0]);
   const [contactMessage, setContactMessage] = useState('');
-  const [contactSent, setContactSent] = useState(false);
+  // idle -> sending -> sent | error. Shown on the page, never in a pop-up.
+  const [contactStatus, setContactStatus] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle');
 
   // Custom Cursor Spring Follower Coordinates
   const cursorX = useMotionValue(-100);
@@ -303,41 +308,50 @@ export default function App({ initialPath }: { initialPath?: string }) {
     }
   };
 
-  // Contact Form Submit Handler — sends email via EmailJS
-  const handleContactSubmit = async (e: React.FormEvent) => {
+  // Contact form: sends through Robert's Web3Forms account. The access key is the
+  // VITE_WEB3FORMS_ACCESS_KEY setting in Vercel (public by design, never in the code).
+  const handleContactSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setContactSent(true);
-
-    const templateParams = {
-      from_name: contactName,
-      from_email: contactEmail,
-      project_type: contactType,
-      message: contactMessage,
-      to_email: 'robertlazau@gmail.com',
-    };
-
+    const form = e.currentTarget;
+    // Hidden field only bots fill in.
+    if ((form.elements.namedItem('botcheck') as HTMLInputElement | null)?.checked) return;
+    const accessKey = import.meta.env.VITE_WEB3FORMS_ACCESS_KEY as string | undefined;
+    if (!accessKey) {
+      track('Form Error', { page: window.location.pathname });
+      setContactStatus('error');
+      return;
+    }
+    setContactStatus('sending');
     try {
-      await emailjs.send(
-        import.meta.env.VITE_EMAILJS_SERVICE_ID || 'service_qiwj9ck',
-        import.meta.env.VITE_EMAILJS_TEMPLATE_ID || 'template_dxzql3r',
-        templateParams,
-        import.meta.env.VITE_EMAILJS_PUBLIC_KEY || 'HCe1iw0Kc6rDNVge8'
-      );
+      const res = await fetch('https://api.web3forms.com/submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+        body: JSON.stringify({
+          access_key: accessKey,
+          subject: `New message from robertlazau.com: ${contactType}`,
+          from_name: 'RobertLazau.com',
+          name: contactName,
+          email: contactEmail,
+          replyto: contactEmail,
+          project_type: contactType,
+          message: contactMessage,
+        }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok || !data.success) throw new Error(data.message || `HTTP ${res.status}`);
       // A lead for the growth report: the page and the project type picked (no personal details).
-      track('Form Sent', { page: window.location.pathname, type: templateParams.project_type });
-      // Google Ads contact conversion: only here, once EmailJS has accepted the message.
+      track('Form Sent', { page: window.location.pathname, type: contactType });
+      // Google Ads contact conversion: only here, once Web3Forms has accepted the message.
       trackAdsConversion('contact');
       setContactName('');
       setContactEmail('');
-      setContactType('Commercial / Brand Campaign');
+      setContactType(CONTACT_TYPES[0]);
       setContactMessage('');
-      alert('Your message has been sent successfully! Robert will review it shortly.');
-    } catch (error: any) {
-      console.error('EmailJS Error:', error);
+      setContactStatus('sent');
+    } catch (error) {
+      console.error('Contact form error:', error);
       track('Form Error', { page: window.location.pathname });
-      alert("Sorry, your message couldn't be sent. Please email Robert directly at robertlazau@gmail.com.");
-    } finally {
-      setContactSent(false);
+      setContactStatus('error');
     }
   };
 
@@ -802,6 +816,11 @@ export default function App({ initialPath }: { initialPath?: string }) {
                     <h1 className="font-display text-4xl md:text-6xl text-ink tracking-tight">Contact Robert</h1>
                   </div>
 
+                  <div className="mb-16">
+                    <h2 className="font-display text-xl text-ink mb-6 text-center md:text-left">What happens next</h2>
+                    <NextSteps />
+                  </div>
+
                   <div className="grid grid-cols-1 md:grid-cols-12 gap-12 items-start">
                     
                     {/* Left: Contact Info */}
@@ -809,7 +828,7 @@ export default function App({ initialPath }: { initialPath?: string }) {
                       <div className="border-t border-line pt-6">
                         <h3 className="font-display text-lg text-ink mb-2">General Inquiries</h3>
                         <p className="text-sm text-ink-muted leading-relaxed mb-4">
-                          For brand campaigns, community and nonprofit films, events, and creative collaborations. Tell Robert about your project and he'll get back to you.
+                          Films, photos and websites for businesses, nonprofits and cities. {replyPromise}
                         </p>
                         <a 
                           href="mailto:robertlazau@gmail.com" 
@@ -869,9 +888,26 @@ export default function App({ initialPath }: { initialPath?: string }) {
                     </div>
 
                     {/* Right: Contact Form */}
-                    <div className="md:col-span-7 bg-ground-raised border border-line p-6 md:p-8 rounded-sm">
+                    <div className="md:col-span-7 order-first md:order-none bg-ground-raised border border-line p-6 md:p-8 rounded-sm">
                       <h3 className="font-display text-xl text-ink mb-6">Send a Message</h3>
+                      {contactStatus === 'sent' ? (
+                        <div role="status" className="space-y-4">
+                          <p className="font-display text-2xl text-ink">Got it. Thank you.</p>
+                          <p className="text-sm text-ink-muted leading-relaxed">{replyPromise}</p>
+                          <p className="text-sm text-ink-muted leading-relaxed">
+                            Next: {nextSteps[2].title.toLowerCase()}, then {nextSteps[3].title.toLowerCase()}.
+                          </p>
+                          <button
+                            type="button"
+                            onClick={() => setContactStatus('idle')}
+                            className="text-xs uppercase font-label tracking-label text-accent hover:text-ink transition-colors"
+                          >
+                            Send another message
+                          </button>
+                        </div>
+                      ) : (
                       <form onSubmit={handleContactSubmit} className="space-y-6">
+                        <input type="checkbox" name="botcheck" className="hidden" tabIndex={-1} autoComplete="off" aria-hidden="true" />
                         <div>
                           <label className="block text-[13px] uppercase font-label tracking-label text-ink-muted mb-2">Your Name *</label>
                           <input 
@@ -879,7 +915,7 @@ export default function App({ initialPath }: { initialPath?: string }) {
                             required
                             value={contactName}
                             onChange={(e) => setContactName(e.target.value)}
-                            placeholder="John Doe"
+                            autoComplete="name"
                             className="w-full bg-ground-raised border border-line px-4 py-3 text-sm text-ink focus:outline-none focus:border-accent transition-colors"
                           />
                         </div>
@@ -891,30 +927,23 @@ export default function App({ initialPath }: { initialPath?: string }) {
                             required
                             value={contactEmail}
                             onChange={(e) => setContactEmail(e.target.value)}
-                            placeholder="john@example.com"
+                            autoComplete="email"
+                            placeholder="you@yourbusiness.com"
                             className="w-full bg-ground-raised border border-line px-4 py-3 text-sm text-ink focus:outline-none focus:border-accent transition-colors"
                           />
                         </div>
 
                         <div>
-                          <label htmlFor="contact-type" className="block text-[13px] uppercase font-label tracking-label text-ink-muted mb-2">Project / Inquiry Type</label>
+                          <label htmlFor="contact-type" className="block text-[13px] uppercase font-label tracking-label text-ink-muted mb-2">What do you need?</label>
                           <select 
                             id="contact-type"
                             value={contactType}
                             onChange={(e) => setContactType(e.target.value)}
                             className="w-full bg-ground-raised border border-line px-4 py-3 text-sm text-ink focus:outline-none focus:border-accent transition-colors appearance-none"
                           >
-                            <option value="Commercial / Brand Campaign" className="bg-ground">Commercial / Brand Campaign</option>
-                            <option value="Community or Nonprofit Film" className="bg-ground">Community or Nonprofit Film</option>
-                            <option value="PSA / Public Sector" className="bg-ground">PSA / Public Sector</option>
-                            <option value="Fashion Visual" className="bg-ground">Fashion Visual</option>
-                            <option value="Event Coverage" className="bg-ground">Event Coverage</option>
-                            <option value="Website Design" className="bg-ground">Website Design</option>
-                            <option value="Website Visual / Promo" className="bg-ground">Website Visual / Promo</option>
-                            <option value="Music Video" className="bg-ground">Music Video</option>
-                            <option value="Short or Feature Film" className="bg-ground">Short or Feature Film</option>
-                            <option value="Media Consulting" className="bg-ground">Media Consulting</option>
-                            <option value="Press / Other" className="bg-ground">Press / Other</option>
+                            {CONTACT_TYPES.map(t => (
+                              <option key={t} value={t} className="bg-ground">{t}</option>
+                            ))}
                           </select>
                         </div>
 
@@ -925,19 +954,29 @@ export default function App({ initialPath }: { initialPath?: string }) {
                             rows={5}
                             value={contactMessage}
                             onChange={(e) => setContactMessage(e.target.value)}
-                            placeholder="Detail your production concept, timeline, and shoot requirements..."
+                            placeholder="Tell Robert what's going on: more calls, a video, a new site, or not sure yet."
                             className="w-full bg-ground-raised border border-line px-4 py-3 text-sm text-ink focus:outline-none focus:border-accent transition-colors"
                           />
                         </div>
 
+                        {contactStatus === 'error' && (
+                          <p role="alert" className="text-sm text-ink leading-relaxed border border-line p-4">
+                            That didn't go through. Please call Robert at{' '}
+                            <a href={business.phoneHref} className="text-accent underline">{business.phone}</a> or email{' '}
+                            <a href="mailto:robertlazau@gmail.com" className="text-accent underline">robertlazau@gmail.com</a>.
+                          </p>
+                        )}
+
                         <button 
                           type="submit" 
-                          disabled={contactSent}
+                          disabled={contactStatus === 'sending'}
                           className="w-full py-3 rounded-sm bg-sun text-on-sun text-[13px] uppercase font-label tracking-label hover:bg-ink hover:text-ground transition-all font-semibold flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
                         >
-                          <Send size={12} /> {contactSent ? 'Sending...' : 'Send Message'}
+                          <Send size={12} /> {contactStatus === 'sending' ? 'Sending...' : 'Send Message'}
                         </button>
+                        <p className="text-xs text-ink-muted text-center">{replyPromise}</p>
                       </form>
+                      )}
                     </div>
 
                   </div>
