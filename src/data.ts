@@ -40,6 +40,18 @@ export const business = {
   instagram: 'https://www.instagram.com/goldenboyproductionss/',
 };
 
+// What happens after someone writes in, and the reply promise (Robert, Nov 24,
+// 2026). Shown on Contact, at the bottom of every page and in the form's
+// thank-you. Change them only when Robert changes how he works.
+export const replyPromise = "Robert reads every message himself and replies within one business day.";
+
+export const nextSteps: Array<{ title: string; desc: string }> = [
+  { title: "You write or call", desc: "Tell Robert what's going on: more calls, a video, a new site, or not sure yet." },
+  { title: "Robert replies", desc: "Within one business day, from Robert himself." },
+  { title: "A 15-minute call", desc: "A quick talk about your goals, your customers and your timeline." },
+  { title: "A written plan and price", desc: "What Robert would make, when it would be ready and what it costs." },
+];
+
 export const biography = {
   year: "Portland, OR",
   title: "Early Vision",

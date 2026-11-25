@@ -134,11 +134,18 @@ Robert asked to break from the brand book for the homepage ("go pure creative") 
 - Armadas Exterior has no project page yet (no full film on YouTube); its homepage button goes to Contact. Add a project once Robert sends the film and its year.
 - The Disaster Preparedness ad's storm, rescue and grocery shots look like stock footage, so the homepage uses only its siren, exit-bar and map shots. Ask Robert before using the others.
 
+## Contact form and the reply promise
+
+- The contact form sends through Robert's paid Web3Forms account (form "Golden Boy Productions contact form", to robertlazau@gmail.com, created Nov 24, 2026). The access key is the `VITE_WEB3FORMS_ACCESS_KEY` setting in the Vercel project (Config type, set by Robert); it never goes in the code. Vite bakes it in at build time, so a new key needs a redeploy. Without it the form shows the call/email message instead of pretending to send.
+- Success and failure show on the page (`contactStatus` in `src/App.tsx`), never in a pop-up. A hidden `botcheck` box stops simple bots. Never send a test message yourself; Robert sends the test.
+- `replyPromise` and `nextSteps` in `src/data.ts` are Robert's own words (Nov 24, 2026): he replies within one business day, then a 15-minute call, then a written plan and price. They show on Contact, in every page's contact band, on the service pages (`NextSteps`) and in the thank-you. Change them only when Robert changes how he works.
+- The movie recommendation form still uses EmailJS; the contact form doesn't.
+
 ## Lead events
 
 - `src/leadEvents.ts` counts taps as Vercel Web Analytics custom events (Pro plan): `Call Click`, `Text Click`, `Email Click`, `Review Click`, `Google Profile Click`, `Directions Click` and `Instagram Click`, from one click listener started in `src/main.tsx`. Properties: `page` and `spot` (nearest `data-spot`, else footer, header/nav, the section id, or page).
 - The Google profile link (`maps.google.com/?cid=…`) counts as `Google Profile Click`, not `Directions Click`. Both Instagram links count as `Instagram Click`.
-- The contact form (`handleContactSubmit` in `src/App.tsx`) sends `Form Sent` (page + project type) when EmailJS accepts it, and `Form Error` (page) when it doesn't.
+- The contact form (`handleContactSubmit` in `src/App.tsx`) sends `Form Sent` (page + project type) when Web3Forms accepts it, and `Form Error` (page) when it doesn't or the access key is missing.
 - Two properties per event at most (Pro's limit). Never put names, emails or messages in an event.
 
 ## Google Ads tracking
@@ -152,7 +159,7 @@ Robert asked to break from the brand book for the homepage ("go pure creative") 
 
 - Use the tag and conversion snippets exactly as Google gave them. No GA4, enhanced conversions or other Google add-ons unless Robert asks.
 - `trackAdsConversion` in `src/leadEvents.ts` is the only code that calls `gtag`. It checks `typeof window.gtag === 'function'` first and never throws, so an ad blocker can't cause errors.
-- Contact conversion: fired in `handleContactSubmit` (`src/App.tsx`) only after EmailJS accepts the message, once per send. Never on the button click or on an error.
+- Contact conversion: fired in `handleContactSubmit` (`src/App.tsx`) only after Web3Forms accepts the message, once per send. Never on the button click or on an error.
 - Phone conversion: the site-wide click listener fires it on every `tel:` tap (header, footer, Contact), next to the Vercel `Call Click` event.
 - Each prerendered page must have the Google tag exactly once. Never test by sending a real message through the form.
 - There's no Content-Security-Policy today. If one is added, allow the hosts in Google's CSP guide for the Google tag.

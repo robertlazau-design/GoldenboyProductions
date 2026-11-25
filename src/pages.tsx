@@ -2,7 +2,7 @@
 // (/services/<slug>) and /about. Styled to match the tabs in App.tsx.
 import React from 'react';
 import { ArrowLeft, ArrowRight, Play } from 'lucide-react';
-import { biography, clientApproach, currentProjects, featuredExtras, finishedProjects, recentWork, services, sunStar, type Project, type RecentWork, type Service, type WorkKind } from './data';
+import { biography, clientApproach, currentProjects, featuredExtras, finishedProjects, nextSteps, recentWork, replyPromise, services, sunStar, type Project, type RecentWork, type Service, type WorkKind } from './data';
 import { ABOUT_PATH, TAB_ROUTES, WORK_PATH, projectPath, recapPath, servicePath } from './seo';
 import { formatRecapDate, recaps, type Recap } from './recaps';
 import { isDriveVideo, isYouTubeEmbed } from './media';
@@ -59,13 +59,30 @@ function ProjectCard({ project, link, detailed = false }: { project: Project; li
   );
 }
 
-function ContactCta({ link, heading, cta }: { link: LinkTo; heading: string; cta?: { href: string; onClick: (e: React.MouseEvent) => void; label: string } }) {
+// What happens after someone writes in (nextSteps in data.ts): a numbered strip
+// so reaching out feels like a known path, not a leap.
+export function NextSteps({ className = '' }: { className?: string }) {
+  return (
+    <ol className={`grid grid-cols-2 md:grid-cols-4 gap-x-4 gap-y-6 md:gap-6 text-left ${className}`} aria-label="What happens next">
+      {nextSteps.map((step, i) => (
+        <li key={step.title} className="border-t border-line pt-4">
+          <span className="font-slug font-bold text-[15px] text-accent mb-2 block">0{i + 1}/</span>
+          <h3 className="font-display text-base text-ink mb-1">{step.title}</h3>
+          <p className="text-sm text-ink-muted leading-relaxed">{step.desc}</p>
+        </li>
+      ))}
+    </ol>
+  );
+}
+
+function ContactCta({ link, heading, cta, steps }: { link: LinkTo; heading: string; cta?: { href: string; onClick: (e: React.MouseEvent) => void; label: string }; steps?: boolean }) {
   return (
     <section className="py-20 border-t border-line text-center" aria-label="Get in touch">
       <h2 className="font-display text-3xl md:text-5xl text-ink mb-6">{heading}</h2>
       <p className="max-w-xl mx-auto text-sm text-ink-muted leading-relaxed mb-10">
-        Tell Robert about your project, your audience and your timeline. He reads every message himself.
+        Tell Robert about your project, your audience and your timeline. {replyPromise}
       </p>
+      {steps && <NextSteps className="max-w-5xl mx-auto mb-12" />}
       <a
         {...(cta ? { href: cta.href, onClick: cta.onClick } : link(TAB_ROUTES.contact.path))}
         className="inline-flex items-center gap-3 px-8 py-4 border border-accent/40 text-accent text-[13px] uppercase font-label tracking-label hover:bg-sun hover:text-on-sun transition-all duration-300"
@@ -315,7 +332,7 @@ export function ServicePage({ service, link, quote }: { service: Service; link: 
         </nav>
       )}
 
-      <ContactCta link={link} heading="Let's make something together" cta={quote && { ...quote, label: 'Get a quote' }} />
+      <ContactCta link={link} heading="Let's make something together" cta={quote && { ...quote, label: 'Get a quote' }} steps />
     </article>
   );
 }
